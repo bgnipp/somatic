@@ -16,7 +16,11 @@ export function KonnoMead({ history }: Props) {
   }));
   const toX = (v: number) => PAD + (Math.min(v, MAX) / MAX) * (S - PAD * 2);
   const toY = (v: number) => S - PAD - (Math.min(v, MAX) / MAX) * (S - PAD * 2);
-  const line = pts.map((p) => `${toX(p.x).toFixed(1)},${toY(p.y).toFixed(1)}`).join(" ");
+  const toPoint = (p: { x: number; y: number }) =>
+    `${toX(p.x).toFixed(1)},${toY(p.y).toFixed(1)}`;
+  const split = Math.max(0, pts.length - 90);
+  const older = pts.slice(0, split + 1).map(toPoint).join(" ");
+  const recent = pts.slice(split).map(toPoint).join(" ");
   const last = pts[pts.length - 1];
 
   return (
@@ -40,7 +44,8 @@ export function KonnoMead({ history }: Props) {
         >
           abdomen
         </text>
-        {line && <polyline points={line} className="trace loop" />}
+        {older && pts.length > 2 && <polyline points={older} className="trace loop old" />}
+        {recent && <polyline points={recent} className="trace loop" />}
         {last && <circle cx={toX(last.x)} cy={toY(last.y)} r="3.2" className="loop-now" />}
       </svg>
       <p className="chart-foot">Loop shape is phase. Not scored as good or bad.</p>

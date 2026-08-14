@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CrossSection } from "./components/CrossSection";
 import { KonnoMead } from "./components/KonnoMead";
+import { LiveLevels } from "./components/LiveLevels";
 import { TorsoMap } from "./components/TorsoMap";
 import { TracePanel } from "./components/TracePanel";
 import { MockBreathSource } from "./mock/MockBreathSource";
-import { sampleAt } from "./mock/synthesize";
+import { meanAbdomen, meanRibCage, sampleAt } from "./mock/synthesize";
 import { downloadSession, loadSessions, newId, saveSessions } from "./storage/sessions";
 import type { PresetId, Sample, Session } from "./types";
 import { PRESETS } from "./types";
@@ -18,6 +19,27 @@ function formatTime(ms: number): string {
   const m = Math.floor(s / 60);
   const r = s - m * 60;
   return `${m}:${r.toFixed(1).padStart(4, "0")}`;
+}
+
+type Phase = "inhale" | "exhale" | "still";
+
+/** Rising total displacement reads as inhale, falling as exhale. */
+function breathPhase(history: Sample[]): Phase {
+  if (history.length < 4) return "still";
+  const latest = history[history.length - 1];
+  const windowStart = latest.t - 400;
+  let earlier = history[0];
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].t <= windowStart) {
+      earlier = history[i];
+      break;
+    }
+  }
+  const total = (s: Sample) => meanRibCage(s) + meanAbdomen(s);
+  const delta = total(latest) - total(earlier);
+  if (delta > 0.35) return "inhale";
+  if (delta < -0.35) return "exhale";
+  return "still";
 }
 
 export default function App() {
@@ -93,6 +115,7 @@ export default function App() {
     () => PRESETS.find((p) => p.id === preset) ?? PRESETS[0],
     [preset],
   );
+  const phase = breathPhase(history);
 
   function startRecording() {
     bufferRef.current = [];
@@ -147,6 +170,13 @@ export default function App() {
     source.current = new MockBreathSource(preset);
   }
 
+  function deleteSession(id: string) {
+    const next = sessions.filter((s) => s.id !== id);
+    setSessions(next);
+    saveSessions(next);
+    if (active?.id === id) backToLive();
+  }
+
   function updateNotes(value: string) {
     setNotes(value);
     if (!active) return;
@@ -182,7 +212,14 @@ export default function App() {
       </aside>
 
       <section className="studio">
-        <div className="stage">
+        <div className="stage" data-mode={mode}>
+          <div className="stage-status">
+            <span className={`phase-pill ${phase}`}>
+              {phase === "inhale" ? "Inhale" : phase === "exhale" ? "Exhale" : "Still"}
+            </span>
+            {mode === "recording" && <span className="mode-pill rec">Recording</span>}
+            {mode === "replay" && <span className="mode-pill">Replay</span>}
+          </div>
           <TorsoMap sample={sample} showLandmarks={landmarks} />
           <CrossSection sample={sample} />
         </div>
@@ -228,7 +265,10 @@ export default function App() {
           </div>
 
           <TracePanel history={history} />
-          <KonnoMead history={history} />
+          <div className="console-row">
+            <KonnoMead history={history} />
+            <LiveLevels sample={sample} />
+          </div>
         </div>
       </section>
 
@@ -299,14 +339,23 @@ export default function App() {
           <h2>Saved takes</h2>
           <ul>
             {sessions.map((s) => (
-              <li key={s.id}>
-                <button type="button" onClick={() => openSession(s)}>
+              <li key={s.id} className="take-row">
+                <button type="button" className="take-open" onClick={() => openSession(s)}>
                   <strong>
                     {PRESETS.find((p) => p.id === s.scenario)?.label ?? s.scenario ?? s.protocol}
                   </strong>
                   <span>
                     {new Date(s.startedAt).toLocaleString()} · {(s.durationMs / 1000).toFixed(1)}s
+                    {s.notes ? " · noted" : ""}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className="take-delete"
+                  aria-label="Delete take"
+                  onClick={() => deleteSession(s.id)}
+                >
+                  ✕
                 </button>
               </li>
             ))}

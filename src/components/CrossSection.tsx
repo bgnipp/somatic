@@ -34,10 +34,10 @@ export function CrossSection({ sample }: Props) {
           opacity="0.85"
           stroke="rgba(228,184,106,0.45)"
         />
-        <text x="80" y="18" textAnchor="middle" className="section-label">
+        <text x="80" y="16" textAnchor="middle" className="section-label">
           front
         </text>
-        <text x="80" y="112" textAnchor="middle" className="section-label">
+        <text x="80" y="110" textAnchor="middle" className="section-label">
           back
         </text>
         <text x="14" y="64" textAnchor="middle" className="section-label">

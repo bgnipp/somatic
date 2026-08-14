@@ -40,6 +40,11 @@ export function TracePanel({ history }: Props) {
       </header>
       <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg" aria-label="Displacement traces">
         <line x1={PAD} y1={H - PAD} x2={W - PAD} y2={H - PAD} className="axis" />
+        <line x1={PAD} y1={H / 2} x2={W - PAD} y2={H / 2} className="gridline" />
+        <line x1={PAD} y1={PAD} x2={W - PAD} y2={PAD} className="gridline" />
+        <text x={W - PAD} y={PAD - 2} textAnchor="end" className="axis-label trace-max">
+          18 mm
+        </text>
         <polyline points={polyline(rib)} className="trace rib" />
         <polyline points={polyline(belly)} className="trace belly" />
         <polyline points={polyline(left)} className="trace left" />

@@ -4,9 +4,10 @@ import type { CompartmentId, Sample } from "../types";
 import { COMPARTMENT_LABELS, LANDMARKS } from "../types";
 
 /**
- * Standing front view, head through mid-thigh.
- * One head ≈ 40px. Neck is short. Shoulder width ≈ 2.3 heads.
- * Arms hang to mid-thigh with an elbow at the waist.
+ * Standing front view, head through the hip crop.
+ * One head ≈ 40px, short neck, shoulders ≈ 2.3 head-widths,
+ * arms hang to the hips. Compartments are clipped to the torso
+ * silhouette so fills can never spill outside the body.
  */
 const PATHS: Record<CompartmentId, string> = {
   rc_pulmonary_L:
@@ -18,9 +19,9 @@ const PATHS: Record<CompartmentId, string> = {
   rc_abdominal_R:
     "M154 126 C155 136 154 146 150 154 C144 164 132 168 120 152 L120 126 Z",
   abdomen_L:
-    "M120 152 C108 168 98 172 94 176 C94 188 96 200 100 210 C108 216 114 218 120 218 Z",
+    "M120 152 C108 168 98 172 94 176 C94 188 96 198 100 208 C106 214 114 217 120 217 Z",
   abdomen_R:
-    "M120 152 C132 168 142 172 146 176 C146 188 144 200 140 210 C132 216 126 218 120 218 Z",
+    "M120 152 C132 168 142 172 146 176 C146 188 144 198 140 208 C134 214 126 217 120 217 Z",
 };
 
 const TORSO =
@@ -47,38 +48,45 @@ export function TorsoMap({ sample, showLandmarks }: Props) {
   return (
     <div className="torso-wrap">
       <svg
-        viewBox="0 0 240 280"
+        viewBox="0 0 240 250"
         className="torso-svg"
         role="img"
         aria-label="Front torso motion map"
       >
+        <defs>
+          <clipPath id="torso-clip">
+            <path d={TORSO} />
+          </clipPath>
+        </defs>
         <ellipse className="torso-context" cx="120" cy="30" rx="17" ry="20" />
         <path
           className="torso-neck"
           d="M111 46 L109 58 L131 58 L129 46 C126 50 123 52 120 52 C117 52 114 50 111 46 Z"
         />
-        <path className="torso-context" d={TORSO} />
         <path className="torso-limb" d={LEFT_ARM} />
         <path className="torso-limb" d={RIGHT_ARM} />
-        {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
-          const mm = sample?.compartments[id].displacementMm ?? 0;
-          return (
-            <path
-              key={id}
-              d={PATHS[id]}
-              fill={motionFill(mm, ceiling)}
-              stroke={motionStroke(mm, ceiling)}
-              strokeWidth={hover === id ? 1.6 : 0.75}
-              className="compartment"
-              onMouseEnter={() => setHover(id)}
-              onMouseLeave={() => setHover(null)}
-            />
-          );
-        })}
-        <path className="bone-line" d={CLAVICLE_L} />
-        <path className="bone-line" d={CLAVICLE_R} />
-        <path className="bone-line" d={COSTAL_ARCH} />
-        <line x1="120" y1="66" x2="120" y2="218" className="midline" />
+        <path className="torso-context" d={TORSO} />
+        <g clipPath="url(#torso-clip)">
+          {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
+            const mm = sample?.compartments[id].displacementMm ?? 0;
+            return (
+              <path
+                key={id}
+                d={PATHS[id]}
+                fill={motionFill(mm, ceiling)}
+                stroke={motionStroke(mm, ceiling)}
+                strokeWidth={hover === id ? 1.6 : 0.75}
+                className="compartment"
+                onMouseEnter={() => setHover(id)}
+                onMouseLeave={() => setHover(null)}
+              />
+            );
+          })}
+          <path className="bone-line" d={CLAVICLE_L} />
+          <path className="bone-line" d={CLAVICLE_R} />
+          <path className="bone-line" d={COSTAL_ARCH} />
+          <line x1="120" y1="66" x2="120" y2="217" className="midline" />
+        </g>
         {showLandmarks &&
           LANDMARKS.map((mark) => (
             <g key={mark.id} className="landmark">
