@@ -116,14 +116,14 @@ export type Landmark = {
 };
 
 export const LANDMARKS: Landmark[] = [
-  { id: "sternal_notch", label: "Sternal notch", x: 120, y: 110 },
-  { id: "mid_clav_L", label: "Mid-clavicle L", x: 100, y: 114 },
-  { id: "mid_clav_R", label: "Mid-clavicle R", x: 140, y: 114 },
-  { id: "mid_sternum", label: "Mid-sternum", x: 120, y: 138 },
-  { id: "xiphoid", label: "Xiphoid", x: 120, y: 184 },
-  { id: "costal_L", label: "Costal margin L", x: 96, y: 204 },
-  { id: "costal_R", label: "Costal margin R", x: 144, y: 204 },
-  { id: "lateral_L", label: "Lateral rib L", x: 82, y: 164 },
-  { id: "lateral_R", label: "Lateral rib R", x: 158, y: 164 },
-  { id: "umbilicus", label: "Umbilicus", x: 120, y: 228 },
+  { id: "sternal_notch", label: "Sternal notch", x: 120, y: 66 },
+  { id: "mid_clav_L", label: "Mid-clavicle L", x: 100, y: 70 },
+  { id: "mid_clav_R", label: "Mid-clavicle R", x: 140, y: 70 },
+  { id: "mid_sternum", label: "Mid-sternum", x: 120, y: 96 },
+  { id: "xiphoid", label: "Xiphoid", x: 120, y: 148 },
+  { id: "costal_L", label: "Costal margin L", x: 100, y: 168 },
+  { id: "costal_R", label: "Costal margin R", x: 140, y: 168 },
+  { id: "lateral_L", label: "Lateral rib L", x: 86, y: 118 },
+  { id: "lateral_R", label: "Lateral rib R", x: 154, y: 118 },
+  { id: "umbilicus", label: "Umbilicus", x: 120, y: 188 },
 ];
