@@ -85,16 +85,14 @@ textarea {
   display: grid;
   grid-template-columns: minmax(160px, 220px) 1fr;
   gap: 1.5rem;
-  align-items: end;
+  align-items: start;
   margin-bottom: 1.25rem;
 }
 
-.eyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
+.lede a,
+.foot a {
+  color: var(--gold);
+  text-underline-offset: 0.15em;
 }
 
 h1 {
@@ -129,12 +127,18 @@ h1 {
 
 .stage {
   display: grid;
-  grid-template-columns: 1fr 160px;
+  grid-template-columns: minmax(200px, 340px) 150px;
+  justify-content: center;
   gap: 0.75rem;
   align-items: start;
   background: var(--bg-elev);
   border: 1px solid var(--line);
   padding: 1rem 0.75rem 0.75rem;
+}
+
+.torso-wrap {
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .torso-svg,
@@ -146,9 +150,23 @@ h1 {
 }
 
 .torso-context {
-  fill: #161812;
-  stroke: #3a3c34;
-  stroke-width: 1;
+  fill: #171912;
+  stroke: #4a4c42;
+  stroke-width: 1.1;
+}
+
+.torso-limb,
+.torso-neck {
+  fill: #1e2018;
+  stroke: #4a4c42;
+  stroke-width: 1.1;
+}
+
+.bone-line {
+  fill: none;
+  stroke: #6a6558;
+  stroke-width: 0.9;
+  stroke-linecap: round;
 }
 
 .compartment {

@@ -160,19 +160,25 @@ export default function App() {
   return (
     <div className="app">
       <header className="top">
-        <div>
-          <p className="eyebrow">Working title</p>
-          <h1>Somatic</h1>
-        </div>
+        <h1>Somatic</h1>
         <p className="lede">
-          A teaching mirror for quiet standing breath — and, later, for sung phrases.
-          Brightness is motion, not a problem. This is education, not assessment.
+          This is a prototype. The body map runs on mock breath data — there is no
+          camera yet. A teaching mirror for quiet standing breath, and later for sung
+          phrases. Brightness is motion, not a problem.{" "}
+          <a
+            href="https://github.com/bgnipp/somatic/blob/main/docs/mvp-plan.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Design document
+          </a>
         </p>
       </header>
 
       <aside className="notice">
-        Visualization only. Not a medical device. Does not diagnose or treat breathing
-        function. Sit or sit back down if you feel lightheaded from repeated deep breaths.
+        Prototype for education and teaching, not a medical device. It does not
+        diagnose or treat breathing function. Sit down if you feel lightheaded from
+        repeated deep breaths.
       </aside>
 
       <section className="studio">
@@ -309,8 +315,15 @@ export default function App() {
       )}
 
       <footer className="foot">
-        Data stays in this browser. Protocol is a short dynamic window, not a snapshot.
-        Camera capture is a later swap behind the same sample contract.
+        Prototype. Data stays in this browser. Camera capture is a later swap behind
+        the same sample contract.{" "}
+        <a
+          href="https://github.com/bgnipp/somatic/blob/main/docs/mvp-plan.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Design document
+        </a>
       </footer>
     </div>
   );
