@@ -16,6 +16,8 @@ export type CompartmentSample = {
 export type Sample = {
   t: number;
   compartments: Record<CompartmentId, CompartmentSample>;
+  /** Optional mid-thorax laterals for the cross-section. Additive; older takes omit it. */
+  lateral?: { leftMm: number; rightMm: number };
 };
 
 export type ProtocolId = "quiet_standing" | "sustained_phrase" | (string & {});
@@ -52,6 +54,7 @@ export type Preset = {
   label: string;
   family: "standing" | "singing";
   blurb: string;
+  lookFor: string;
 };
 
 export const PRESETS: Preset[] = [
@@ -60,42 +63,49 @@ export const PRESETS: Preset[] = [
     label: "Abdominal-dominant",
     family: "standing",
     blurb: "Belly moves, rib cage quieter, in phase.",
+    lookFor: "Watch the lower map and the belly trace rise together.",
   },
   {
     id: "apical",
     label: "Chest-dominant",
     family: "standing",
     blurb: "Upper ribs move, abdomen quiet.",
+    lookFor: "Upper map brightens; the belly trace stays small.",
   },
   {
     id: "left_quiet",
     label: "Left quieter",
     family: "standing",
     blurb: "Left lower ribs about 40% of the right. A conversation, not a diagnosis.",
+    lookFor: "Compare the two lower-rib regions, then see if a cue changes the split.",
   },
   {
     id: "asynchrony",
     label: "Chest / belly offset",
     family: "standing",
     blurb: "Belly lags the chest. Timing, shown neutrally.",
+    lookFor: "The Konno–Mead path opens into a loop instead of a line.",
   },
   {
     id: "frozen",
     label: "One region still",
     family: "standing",
     blurb: "Left lower ribs nearly flat. The thing that is hard to feel.",
+    lookFor: "One compartment stays dim while its neighbors move.",
   },
   {
     id: "clavicular",
     label: "Clavicular inhale",
     family: "singing",
     blurb: "Upper chest heaves on the intake — a common student pattern.",
+    lookFor: "A sharp rise at the top of the map on each inhale.",
   },
   {
     id: "rib_collapse",
     label: "Rib collapse on phrase",
     family: "singing",
     blurb: "Ribs fall through a long exhale. Support letting go.",
+    lookFor: "Rib traces drift down across the phrase instead of holding.",
   },
 ];
 

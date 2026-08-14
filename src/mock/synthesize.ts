@@ -21,10 +21,22 @@ function emptyCompartments(): Sample["compartments"] {
   ) as Sample["compartments"];
 }
 
+function lateralsFrom(
+  values: Record<CompartmentId, number>,
+  extraLeft = 1,
+  extraRight = 1,
+): { leftMm: number; rightMm: number } {
+  return {
+    leftMm: clamp(values.rc_abdominal_L * 0.55 + extraLeft, 0, 20),
+    rightMm: clamp(values.rc_abdominal_R * 0.55 + extraRight, 0, 20),
+  };
+}
+
 function apply(
   t: number,
   values: Record<CompartmentId, number>,
   noiseMm = 0.18,
+  lateralScale: { left: number; right: number } = { left: 1, right: 1 },
 ): Sample {
   const compartments = emptyCompartments();
   for (const id of COMPARTMENT_IDS) {
@@ -32,20 +44,29 @@ function apply(
       displacementMm: clamp(values[id] + jitter(noiseMm), 0, 28),
     };
   }
-  return { t, compartments };
+  return {
+    t,
+    compartments,
+    lateral: lateralsFrom(
+      values,
+      0.8 * lateralScale.left,
+      0.8 * lateralScale.right,
+    ),
+  };
 }
 
 function quietCycle(
   t: number,
   amps: Record<CompartmentId, number>,
   phases: Partial<Record<CompartmentId, number>> = {},
+  lateralScale: { left: number; right: number } = { left: 1, right: 1 },
 ): Sample {
   const values = {} as Record<CompartmentId, number>;
   for (const id of COMPARTMENT_IDS) {
     const w = raisedSine(t, QUIET_PERIOD_MS, phases[id] ?? 0);
     values[id] = 0.35 + amps[id] * w;
   }
-  return apply(t, values);
+  return apply(t, values, 0.18, lateralScale);
 }
 
 function phraseEnvelope(t: number, phraseMs: number): { inhale: number; exhale: number; phase: number } {
@@ -79,14 +100,19 @@ export function synthesize(t: number, preset: PresetId): Sample {
       });
 
     case "left_quiet":
-      return quietCycle(t, {
-        rc_pulmonary_L: 4.0,
-        rc_pulmonary_R: 5.2,
-        rc_abdominal_L: 2.4,
-        rc_abdominal_R: 6.2,
-        abdomen_L: 5.0,
-        abdomen_R: 8.4,
-      });
+      return quietCycle(
+        t,
+        {
+          rc_pulmonary_L: 4.0,
+          rc_pulmonary_R: 5.2,
+          rc_abdominal_L: 2.4,
+          rc_abdominal_R: 6.2,
+          abdomen_L: 5.0,
+          abdomen_R: 8.4,
+        },
+        {},
+        { left: 0.45, right: 1.15 },
+      );
 
     case "asynchrony":
       return quietCycle(
@@ -207,5 +233,12 @@ export function sampleAt(samples: Sample[], t: number): Sample | null {
         b.compartments[id].displacementMm * u,
     };
   }
-  return { t, compartments };
+  const lateral =
+    a.lateral && b.lateral
+      ? {
+          leftMm: a.lateral.leftMm * (1 - u) + b.lateral.leftMm * u,
+          rightMm: a.lateral.rightMm * (1 - u) + b.lateral.rightMm * u,
+        }
+      : a.lateral ?? b.lateral;
+  return { t, compartments, lateral };
 }

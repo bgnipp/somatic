@@ -2,13 +2,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CrossSection } from "./components/CrossSection";
 import { KonnoMead } from "./components/KonnoMead";
 import { LiveLevels } from "./components/LiveLevels";
+import { Metrics } from "./components/Metrics";
 import { TorsoMap } from "./components/TorsoMap";
 import { TracePanel } from "./components/TracePanel";
 import { MockBreathSource } from "./mock/MockBreathSource";
 import { meanAbdomen, meanRibCage, sampleAt } from "./mock/synthesize";
-import { downloadSession, loadSessions, newId, saveSessions } from "./storage/sessions";
+import {
+  downloadSession,
+  loadSessions,
+  newId,
+  parseSession,
+  saveSessions,
+} from "./storage/sessions";
 import type { PresetId, Sample, Session } from "./types";
-import { PRESETS } from "./types";
+import { PRESET_IDS, PRESETS } from "./types";
 
 type Mode = "live" | "recording" | "replay";
 
@@ -21,9 +28,13 @@ function formatTime(ms: number): string {
   return `${m}:${r.toFixed(1).padStart(4, "0")}`;
 }
 
+function takeLabel(session: Session): string {
+  const name = PRESETS.find((p) => p.id === session.scenario)?.label ?? session.scenario ?? session.protocol;
+  return `${name} · ${new Date(session.startedAt).toLocaleTimeString()}`;
+}
+
 type Phase = "inhale" | "exhale" | "still";
 
-/** Rising total displacement reads as inhale, falling as exhale. */
 function breathPhase(history: Sample[]): Phase {
   if (history.length < 4) return "still";
   const latest = history[history.length - 1];
@@ -42,24 +53,38 @@ function breathPhase(history: Sample[]): Phase {
   return "still";
 }
 
+function initialPreset(): PresetId {
+  const q = new URLSearchParams(window.location.search).get("scenario");
+  if (q && (PRESET_IDS as readonly string[]).includes(q)) return q as PresetId;
+  return "abdominal";
+}
+
 export default function App() {
-  const [preset, setPreset] = useState<PresetId>("abdominal");
+  const [preset, setPreset] = useState<PresetId>(initialPreset);
   const [mode, setMode] = useState<Mode>("live");
   const [sample, setSample] = useState<Sample | null>(null);
   const [history, setHistory] = useState<Sample[]>([]);
-  const [buffer, setBuffer] = useState<Sample[]>([]);
   const [notes, setNotes] = useState("");
   const [sessions, setSessions] = useState<Session[]>(() => loadSessions());
   const [active, setActive] = useState<Session | null>(null);
+  const [compareId, setCompareId] = useState<string | null>(null);
   const [scrub, setScrub] = useState(0);
   const [landmarks, setLandmarks] = useState(true);
   const [playing, setPlaying] = useState(false);
+  const [loop, setLoop] = useState(false);
+  const [speed, setSpeed] = useState<0.5 | 1>(1);
 
   const source = useRef(new MockBreathSource(preset));
   const bufferRef = useRef<Sample[]>([]);
+  const importRef = useRef<HTMLInputElement>(null);
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
 
   useEffect(() => {
     source.current.setPreset(preset);
+    const url = new URL(window.location.href);
+    url.searchParams.set("scenario", preset);
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }, [preset]);
 
   useEffect(() => {
@@ -75,7 +100,6 @@ export default function App() {
       });
       if (mode === "recording") {
         bufferRef.current = [...bufferRef.current, next];
-        setBuffer(bufferRef.current);
       }
     });
     source.current.start();
@@ -90,17 +114,18 @@ export default function App() {
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      const dt = now - last;
+      const dt = (now - last) * speed;
       last = now;
       setScrub((t) => {
         const next = t + dt;
-        return next >= active.durationMs ? active.durationMs : next;
+        if (next >= active.durationMs) return loop ? 0 : active.durationMs;
+        return next;
       });
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [mode, active, playing]);
+  }, [mode, active, playing, loop, speed]);
 
   useEffect(() => {
     if (mode !== "replay" || !active) return;
@@ -108,19 +133,27 @@ export default function App() {
     if (!s) return;
     setSample(s);
     setHistory(active.samples.filter((x) => x.t <= scrub && scrub - x.t <= HISTORY_MS));
-    if (playing && scrub >= active.durationMs) setPlaying(false);
-  }, [mode, active, scrub, playing]);
+    if (playing && scrub >= active.durationMs && !loop) setPlaying(false);
+  }, [mode, active, scrub, playing, loop]);
 
   const currentPreset = useMemo(
     () => PRESETS.find((p) => p.id === preset) ?? PRESETS[0],
     [preset],
   );
   const phase = breathPhase(history);
+  const compareSession = sessions.find((s) => s.id === compareId) ?? null;
+  const compareHistory = useMemo(() => {
+    if (!compareSession || history.length === 0) return [];
+    const t0 = history[0].t;
+    const t1 = history[history.length - 1].t;
+    return compareSession.samples.filter((s) => s.t >= t0 && s.t <= t1);
+  }, [compareSession, history]);
+  const metricsSamples = mode === "replay" && active ? active.samples : history;
 
   function startRecording() {
     bufferRef.current = [];
-    setBuffer([]);
     setActive(null);
+    setCompareId(null);
     setPlaying(false);
     setMode("recording");
   }
@@ -157,6 +190,7 @@ export default function App() {
     setNotes(session.notes);
     setScrub(0);
     setPlaying(false);
+    setCompareId(null);
     setMode("replay");
     if (session.scenario && PRESETS.some((p) => p.id === session.scenario)) {
       setPreset(session.scenario as PresetId);
@@ -166,6 +200,7 @@ export default function App() {
   function backToLive() {
     setPlaying(false);
     setActive(null);
+    setCompareId(null);
     setMode("live");
     source.current = new MockBreathSource(preset);
   }
@@ -174,6 +209,7 @@ export default function App() {
     const next = sessions.filter((s) => s.id !== id);
     setSessions(next);
     saveSessions(next);
+    if (compareId === id) setCompareId(null);
     if (active?.id === id) backToLive();
   }
 
@@ -186,6 +222,57 @@ export default function App() {
     setSessions(next);
     saveSessions(next);
   }
+
+  function importFiles(fileList: FileList | null) {
+    if (!fileList) return;
+    Promise.all([...fileList].map((f) => f.text())).then((texts) => {
+      const found: Session[] = [];
+      for (const text of texts) {
+        try {
+          const parsed = JSON.parse(text) as unknown;
+          const items = Array.isArray(parsed) ? parsed : [parsed];
+          for (const item of items) {
+            const session = parseSession(item);
+            if (session) found.push(session);
+          }
+        } catch {
+          /* skip unreadable files */
+        }
+      }
+      if (found.length === 0) return;
+      const next = [...found, ...sessions].slice(0, 24);
+      setSessions(next);
+      saveSessions(next);
+    });
+    if (importRef.current) importRef.current.value = "";
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (modeRef.current === "recording") stopRecording();
+        else if (modeRef.current === "replay") setPlaying((p) => !p);
+        else startRecording();
+        return;
+      }
+      if (modeRef.current !== "replay" || !active) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setPlaying(false);
+        setScrub((t) => Math.max(0, t - 500));
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setPlaying(false);
+        setScrub((t) => Math.min(active.durationMs, t + 500));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [active, notes, sessions, preset, currentPreset.family]);
 
   return (
     <div className="app">
@@ -214,7 +301,7 @@ export default function App() {
       <section className="studio">
         <div className="stage" data-mode={mode}>
           <div className="stage-status">
-            <span className={`phase-pill ${phase}`}>
+            <span className={`phase-pill ${phase}`} aria-live="polite">
               {phase === "inhale" ? "Inhale" : phase === "exhale" ? "Exhale" : "Still"}
             </span>
             {mode === "recording" && <span className="mode-pill rec">Recording</span>}
@@ -254,8 +341,10 @@ export default function App() {
               </optgroup>
             </select>
             <p className="blurb">{currentPreset.blurb}</p>
-            <label className="check">
+            <p className="look-for">{currentPreset.lookFor}</p>
+            <label className="check" htmlFor="landmarks">
               <input
+                id="landmarks"
                 type="checkbox"
                 checked={landmarks}
                 onChange={(e) => setLandmarks(e.target.checked)}
@@ -264,9 +353,18 @@ export default function App() {
             </label>
           </div>
 
-          <TracePanel history={history} />
+          <Metrics samples={metricsSamples} />
+          <TracePanel
+            history={history}
+            compare={compareHistory}
+            labels={
+              active && compareSession
+                ? { a: takeLabel(active), b: takeLabel(compareSession) }
+                : undefined
+            }
+          />
           <div className="console-row">
-            <KonnoMead history={history} />
+            <KonnoMead history={history} compare={compareHistory} />
             <LiveLevels sample={sample} />
           </div>
         </div>
@@ -288,6 +386,12 @@ export default function App() {
               <button type="button" onClick={() => setPlaying((p) => !p)}>
                 {playing ? "Pause" : "Play"}
               </button>
+              <button type="button" className={loop ? "primary" : undefined} onClick={() => setLoop((v) => !v)}>
+                Loop {loop ? "on" : "off"}
+              </button>
+              <button type="button" onClick={() => setSpeed((s) => (s === 1 ? 0.5 : 1))}>
+                {speed === 1 ? "1×" : "0.5×"}
+              </button>
               <button type="button" onClick={backToLive}>
                 Live mock
               </button>
@@ -300,7 +404,7 @@ export default function App() {
 
         <div className="scrub">
           {mode === "recording" ? (
-            <p className="status rec">Recording · {formatTime(buffer.at(-1)?.t ?? 0)}</p>
+            <p className="status rec">Recording · {formatTime(sample?.t ?? 0)}</p>
           ) : mode === "replay" && active ? (
             <>
               <input
@@ -317,9 +421,27 @@ export default function App() {
               <span>
                 {formatTime(scrub)} / {formatTime(active.durationMs)}
               </span>
+              {sessions.filter((s) => s.id !== active.id).length > 0 && (
+                <label className="compare-select">
+                  Compare with
+                  <select
+                    value={compareId ?? ""}
+                    onChange={(e) => setCompareId(e.target.value || null)}
+                  >
+                    <option value="">None</option>
+                    {sessions
+                      .filter((s) => s.id !== active.id)
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {takeLabel(s)}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              )}
             </>
           ) : (
-            <p className="status">Live mock · no camera · {currentPreset.label}</p>
+            <p className="status">Live mock · no camera · {currentPreset.label} · space to record</p>
           )}
         </div>
 
@@ -334,9 +456,23 @@ export default function App() {
         </label>
       </section>
 
-      {sessions.length > 0 && (
-        <section className="takes">
-          <h2>Saved takes</h2>
+      <section className="takes">
+        <h2>Saved takes</h2>
+        <div className="takes-toolbar">
+          <button type="button" onClick={() => importRef.current?.click()}>
+            Import JSON
+          </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={(e) => importFiles(e.target.files)}
+          />
+        </div>
+        {sessions.length === 0 ? (
+          <p className="status">No takes yet. Record one, or import a JSON file.</p>
+        ) : (
           <ul>
             {sessions.map((s) => (
               <li key={s.id} className="take-row">
@@ -360,8 +496,8 @@ export default function App() {
               </li>
             ))}
           </ul>
-        </section>
-      )}
+        )}
+      </section>
 
       <footer className="foot">
         Prototype. Data stays in this browser. Camera capture is a later swap behind

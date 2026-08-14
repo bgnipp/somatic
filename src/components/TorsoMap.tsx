@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motionFill, motionStroke } from "../lib/color";
+import { meanAbdomen, meanRibCage } from "../mock/synthesize";
 import type { CompartmentId, Sample } from "../types";
 import { COMPARTMENT_LABELS, LANDMARKS } from "../types";
 
@@ -25,12 +26,12 @@ const PATHS: Record<CompartmentId, string> = {
 };
 
 const TORSO =
-  "M111 58 C102 60 92 64 82 68 L86 78 C84 96 84 114 88 132 C92 150 98 166 104 180 C102 192 100 204 104 214 C110 220 114 222 120 222 C126 222 130 220 136 214 C140 204 138 192 136 180 C142 166 148 150 152 132 C156 114 156 96 154 78 L158 68 C148 64 138 60 129 58 Z";
+  "M111 58 C106 61 98 64 90 68 C86 72 84 76 84 80 C84 96 84 114 88 132 C92 150 98 166 104 180 C102 192 100 204 104 214 C110 220 114 222 120 222 C126 222 130 220 136 214 C140 204 138 192 136 180 C142 166 148 150 152 132 C156 114 156 96 156 80 C156 76 154 72 150 68 C142 64 134 61 129 58 Z";
 
 const LEFT_ARM =
-  "M82 68 C76 74 72 90 70 110 C68 128 68 148 70 168 C71 182 73 194 74 206 C76 212 82 212 83 206 C82 192 81 176 81 160 C82 140 84 118 86 96 C87 82 86 72 82 68 Z";
+  "M84 70 C76 78 70 98 64 120 C58 142 56 150 60 154 C64 172 68 190 74 206 C76 212 82 212 83 206 C80 188 76 170 78 154 C80 140 82 118 86 96 C87 82 88 74 84 70 Z";
 const RIGHT_ARM =
-  "M158 68 C164 74 168 90 170 110 C172 128 172 148 170 168 C169 182 167 194 166 206 C164 212 158 212 157 206 C158 192 159 176 159 160 C158 140 156 118 154 96 C153 82 154 72 158 68 Z";
+  "M156 70 C164 78 170 98 176 120 C182 142 184 150 180 154 C176 172 172 190 166 206 C164 212 158 212 157 206 C160 188 164 170 162 154 C160 140 158 118 154 96 C153 82 152 74 156 70 Z";
 
 const CLAVICLE_L = "M120 66 C110 66 100 68 90 74";
 const CLAVICLE_R = "M120 66 C130 66 140 68 150 74";
@@ -44,6 +45,8 @@ type Props = {
 export function TorsoMap({ sample, showLandmarks }: Props) {
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const ceiling = 12;
+  const total = sample ? meanRibCage(sample) + meanAbdomen(sample) : 0;
+  const scale = 1 + Math.min(total, 22) * 0.0012;
 
   return (
     <div className="torso-wrap">
@@ -61,8 +64,12 @@ export function TorsoMap({ sample, showLandmarks }: Props) {
         <ellipse className="torso-context" cx="120" cy="30" rx="17" ry="20" />
         <path
           className="torso-neck"
-          d="M111 46 L109 58 L131 58 L129 46 C126 50 123 52 120 52 C117 52 114 50 111 46 Z"
+          d="M111 46 L110 58 L130 58 L129 46 C126 50 123 52 120 52 C117 52 114 50 111 46 Z"
         />
+        <g
+          className="torso-breathe"
+          style={{ transform: `scale(${scale})`, transformOrigin: "120px 96px" }}
+        >
         <path className="torso-limb" d={LEFT_ARM} />
         <path className="torso-limb" d={RIGHT_ARM} />
         <path className="torso-context" d={TORSO} />
@@ -86,6 +93,7 @@ export function TorsoMap({ sample, showLandmarks }: Props) {
           <path className="bone-line" d={CLAVICLE_R} />
           <path className="bone-line" d={COSTAL_ARCH} />
           <line x1="120" y1="66" x2="120" y2="217" className="midline" />
+        </g>
         </g>
         {showLandmarks &&
           LANDMARKS.map((mark) => (

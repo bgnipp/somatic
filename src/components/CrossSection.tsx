@@ -10,11 +10,9 @@ export function CrossSection({ sample }: Props) {
   const anterior = c
     ? (c.rc_pulmonary_L.displacementMm + c.rc_pulmonary_R.displacementMm) / 2
     : 0;
-  const left = c ? c.rc_abdominal_L.displacementMm : 0;
-  const right = c ? c.rc_abdominal_R.displacementMm : 0;
-  const posterior = c
-    ? (c.rc_abdominal_L.displacementMm + c.rc_abdominal_R.displacementMm) * 0.45
-    : 0;
+  const left = sample?.lateral?.leftMm ?? (c ? c.rc_abdominal_L.displacementMm * 0.55 : 0);
+  const right = sample?.lateral?.rightMm ?? (c ? c.rc_abdominal_R.displacementMm * 0.55 : 0);
+  const posterior = (left + right) * 0.45;
 
   const ax = 18 + anterior * 1.6;
   const px = 18 + posterior * 1.6;
@@ -49,7 +47,7 @@ export function CrossSection({ sample }: Props) {
       </svg>
       <div className="torso-caption">
         <strong>Mid-thorax section</strong>
-        <span>Lateral and back expansion have somewhere to go.</span>
+        <span>Side expansion from the mock laterals. Older takes fall back to the front map.</span>
       </div>
     </div>
   );
