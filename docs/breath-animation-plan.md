@@ -1,7 +1,7 @@
 # Breath Anatomy Animation ("Guide" view) — Physician Feedback, Assessment, Implementation Spec
 
 **Date:** 2026-08-15 (revised same day from assessment-only to handoff-ready)
-**Status:** Implemented (B1–B4). Remaining work is the physician review session (quiet-breath table, neck scope, color-scope confirmation) — not code.
+**Status:** Implemented (B1–B4), plus her iMessage follow-up edits (solid-at-full activation gradient, exhale rib depression, SCM). Remaining work is her review of the quiet-breath choreography table — not code.
 **Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`).
 
 ## What she asked for, in her words (condensed)
@@ -194,11 +194,20 @@ export function activationColor(a: number): string {
 
 *Accept B4:* reduced-motion shows a static, scrubable frame; pause+scrub works for everyone; no regressions in the measured views; build clean, pushed.
 
+## Physician follow-up (iMessage, 2026-08-15 — after implementation)
+
+Full messages preserved at `context/transcripts/2026-08-15-physician-imessage-follow-up.txt`. Four points, all acted on:
+
+1. **"Include neck & shoulder muscles."** Confirms the neck scope (open question 2). Scalenes and upper traps already shipped; the sternocleidomastoid was added to the neck hints in response. Platysma remains deferred.
+2. **Exhale mechanics of active abdominal breathing:** the slight rectus contraction on exhalation forms a slight C-curve of the spine; the ribs are pulled **in, together, and down** while the superior thoracic cavity stays relaxed so the next breath can fill fully. Implemented: the supported script's `ribExpand` now dips below rest through the active exhale (ribs visibly narrow and descend) before settling. The **C-curve itself is sagittal-plane motion — invisible in a front view**; logged in the roadmap backlog as a future side-view candidate rather than faked frontally.
+3. **"The red/blue should be a transparency gradient where the solid color is full contraction/relaxation."** Implemented: `activationColor()` alpha now runs 0 (neutral) → 1 (full), replacing the earlier ~0.55 cap.
+4. **Product confirmation:** "the visualization is first step of the application"; after the basic breath is mapped, **motion recording comes later — possibly a combination of EMG, acupuncture-needle mapping, and motion tracking** (all later versions). This validates the modeled-vs-measured mode split and is logged in the roadmap backlog.
+
 ## Open questions for the physician
 
-1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the B4-era review session.
-2. **Scope of the neck** (confirmation item, default is safe): scalenes ship as schematic hints on the existing neck; platysma is deferred. Extend the figure upward only if she asks.
-3. **Confirm the color scope** (confirmation item, default is safe): red/blue lives only in the Guide view; measured views stay gold. If she wanted activation colors on the *live* map, we need the "modeled, not measured" conversation before changing anything.
+1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the review session.
+2. ~~**Scope of the neck**~~ **Answered 2026-08-15 (follow-up above): include neck & shoulder muscles.** Scalenes, SCM, and upper traps ship; platysma deferred; extend the figure crop only if she asks.
+3. ~~**Confirm the color scope**~~ **Effectively confirmed** by the follow-up: she engaged with red/blue as the Guide encoding ("transparency gradient…") and confirmed the visualization-first framing. Measured views stay gold.
 
 ## Guardrails carried forward
 

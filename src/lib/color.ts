@@ -33,11 +33,15 @@ export function motionSolid(mm: number, ceiling = 14): string {
   return `hsl(${h} ${s}% ${l}%)`;
 }
 
-/** Red for contracting (+), blue for relaxing (−), transparent near 0. Guide view only. */
+/**
+ * Red for contracting (+), blue for relaxing (−). Transparency gradient per
+ * the physician: fully transparent at neutral, solid at full contraction or
+ * full relaxation. Guide view only.
+ */
 export function activationColor(a: number): string {
   const t = Math.min(1, Math.abs(a));
   const eased = t * t * (3 - 2 * t);
   return a >= 0
-    ? `hsla(4, 68%, ${40 + eased * 14}%, ${eased * 0.55})`
-    : `hsla(210, 60%, ${46 + eased * 12}%, ${eased * 0.5})`;
+    ? `hsla(4, 68%, ${40 + eased * 14}%, ${eased})`
+    : `hsla(210, 60%, ${46 + eased * 12}%, ${eased})`;
 }

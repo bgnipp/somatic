@@ -1,0 +1,29 @@
+Physician follow-up — iMessage, 2026-08-15
+============================================
+
+Received after the Guide-view assessment summary was relayed to her.
+Acted on in: docs/breath-animation-plan.md ("Physician follow-up" section)
+and the Guide-view implementation.
+
+Messages
+--------
+
+"include neck & shoulder muscles . active abdominal breathing, the slight
+contraction of the rectus on exhalation is to facilitate the formation of a
+slight C curve of the spine. the ribs are being pulled in, together and down
+while the superior thoracic cavity relaxes to expand and allow full filling
+of the lungs"
+
+"the red blue should be a transparency gradient where the solid color is full
+contraction / relaxation"
+
+[In reply to the assessment: "The big realization from her memo: she's
+describing something new, not an edit to the motion map. Muscle activation
+(contracting vs relaxing) can't be measured by a camera — so what she wants
+is a choreographed teaching animation of the canonical breath…"]
+
+"correct: the visualization is first step of the application"
+
+"after basic breath is mapped we will later add motion recording (this may
+require combination emg, acupuncture needle mapping and motion tracking; all
+later versions)"

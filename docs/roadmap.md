@@ -27,7 +27,7 @@ None. Next agent work is blocked on human items below.
 | **Track H:** Blender renders of the 6 anatomy layers from Z-Anatomy (H0 licensing/pipeline spike, H1 full render set) | `docs/layered-anatomy-plan.md` §Track H | `deep.png` should include the pelvic floor dome (now part of Diaphragm & core) |
 | **F3:** motion-field tuning session with the therapist (light angle, exaggeration, default view) | `docs/motion-field-plan.md` §F3 | Session time, not code time |
 | **Therapist success-gate session** | `docs/mvp-plan.md` §Success gate | Gates all capture (Phase 2) work |
-| **Physician confirmations** for the Guide view | `docs/breath-animation-plan.md` §Open questions | Neck scope; color-scope confirmation; her review of the quiet-breath choreography table (quiet vs. supported was answered 2026-08-15: both ship, selectable) |
+| **Physician review of the quiet-breath choreography table** | `docs/breath-animation-plan.md` §Open questions | Neck scope and color scope were answered in her 2026-08-15 iMessage follow-up (acted on same day); only the quiet-breath table review remains |
 
 ## Remaining — agent work, blocked
 
@@ -38,6 +38,8 @@ None. Next agent work is blocked on human items below.
 ## Backlog (captured, not planned in detail)
 
 - **Signed displacement + "reverse breather" preset.** Insight from the flail-chest video: direction of motion matters, not just magnitude. Would extend `CompartmentSample` with a signed convention (or a `paradoxical` flag per region in mocks) and a preset where the belly draws in on inhale. Needs its own mini-plan before implementation — touches color ramps (what does "inward" look like?), metrics, and the relief field.
-- **Neck extension** (scalenes/platysma as first-class anatomy): pending physician's answer; B3 ships schematic scalene hints only.
+- **Side view for sagittal mechanics.** Her follow-up describes a slight C-curve of the spine during the active exhale — sagittal-plane motion a front view cannot show. A future side-view figure (or a small side inset) is the honest way to render it.
+- **Motion recording, later versions (physician, 2026-08-15):** after the basic breath is mapped, add motion recording — possibly a combination of EMG, acupuncture-needle mapping, and motion tracking. Aligns with the existing Phase 2 capture plan; EMG would also make the Guide's activation colors measurable someday.
+- **Platysma** (superficial neck): deferred from the neck scope; cosmetic in front view.
 - **Phase 2 capture spike** (4 markers + webcam behind `BreathSource`): gated on the therapist success-gate session.
 - **Installation mode / back view / therapist-named presets:** parked open questions in `docs/mvp-plan.md`.

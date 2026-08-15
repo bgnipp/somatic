@@ -125,7 +125,24 @@ const supported: GuideScript = {
     },
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, supportedInhale),
-  ribExpand: (phase) => inhaleWave(phase, supportedInhale),
+  /**
+   * Per the physician: on the active exhale the ribs are pulled in, together,
+   * and down (rectus/oblique work), dipping below rest before settling for
+   * the next inhale.
+   */
+  ribExpand: (phase) => {
+    const p = wrapPhase(phase);
+    if (p < supportedInhale) {
+      return 0.5 - 0.5 * Math.cos((p / supportedInhale) * Math.PI);
+    }
+    const t = (p - supportedInhale) / (1 - supportedInhale);
+    const dip = 0.22;
+    if (t < 0.75) {
+      return 1 - (1 + dip) * (0.5 - 0.5 * Math.cos((t / 0.75) * Math.PI));
+    }
+    const u = (t - 0.75) / 0.25;
+    return -dip * (0.5 + 0.5 * Math.cos(u * Math.PI));
+  },
   pelvicLift: (phase) => inhaleWave(phase + 0.05, supportedInhale),
 };
 

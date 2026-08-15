@@ -131,6 +131,9 @@ const SCALENES = [
   "M126 44 L130 58",
 ];
 
+/** Sternocleidomastoid: mastoid down to the sternal notch, each side. */
+const SCM = ["M111 40 C111 47 114 54 118 60", "M129 40 C129 47 126 54 122 60"];
+
 function SkeletonLayer({ expand = 0 }: LayerProps) {
   const widthScale = 1 + expand * 0.05;
   const lift = expand * 2;
@@ -290,15 +293,21 @@ function SurfaceLayer() {
   );
 }
 
-/** Neck scalenes sit outside #torso-clip — mount unclipped, Guide view only. */
+/** Neck muscles sit outside #torso-clip — mount unclipped, Guide view only. */
 export function ScaleneHints({ activation = 0 }: { activation?: number }) {
   return (
     <g className="anatomy-placeholder anatomy-scalenes" pointerEvents="none" aria-hidden="true">
       {SCALENES.map((d) => (
         <path key={d} className="anatomy-scalene" d={d} />
       ))}
+      {SCM.map((d) => (
+        <path key={d} className="anatomy-scm" d={d} />
+      ))}
       {SCALENES.map((d) => (
         <TintStroke key={`${d}-tint`} d={d} a={activation} width={1.8} />
+      ))}
+      {SCM.map((d) => (
+        <TintStroke key={`${d}-tint`} d={d} a={activation} width={2} />
       ))}
     </g>
   );
