@@ -352,6 +352,13 @@ h1 {
   opacity: 0.7;
 }
 
+.anatomy-pec-minor {
+  fill: #2a261c;
+  fill-opacity: 0.28;
+  stroke: #5c5346;
+  stroke-width: 0.5;
+}
+
 .anatomy-pec,
 .anatomy-rectus,
 .anatomy-oblique {

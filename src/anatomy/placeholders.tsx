@@ -24,6 +24,8 @@ export const STRUCTURE_CLASSES: Partial<Record<MuscleId, string>> = {
   scalenes: "anatomy-scalene",
   traps: "anatomy-trap",
   platysma: "anatomy-platysma",
+  pec_major: "anatomy-pec",
+  pec_minor: "anatomy-pec-minor",
 };
 
 type Activations = Partial<Record<MuscleId, number>>;
@@ -123,6 +125,19 @@ const OBLIQUES = [
 const TRAPS = [
   "M108 62 L90 74 L111 70 Z",
   "M132 62 L150 74 L129 70 Z",
+];
+
+const PEC_MAJOR = [
+  "M122 72 C132 74 144 80 150 90 C148 104 140 114 128 118 C124 108 122 92 122 72 Z",
+  "M118 72 C108 74 96 80 90 90 C92 104 100 114 112 118 C116 108 118 92 118 72 Z",
+  "M88 74 C84 80 82 90 83 100 C86 94 89 86 92 80 Z",
+  "M152 74 C156 80 158 90 157 100 C154 94 151 86 148 80 Z",
+];
+
+/** Small wedges from ribs 3–5 toward the coracoid, under the major. */
+const PEC_MINOR = [
+  "M108 108 L98 118 L92 74 Z",
+  "M132 108 L142 118 L148 74 Z",
 ];
 
 const SCALENES = [
@@ -269,24 +284,22 @@ function AbWallLayer({ activations }: LayerProps) {
 
 function SuperficialLayer({ activations }: LayerProps) {
   const trapA = act(activations, "traps");
+  const majorA = act(activations, "pec_major");
+  const minorA = act(activations, "pec_minor");
   return (
     <g className="anatomy-placeholder anatomy-superficial">
-      <path
-        className="anatomy-pec"
-        d="M122 72 C132 74 144 80 150 90 C148 104 140 114 128 118 C124 108 122 92 122 72 Z"
-      />
-      <path
-        className="anatomy-pec"
-        d="M118 72 C108 74 96 80 90 90 C92 104 100 114 112 118 C116 108 118 92 118 72 Z"
-      />
-      <path
-        className="anatomy-pec"
-        d="M88 74 C84 80 82 90 83 100 C86 94 89 86 92 80 Z"
-      />
-      <path
-        className="anatomy-pec"
-        d="M152 74 C156 80 158 90 157 100 C154 94 151 86 148 80 Z"
-      />
+      {PEC_MINOR.map((d) => (
+        <path key={d} className="anatomy-pec-minor" d={d} />
+      ))}
+      {PEC_MINOR.map((d) => (
+        <TintFill key={`${d}-tint`} d={d} a={minorA} />
+      ))}
+      {PEC_MAJOR.map((d) => (
+        <path key={d} className="anatomy-pec" d={d} />
+      ))}
+      {PEC_MAJOR.map((d) => (
+        <TintFill key={`${d}-tint`} d={d} a={majorA} />
+      ))}
       {TRAPS.map((d) => (
         <path key={d} className="anatomy-trap" d={d} />
       ))}

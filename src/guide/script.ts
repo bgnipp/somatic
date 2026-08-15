@@ -125,6 +125,12 @@ const supported: GuideScript = {
       return 0;
     },
     platysma: (phase) => -inhaleWave(phase, supportedInhale) * 0.35,
+    pec_minor: (phase) => inhaleWave(phase, supportedInhale) * 0.5,
+    pec_major: (phase) => {
+      const p = wrapPhase(phase);
+      if (p < supportedInhale) return -Math.sin((p / supportedInhale) * Math.PI) * 0.6;
+      return 0;
+    },
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, supportedInhale),
   /**
