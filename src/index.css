@@ -643,6 +643,125 @@ h1 {
   line-height: 1.4;
 }
 
+.composer {
+  margin: 0.55rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.composer-empty {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.composer-seq p {
+  margin: 0 0 0.25rem;
+  color: var(--ink);
+  font-size: 0.72rem;
+}
+
+.composer-seq-empty {
+  color: var(--ink-dim);
+  font-size: 0.68rem;
+}
+
+.composer-seq ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.composer-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.3rem 0.15rem 0.45rem;
+  border: 1px solid #3a362c;
+  background: #1c1b16;
+  font-size: 0.68rem;
+}
+
+.composer-chip button {
+  padding: 0.05rem 0.3rem;
+  font-size: 0.62rem;
+  color: var(--ink-dim);
+}
+
+.composer-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.composer-region summary {
+  cursor: pointer;
+  color: var(--gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+.composer-region ul {
+  list-style: none;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.composer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.35rem 0.7rem;
+  align-items: flex-start;
+}
+
+.composer-row strong {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.composer-row span {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--ink-dim);
+  line-height: 1.35;
+}
+
+.composer-adds {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.composer-adds button {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.composer-adds button.active {
+  background: #2a2618;
+  border-color: #6d5a2c;
+  color: var(--gold);
+}
+
+@media (max-width: 520px) {
+  .composer-row span {
+    display: none;
+  }
+}
+
 .guide-controls {
   display: flex;
   flex-wrap: wrap;

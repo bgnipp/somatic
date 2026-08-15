@@ -19,6 +19,14 @@ export function ScriptToggle({ scriptId, onChange }: Props) {
           {script.label}
         </button>
       ))}
+      <button
+        type="button"
+        className={scriptId === "custom" ? "active" : undefined}
+        aria-pressed={scriptId === "custom"}
+        onClick={() => onChange("custom")}
+      >
+        Compose
+      </button>
     </div>
   );
 }

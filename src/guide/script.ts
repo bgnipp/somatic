@@ -10,7 +10,7 @@ export const GUIDE_STRUCTURE_IDS = MUSCLE_IDS;
  */
 export type ActivationFn = (phase: number) => number;
 
-export type GuideScriptId = "quiet" | "supported" | "lengthen";
+export type GuideScriptId = "quiet" | "supported" | "lengthen" | "custom";
 
 export type GuideScript = {
   id: GuideScriptId;
@@ -231,6 +231,7 @@ export function scriptById(id: GuideScriptId): GuideScript {
 export function loadStoredScript(): GuideScriptId {
   try {
     const raw = localStorage.getItem(GUIDE_SCRIPT_KEY);
+    if (raw === "custom") return "custom";
     return GUIDE_SCRIPTS.some((s) => s.id === raw)
       ? (raw as GuideScriptId)
       : DEFAULT_GUIDE_SCRIPT;

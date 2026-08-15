@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnatomyStack } from "../anatomy/AnatomyStack";
 import { BackFigure } from "../anatomy/backPlaceholders";
 import type { FigureAspect } from "../anatomy/catalog";
@@ -17,6 +17,12 @@ import { ViewToggle } from "../field/ViewToggle";
 import type { MapView } from "../field/view";
 import { AspectToggle } from "../guide/AspectToggle";
 import { loadStoredAspect, saveStoredAspect } from "../guide/aspect";
+import {
+  compileComposition,
+  loadComposition,
+  saveComposition,
+} from "../guide/composer";
+import { ComposerPanel } from "../guide/ComposerPanel";
 import { GuideLegend } from "../guide/GuideLegend";
 import { ScriptToggle } from "../guide/ScriptToggle";
 import { SideInset } from "../guide/SideInset";
@@ -61,6 +67,7 @@ export function TorsoMap({
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
   const [scriptId, setScriptId] = useState<GuideScriptId>(loadStoredScript);
+  const [composition, setComposition] = useState(loadComposition);
   const [aspect, setAspect] = useState<FigureAspect>(loadStoredAspect);
   const [paused, setPaused] = useState(false);
   const [scrub, setScrub] = useState(0.2);
@@ -79,7 +86,8 @@ export function TorsoMap({
   const ceiling = 12;
   const belly = sample ? meanAbdomen(sample) : 0;
   const total = sample ? meanRibCage(sample) + belly : 0;
-  const script = scriptById(scriptId);
+  const compiled = useMemo(() => compileComposition(composition), [composition]);
+  const script = scriptId === "custom" ? compiled : scriptById(scriptId);
   const showGuide = view === "guide";
   const showBack = showGuide && aspect === "back";
   const held = reduceMotion || paused;
@@ -124,6 +132,10 @@ export function TorsoMap({
   useEffect(() => {
     saveStoredScript(scriptId);
   }, [scriptId]);
+
+  useEffect(() => {
+    saveComposition(composition);
+  }, [composition]);
 
   useEffect(() => {
     saveStoredAspect(aspect);
@@ -313,6 +325,13 @@ export function TorsoMap({
             <AspectToggle aspect={aspect} onChange={setAspect} />
           </div>
           <p className="guide-blurb">{script.blurb}</p>
+          {scriptId === "custom" && (
+            <ComposerPanel
+              composition={composition}
+              onChange={setComposition}
+              onAspectHint={setAspect}
+            />
+          )}
           {script.sideCaption && !showBack && <SideInset script={script} phase={phase} />}
           <div className="guide-controls">
             <button
