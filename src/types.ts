@@ -42,6 +42,7 @@ export const PRESET_IDS = [
   "apical",
   "left_quiet",
   "asynchrony",
+  "paradox",
   "frozen",
   "clavicular",
   "rib_collapse",
@@ -85,6 +86,13 @@ export const PRESETS: Preset[] = [
     family: "standing",
     blurb: "Belly lags the chest. Timing, shown neutrally.",
     lookFor: "The Konno–Mead path opens into a loop instead of a line.",
+  },
+  {
+    id: "paradox",
+    label: "Paradoxical timing",
+    family: "standing",
+    blurb: "Belly and rib cage move opposite each other — reverse breathing, shown neutrally.",
+    lookFor: "The belly trace peaks while the rib traces dip; the map alternates top and bottom.",
   },
   {
     id: "frozen",

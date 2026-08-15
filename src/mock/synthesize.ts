@@ -131,6 +131,26 @@ export function synthesize(t: number, preset: PresetId): Sample {
         },
       );
 
+    case "paradox":
+      // Reverse breathing: the abdomen runs in anti-phase to the rib cage,
+      // so the belly is drawn in while the chest fills. Magnitude-only data
+      // shows this honestly as opposite timing, not as negative displacement.
+      return quietCycle(
+        t,
+        {
+          rc_pulmonary_L: 6.2,
+          rc_pulmonary_R: 6.4,
+          rc_abdominal_L: 5.4,
+          rc_abdominal_R: 5.6,
+          abdomen_L: 6.8,
+          abdomen_R: 7.0,
+        },
+        {
+          abdomen_L: Math.PI,
+          abdomen_R: Math.PI,
+        },
+      );
+
     case "frozen":
       return quietCycle(t, {
         rc_pulmonary_L: 5.2,

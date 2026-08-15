@@ -12,7 +12,7 @@ import { BlobField } from "../field/BlobField";
 import { ReliefField } from "../field/ReliefField";
 import { sitesFromSample } from "../field/sites";
 import { ViewToggle } from "../field/ViewToggle";
-import { loadStoredView, saveStoredView, type MapView } from "../field/view";
+import type { MapView } from "../field/view";
 import { GuideLegend } from "../guide/GuideLegend";
 import { ScriptToggle } from "../guide/ScriptToggle";
 import {
@@ -41,17 +41,20 @@ import {
 type Props = {
   sample: Sample | null;
   showLandmarks: boolean;
+  view: MapView;
+  onViewChange: (view: MapView) => void;
   depth?: AnatomyDepth;
 };
 
 export function TorsoMap({
   sample,
   showLandmarks,
+  view,
+  onViewChange,
   depth: depthProp,
 }: Props) {
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
-  const [view, setView] = useState<MapView>(loadStoredView);
   const [scriptId, setScriptId] = useState<GuideScriptId>(loadStoredScript);
   const [paused, setPaused] = useState(false);
   const [scrub, setScrub] = useState(0.2);
@@ -60,8 +63,12 @@ export function TorsoMap({
     window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const lastMeasured = useRef<Exclude<MapView, "guide">>(
-    loadStoredView() === "field" ? "field" : "regions",
+    view === "field" ? "field" : "regions",
   );
+  const viewRef = useRef(view);
+  viewRef.current = view;
+  const onViewChangeRef = useRef(onViewChange);
+  onViewChangeRef.current = onViewChange;
   const depth = depthProp ?? storedDepth;
   const ceiling = 12;
   const belly = sample ? meanAbdomen(sample) : 0;
@@ -103,7 +110,6 @@ export function TorsoMap({
   }, [storedDepth, depthProp]);
 
   useEffect(() => {
-    saveStoredView(view);
     if (view !== "guide") lastMeasured.current = view;
   }, [view]);
 
@@ -117,15 +123,16 @@ export function TorsoMap({
       if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
       if (e.key === "g" || e.key === "G") {
         e.preventDefault();
-        setView((v) => (v === "guide" ? lastMeasured.current : "guide"));
+        const v = viewRef.current;
+        onViewChangeRef.current(v === "guide" ? lastMeasured.current : "guide");
         return;
       }
       if (e.key === "v" || e.key === "V") {
         e.preventDefault();
-        setView((v) => {
-          if (v === "guide") return "regions";
-          return v === "field" ? "regions" : "field";
-        });
+        const v = viewRef.current;
+        onViewChangeRef.current(
+          v === "guide" ? "regions" : v === "field" ? "regions" : "field",
+        );
         return;
       }
       if (e.key !== "[" && e.key !== "]") return;
@@ -245,7 +252,7 @@ export function TorsoMap({
       </svg>
       <DepthRail depth={depth} onChange={setDepth} />
       </div>
-      <ViewToggle view={view} onChange={setView} />
+      <ViewToggle view={view} onChange={onViewChange} />
       <div className="torso-caption">
         {hover && sample ? (
           <>

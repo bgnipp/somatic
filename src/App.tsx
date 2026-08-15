@@ -5,6 +5,7 @@ import { LiveLevels } from "./components/LiveLevels";
 import { Metrics } from "./components/Metrics";
 import { TorsoMap } from "./components/TorsoMap";
 import { TracePanel } from "./components/TracePanel";
+import { loadStoredView, saveStoredView, type MapView } from "./field/view";
 import { MockBreathSource } from "./mock/MockBreathSource";
 import { meanAbdomen, meanRibCage, sampleAt } from "./mock/synthesize";
 import {
@@ -75,6 +76,11 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(false);
   const [speed, setSpeed] = useState<0.5 | 1>(1);
+  const [view, setView] = useState<MapView>(loadStoredView);
+
+  useEffect(() => {
+    saveStoredView(view);
+  }, [view]);
 
   const source = useRef(new MockBreathSource(preset));
   const bufferRef = useRef<Sample[]>([]);
@@ -309,13 +315,22 @@ export default function App() {
       <section className="studio">
         <div className="stage" data-mode={mode}>
           <div className="stage-status">
-            <span className={`phase-pill ${phase}`} aria-live="polite">
-              {phase === "inhale" ? "Inhale" : phase === "exhale" ? "Exhale" : "Still"}
-            </span>
+            {/* The pill reads the mock stream; in Guide view the figure plays
+                its own scripted loop, so the pill would contradict it. */}
+            {view !== "guide" && (
+              <span className={`phase-pill ${phase}`} aria-live="polite">
+                {phase === "inhale" ? "Inhale" : phase === "exhale" ? "Exhale" : "Still"}
+              </span>
+            )}
             {mode === "recording" && <span className="mode-pill rec">Recording</span>}
             {mode === "replay" && <span className="mode-pill">Replay</span>}
           </div>
-          <TorsoMap sample={sample} showLandmarks={landmarks} />
+          <TorsoMap
+            sample={sample}
+            showLandmarks={landmarks}
+            view={view}
+            onViewChange={setView}
+          />
           <CrossSection sample={sample} />
         </div>
 
