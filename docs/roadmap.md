@@ -19,6 +19,7 @@
 | Physician iMessage follow-up applied: solid-at-full activation gradient, exhale rib pull-in/down, SCM | `docs/breath-animation-plan.md` §Physician follow-up | `31ddc6e` |
 | **Paradoxical timing preset** (belly anti-phase to ribs — the "reverse breather", magnitude-only) + mock-stream phase pill hidden in Guide view | (was backlog) | `e2b17a9` |
 | **Platysma** + **sagittal side inset** showing the supported exhale's slight C-curve (front view can't show sagittal flexion) | (was backlog) | `e59f254` |
+| **Third Guide script "Rib lengthening"** (held directions loop from the endorsed video: sternum forward/up, ribs back/up, lower front narrowing; no activation tints; new `ribLift`/`sternumLift` drivers; side inset data-driven) | `docs/breath-animation-plan.md` §Fourth video | this commit |
 
 ## Remaining — agent work, ready now
 
@@ -32,7 +33,7 @@ None. Next agent work is blocked on human items below.
 | **F3:** motion-field tuning session with the therapist (light angle, exaggeration, default view) | `docs/motion-field-plan.md` §F3 | Session time, not code time |
 | **Therapist success-gate session** | `docs/mvp-plan.md` §Success gate | Gates all capture (Phase 2) work |
 | **Physician review of the quiet-breath choreography table** | `docs/breath-animation-plan.md` §Open questions | Neck scope and color scope were answered in her 2026-08-15 iMessage follow-up (acted on same day) |
-| **Physician confirmation: "Lengthening the rib cage" as a third Guide script?** | `docs/breath-animation-plan.md` §Fourth video | Directions-based coordination (sternum forward/up, lower ribs back/up, lower front narrowing) from the video she endorsed; mapped but deliberately unimplemented — it imports a school's postural doctrine |
+| **Physician review of the "Rib lengthening" Guide script** | `docs/breath-animation-plan.md` §Fourth video | Implemented at the user's direction from the video she endorsed; her review decides whether it stays (it renders one school's postural doctrine — trivial to remove) |
 
 ## Remaining — agent work, blocked
 
@@ -45,7 +46,6 @@ None. Next agent work is blocked on human items below.
 - **Signed displacement** (true negative excursion in the data contract). The paradoxical-timing preset ships the observable half (anti-phase timing, magnitude-only); real signed data would additionally let a region read "drawn inward" at capture time. Revisit in the camera era — touches color ramps, metrics, and the relief field.
 - **Motion recording, later versions (physician, 2026-08-15):** after the basic breath is mapped, add motion recording — possibly a combination of EMG, acupuncture-needle mapping, and motion tracking. Aligns with the existing Phase 2 capture plan; EMG would also make the Guide's activation colors measurable someday.
 - **Full side-view figure.** The Guide's schematic side inset covers the C-curve for now; a full side view with its own compartments is a capture-era question.
-- **Third Guide script, "Lengthening the rib cage" (directions, not a breath):** the coordination taught in the rib-geometry video she endorsed. Maps onto existing drivers + the side inset. Pending her explicit confirmation (see human work above).
 - **Posterior expansion capture (capture-era requirement, upgraded from nice-to-have):** the rib-geometry video's school holds that the back and upper rib cage expand most; a front-only camera cannot see it, and large anterior motion can be *compensation* for a blocked back. Multi-view or posterior capture should be a named requirement of the Phase 2+ design — and the "brightness is motion, not a problem" copy must never drift toward "more motion = better."
 - **Phase 2 capture spike** (4 markers + webcam behind `BreathSource`): gated on the therapist success-gate session.
 - **Installation mode / back view / therapist-named presets:** parked open questions in `docs/mvp-plan.md`.

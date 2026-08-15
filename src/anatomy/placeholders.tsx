@@ -9,6 +9,7 @@ import type { AnatomyLayerId } from "./layers";
  *
  * `flatten` (0–1) lowers the diaphragm dome on inhale.
  * `expand` (0–1) widens/raises the rib arcs.
+ * `ribLift` (0–1) raises the ribs away from the pelvis (cage lengthening).
  * `pelvicLift` (−1..1) raises (engaged) or lowers (yielded) the pelvic floor.
  * `activations` tints structures in Guide view only; omitted elsewhere.
  */
@@ -30,6 +31,7 @@ type Activations = Partial<Record<GuideStructureId, number>>;
 type LayerProps = {
   flatten?: number;
   expand?: number;
+  ribLift?: number;
   pelvicLift?: number;
   activations?: Activations;
 };
@@ -143,13 +145,14 @@ const PLATYSMA = [
   "M127 45 C129 51 134 58 141 63",
 ];
 
-function SkeletonLayer({ expand = 0 }: LayerProps) {
+function SkeletonLayer({ expand = 0, ribLift = 0 }: LayerProps) {
   const widthScale = 1 + expand * 0.05;
-  const lift = expand * 2;
+  const lift = expand * 2 + ribLift * 2.5;
   return (
     <g className="anatomy-placeholder anatomy-skeleton">
       <path
         className="anatomy-bone anatomy-sternum"
+        transform={ribLift ? `translate(0 ${(-ribLift * 1.5).toFixed(2)})` : undefined}
         d="M115 66 C113 68 113 72 115 76 L117 80 L117 144 C117 148 118 151 120 152 C122 151 123 148 123 144 L123 80 L125 76 C127 72 127 68 125 66 C123 64 117 64 115 66 Z"
       />
       {RIBS.map(([attachY, halfWidth, lateralY], i) => {
@@ -201,9 +204,9 @@ function DeepLayer({ flatten = 0, pelvicLift = 0, activations }: LayerProps) {
   );
 }
 
-function IntercostalLayer({ expand = 0, activations }: LayerProps) {
+function IntercostalLayer({ expand = 0, ribLift = 0, activations }: LayerProps) {
   const widthScale = 1 + expand * 0.05;
-  const lift = expand * 2;
+  const lift = expand * 2 + ribLift * 2.5;
   const hatches: string[] = [];
   for (let i = 0; i < RIBS.length - 1; i++) {
     const [y0, w0, ly0] = RIBS[i];
@@ -334,16 +337,18 @@ export function AnatomyPlaceholder({
   id,
   flatten = 0,
   expand = 0,
+  ribLift = 0,
   pelvicLift = 0,
   activations,
 }: {
   id: AnatomyLayerId;
   flatten?: number;
   expand?: number;
+  ribLift?: number;
   pelvicLift?: number;
   activations?: Activations;
 }) {
-  const props: LayerProps = { flatten, expand, pelvicLift, activations };
+  const props: LayerProps = { flatten, expand, ribLift, pelvicLift, activations };
   switch (id) {
     case "skeleton":
       return <SkeletonLayer {...props} />;

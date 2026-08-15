@@ -33,6 +33,7 @@ function AnatomyLayerView({
   depth,
   flatten,
   expand,
+  ribLift,
   pelvicLift,
   activations,
 }: {
@@ -40,6 +41,7 @@ function AnatomyLayerView({
   depth: AnatomyDepth;
   flatten: number;
   expand: number;
+  ribLift: number;
   pelvicLift: number;
   activations?: Partial<Record<GuideStructureId, number>>;
 }) {
@@ -67,6 +69,7 @@ function AnatomyLayerView({
           id={layer.id}
           flatten={flatten}
           expand={expand}
+          ribLift={ribLift}
           pelvicLift={pelvicLift}
           activations={activations}
         />
@@ -81,6 +84,8 @@ type Props = {
   flatten?: number;
   /** 0–1 rib widening / rise. */
   expand?: number;
+  /** 0–1 ribs rise away from the pelvis (cage lengthening). */
+  ribLift?: number;
   /** −1 descended, 0 rest, +1 lifted. */
   pelvicLift?: number;
   /** Guide-view activation tints. Omit in measured views. */
@@ -91,6 +96,7 @@ export function AnatomyStack({
   depth,
   flatten = 0,
   expand = 0,
+  ribLift = 0,
   pelvicLift = 0,
   activations,
 }: Props) {
@@ -103,6 +109,7 @@ export function AnatomyStack({
           depth={depth}
           flatten={flatten}
           expand={expand}
+          ribLift={ribLift}
           pelvicLift={pelvicLift}
           activations={activations}
         />

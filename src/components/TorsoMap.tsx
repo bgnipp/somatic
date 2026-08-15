@@ -89,6 +89,7 @@ export function TorsoMap({
       ? 0
       : Math.min(1, belly / 9.5);
   const expand = showGuide ? script.ribExpand(phase) : 0;
+  const ribLift = showGuide ? script.ribLift(phase) : 0;
   const pelvicLift = showGuide ? script.pelvicLift(phase) : 0;
   const scale = showGuide
     ? 1 + expand * 0.02
@@ -180,6 +181,7 @@ export function TorsoMap({
             depth={depth}
             flatten={flatten}
             expand={expand}
+            ribLift={ribLift}
             pelvicLift={pelvicLift}
             activations={activations}
           />
@@ -261,7 +263,7 @@ export function TorsoMap({
         ) : showGuide ? (
           <>
             <strong>Guide · {script.label}</strong>
-            <span>A reference loop of the coordinated breath. G returns to your data.</span>
+            <span>A scripted reference loop. G returns to your data.</span>
           </>
         ) : showField ? (
           <>
@@ -279,7 +281,7 @@ export function TorsoMap({
         <>
           <ScriptToggle scriptId={scriptId} onChange={setScriptId} />
           <p className="guide-blurb">{script.blurb}</p>
-          {script.id === "supported" && <SideInset script={script} phase={phase} />}
+          {script.sideCaption && <SideInset script={script} phase={phase} />}
           <div className="guide-controls">
             <button
               type="button"

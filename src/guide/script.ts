@@ -28,7 +28,7 @@ export const GUIDE_STRUCTURE_IDS: GuideStructureId[] = [
  */
 export type ActivationFn = (phase: number) => number;
 
-export type GuideScriptId = "quiet" | "supported";
+export type GuideScriptId = "quiet" | "supported" | "lengthen";
 
 export type GuideScript = {
   id: GuideScriptId;
@@ -42,6 +42,12 @@ export type GuideScript = {
   pelvicLift: (phase: number) => number;
   /** 0..1 sagittal spine flexion (the slight C-curve of the active exhale). */
   spineFlex: (phase: number) => number;
+  /** 0..1 ribs rise away from the pelvis (rib-cage lengthening). */
+  ribLift: (phase: number) => number;
+  /** 0..1 upper sternum moves forward and up (sagittal; drives the side inset). */
+  sternumLift: (phase: number) => number;
+  /** When set, the sagittal side inset renders with this caption. */
+  sideCaption?: string;
 };
 
 export const DEFAULT_GUIDE_SCRIPT: GuideScriptId = "supported";
@@ -81,6 +87,15 @@ function signedCycle(phase: number, inhaleFraction: number): number {
 
 function constant(value: number): ActivationFn {
   return () => value;
+}
+
+/** Ease in, hold, release — for held coordinations rather than breath cycles. */
+function holdEnvelope(phase: number): number {
+  const p = wrapPhase(phase);
+  if (p < 0.3) return 0.5 - 0.5 * Math.cos((p / 0.3) * Math.PI);
+  if (p < 0.72) return 1;
+  const t = (p - 0.72) / 0.28;
+  return 0.5 + 0.5 * Math.cos(t * Math.PI);
 }
 
 function sampleActivations(
@@ -156,6 +171,9 @@ const supported: GuideScript = {
     const t = (p - supportedInhale) / (1 - supportedInhale);
     return Math.sin(t * Math.PI);
   },
+  ribLift: constant(0),
+  sternumLift: constant(0),
+  sideCaption: "Side · the supported exhale draws a slight C-curve",
 };
 
 const quietInhale = 0.42;
@@ -187,9 +205,47 @@ const quiet: GuideScript = {
   ribExpand: (phase) => inhaleWave(phase, quietInhale) * 0.6,
   pelvicLift: (phase) => -inhaleWave(phase, quietInhale) * 0.55,
   spineFlex: constant(0),
+  ribLift: constant(0),
+  sternumLift: constant(0),
 };
 
-export const GUIDE_SCRIPTS: GuideScript[] = [quiet, supported];
+/**
+ * The rib-geometry coordination from the "Unbunch Your Ribs" video the
+ * physician endorsed: a held direction, not a breath. Upper sternum forward
+ * and up, lowest ribs back and up (never dropped), lower front ribs
+ * narrowing — the rib cage lengthens top to bottom. No activation tints:
+ * the video is explicit that this is coordination, not muscular effort.
+ */
+const lengthen: GuideScript = {
+  id: "lengthen",
+  label: "Rib lengthening",
+  blurb:
+    "A coordination, not a breath. Upper sternum forward and up; lowest ribs back and up; lower front ribs narrow.",
+  cycleMs: 12000,
+  inhaleFraction: 0.3,
+  activations: {
+    pelvic_floor: constant(0),
+    diaphragm: constant(0),
+    transversus: constant(0),
+    rectus: constant(0),
+    obliques: constant(0),
+    intercostals: constant(0),
+    scalenes: constant(0),
+    traps: constant(0),
+    platysma: constant(0),
+  },
+  diaphragmFlatten: constant(0.3),
+  /** Slightly negative: the lower front ribs narrow while the cage lifts. */
+  ribExpand: (phase) => -0.18 * holdEnvelope(phase),
+  pelvicLift: constant(0),
+  /** Negative flex = the spine lengthens toward straight, opposite the C-curve. */
+  spineFlex: (phase) => -0.5 * holdEnvelope(phase),
+  ribLift: (phase) => holdEnvelope(phase),
+  sternumLift: (phase) => holdEnvelope(phase),
+  sideCaption: "Side · sternum forward and up, lowest ribs back and up",
+};
+
+export const GUIDE_SCRIPTS: GuideScript[] = [quiet, supported, lengthen];
 
 export function scriptById(id: GuideScriptId): GuideScript {
   return GUIDE_SCRIPTS.find((s) => s.id === id) ?? supported;
@@ -198,7 +254,9 @@ export function scriptById(id: GuideScriptId): GuideScript {
 export function loadStoredScript(): GuideScriptId {
   try {
     const raw = localStorage.getItem(GUIDE_SCRIPT_KEY);
-    return raw === "quiet" || raw === "supported" ? raw : DEFAULT_GUIDE_SCRIPT;
+    return GUIDE_SCRIPTS.some((s) => s.id === raw)
+      ? (raw as GuideScriptId)
+      : DEFAULT_GUIDE_SCRIPT;
   } catch {
     return DEFAULT_GUIDE_SCRIPT;
   }

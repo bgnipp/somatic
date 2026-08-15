@@ -515,6 +515,7 @@ h1 {
 
 .script-toggle {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 0.25rem;
   margin-top: 0.55rem;
