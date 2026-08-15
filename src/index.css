@@ -367,6 +367,14 @@ h1 {
   stroke-width: 0.6;
 }
 
+.anatomy-oblique-fiber {
+  fill: none;
+  stroke: #5c5346;
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
 .anatomy-surface path {
   fill: #3a3428;
   fill-opacity: 1;

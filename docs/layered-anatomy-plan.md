@@ -52,8 +52,11 @@ Five anatomy layers, deep → superficial, matching the teaching story ("what's 
 | 1 | `skeleton` | Rib cage, sternum, clavicles, spine, pelvis | Where ribs actually are; costal margin is real, not schematic |
 | 2 | `deep` | Diaphragm (dome, crura), psoas, transversus abdominis | *The* breathing muscle nobody can see; the "breathe into your back" layer |
 | 3 | `intercostal` | Internal/external intercostals, deep rib cage wall | Rib-to-rib motion; what "ribs widening" physically is |
-| 4 | `superficial` | Rectus abdominis, obliques, pec major, serratus | The palpable layer; what a hand on the client touches |
-| 5 | `surface` | Skin-tone-neutral body silhouette (subtle) | Softens the figure; optional, lowest priority |
+| 4 | `ab_wall` | Rectus abdominis, internal/external obliques | The "support" musculature — central to singing and exhale control |
+| 5 | `superficial` | Pec major, deltoid, serratus | The palpable layer; what a hand on the client touches |
+| 6 | `surface` | Skin-tone-neutral body silhouette (subtle) | Softens the figure; optional, lowest priority |
+
+*(Updated 2026-08-15 after reviewing the reference video (`docs/reference/anatomy-layers/vid-*.png`): the app's trunk peel treats the abdominal wall as its own stratum, and it earns the slot — rectus/obliques are the singing-support muscles. Six layers, still muscle strata only, no extra systems.)*
 
 On top of the anatomy stack, always-on overlay layers (existing functionality, unchanged in role):
 

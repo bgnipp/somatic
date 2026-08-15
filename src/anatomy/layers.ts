@@ -23,13 +23,14 @@ export const ANATOMY_LAYER_IDS = [
   "skeleton",
   "deep",
   "intercostal",
+  "ab_wall",
   "superficial",
   "surface",
 ] as const;
 
 export type AnatomyLayerId = (typeof ANATOMY_LAYER_IDS)[number];
 
-export type AnatomyDepth = 1 | 2 | 3 | 4 | 5;
+export type AnatomyDepth = 1 | 2 | 3 | 4 | 5 | 6;
 
 export type AnatomyLayer = {
   id: AnatomyLayerId;
@@ -43,13 +44,14 @@ export const ANATOMY_LAYERS: AnatomyLayer[] = [
   { id: "skeleton", depth: 1, label: "Skeleton", filename: "skeleton.png" },
   { id: "deep", depth: 2, label: "Diaphragm & deep", filename: "deep.png" },
   { id: "intercostal", depth: 3, label: "Rib wall", filename: "intercostal.png" },
-  { id: "superficial", depth: 4, label: "Surface muscle", filename: "superficial.png" },
-  { id: "surface", depth: 5, label: "Body", filename: "surface.png" },
+  { id: "ab_wall", depth: 4, label: "Abdominal wall", filename: "ab-wall.png" },
+  { id: "superficial", depth: 5, label: "Chest & shoulder", filename: "superficial.png" },
+  { id: "surface", depth: 6, label: "Body", filename: "surface.png" },
 ];
 
 export const DEFAULT_ANATOMY_DEPTH: AnatomyDepth = 2;
 
-export const ANATOMY_DEPTH_KEY = "somatic.anatomyDepth.v1";
+export const ANATOMY_DEPTH_KEY = "somatic.anatomyDepth.v2";
 
 export function layerHref(filename: string): string {
   const base = import.meta.env.BASE_URL;
@@ -74,20 +76,23 @@ export function layerOpacity(id: AnatomyLayerId, depth: AnatomyDepth): number {
     if (depth === 3) return 0.9;
     return depth > 3 ? 0.15 : 0;
   }
-  if (id === "superficial") {
+  if (id === "ab_wall") {
     if (depth === 4) return 0.9;
-    return depth === 5 ? 0.35 : 0;
+    return depth > 4 ? 0.3 : 0;
   }
-  if (id === "surface") return depth === 5 ? 0.32 : 0;
+  if (id === "superficial") {
+    if (depth === 5) return 0.9;
+    return depth === 6 ? 0.35 : 0;
+  }
+  if (id === "surface") return depth === 6 ? 0.32 : 0;
   return 0;
 }
 
 export function clampDepth(n: number): AnatomyDepth {
-  if (n <= 1) return 1;
-  if (n === 2) return 2;
-  if (n === 3) return 3;
-  if (n === 4) return 4;
-  return 5;
+  const depth = Math.round(n);
+  if (depth <= 1) return 1;
+  if (depth >= 6) return 6;
+  return depth as AnatomyDepth;
 }
 
 export function loadStoredDepth(): AnatomyDepth {

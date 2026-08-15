@@ -118,17 +118,9 @@ function IntercostalLayer() {
   );
 }
 
-function SuperficialLayer() {
+function AbWallLayer() {
   return (
-    <g className="anatomy-placeholder anatomy-superficial">
-      <path
-        className="anatomy-pec"
-        d="M122 72 C132 74 144 80 150 90 C148 104 140 114 128 118 C124 108 122 92 122 72 Z"
-      />
-      <path
-        className="anatomy-pec"
-        d="M118 72 C108 74 96 80 90 90 C92 104 100 114 112 118 C116 108 118 92 118 72 Z"
-      />
+    <g className="anatomy-placeholder anatomy-ab-wall">
       {[
         [150, 163],
         [166, 179],
@@ -154,6 +146,35 @@ function SuperficialLayer() {
         className="anatomy-oblique"
         d="M148 128 C152 148 150 170 143 192 C139 182 136 168 135 154 C140 146 145 137 148 128 Z"
       />
+      {["M96 140 L106 148", "M94 156 L104 164", "M96 172 L105 180"].map((d) => (
+        <path key={d} className="anatomy-oblique-fiber" d={d} />
+      ))}
+      {["M144 140 L134 148", "M146 156 L136 164", "M144 172 L135 180"].map((d) => (
+        <path key={d} className="anatomy-oblique-fiber" d={d} />
+      ))}
+    </g>
+  );
+}
+
+function SuperficialLayer() {
+  return (
+    <g className="anatomy-placeholder anatomy-superficial">
+      <path
+        className="anatomy-pec"
+        d="M122 72 C132 74 144 80 150 90 C148 104 140 114 128 118 C124 108 122 92 122 72 Z"
+      />
+      <path
+        className="anatomy-pec"
+        d="M118 72 C108 74 96 80 90 90 C92 104 100 114 112 118 C116 108 118 92 118 72 Z"
+      />
+      <path
+        className="anatomy-pec"
+        d="M88 74 C84 80 82 90 83 100 C86 94 89 86 92 80 Z"
+      />
+      <path
+        className="anatomy-pec"
+        d="M152 74 C156 80 158 90 157 100 C154 94 151 86 148 80 Z"
+      />
     </g>
   );
 }
@@ -170,7 +191,7 @@ export function AnatomyPlaceholder({
   id,
   flatten = 0,
 }: {
-  id: "skeleton" | "deep" | "intercostal" | "superficial" | "surface";
+  id: "skeleton" | "deep" | "intercostal" | "ab_wall" | "superficial" | "surface";
   flatten?: number;
 }) {
   switch (id) {
@@ -180,6 +201,8 @@ export function AnatomyPlaceholder({
       return <DeepLayer flatten={flatten} />;
     case "intercostal":
       return <IntercostalLayer />;
+    case "ab_wall":
+      return <AbWallLayer />;
     case "superficial":
       return <SuperficialLayer />;
     case "surface":
