@@ -218,8 +218,8 @@ Full messages preserved at `context/transcripts/2026-08-15-physician-imessage-fo
 
 1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the review session.
 2. ~~**Scope of the neck**~~ **Answered 2026-08-15 (follow-up above): include neck & shoulder muscles.** Scalenes, SCM, upper traps, and platysma all ship; extend the figure crop only if she asks.
-4. **(New, from the rib-geometry video)** Does she want the "lengthening the rib cage" directions as a third Guide script? See the fourth-video assessment above — mapped out but deliberately not implemented without her confirmation.
 3. ~~**Confirm the color scope**~~ **Effectively confirmed** by the follow-up: she engaged with red/blue as the Guide encoding ("transparency gradient…") and confirmed the visualization-first framing. Measured views stay gold.
+4. **(New, from the rib-geometry video)** Does she want the "lengthening the rib cage" directions as a third Guide script? See the fourth-video assessment above — mapped out but deliberately not implemented without her confirmation.
 
 ## Guardrails carried forward
 
