@@ -1,16 +1,42 @@
-import { computeMetrics } from "../lib/metrics";
+import { useRef } from "react";
+import { computeMetrics, type BreathMetrics } from "../lib/metrics";
 import type { Sample } from "../types";
 
 type Props = {
   samples: Sample[];
 };
 
+type Pair = { a: number; b: number };
+
 function fmt(n: number | null, digits = 1): string {
   return n === null ? "—" : n.toFixed(digits);
 }
 
+function holdPair(prev: Pair | null, next: Pair | null): Pair | null {
+  if (!next) return prev;
+  if (!prev) return next;
+  return Math.abs(next.a - prev.a) < 2 ? prev : next;
+}
+
 export function Metrics({ samples }: Props) {
-  const m = computeMetrics(samples);
+  const held = useRef<BreathMetrics | null>(null);
+  const next = computeMetrics(samples);
+  const prev = held.current;
+  const chestBelly = holdPair(
+    prev?.chestBelly ? { a: prev.chestBelly.chest, b: prev.chestBelly.belly } : null,
+    next.chestBelly ? { a: next.chestBelly.chest, b: next.chestBelly.belly } : null,
+  );
+  const leftRight = holdPair(
+    prev?.leftRight ? { a: prev.leftRight.left, b: prev.leftRight.right } : null,
+    next.leftRight ? { a: next.leftRight.left, b: next.leftRight.right } : null,
+  );
+  const m: BreathMetrics = {
+    breathsPerMin: next.breathsPerMin ?? prev?.breathsPerMin ?? null,
+    chestBelly: chestBelly ? { chest: chestBelly.a, belly: chestBelly.b } : null,
+    leftRight: leftRight ? { left: leftRight.a, right: leftRight.b } : null,
+    phaseDeg: next.phaseDeg ?? prev?.phaseDeg ?? null,
+  };
+  held.current = m;
   const phase =
     m.phaseDeg === null
       ? "—"

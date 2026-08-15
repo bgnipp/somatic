@@ -20,6 +20,7 @@ import { PRESET_IDS, PRESETS } from "./types";
 type Mode = "live" | "recording" | "replay";
 
 const HISTORY_MS = 8000;
+const METRICS_MS = 16000;
 
 function formatTime(ms: number): string {
   const s = Math.max(0, ms) / 1000;
@@ -64,6 +65,7 @@ export default function App() {
   const [mode, setMode] = useState<Mode>("live");
   const [sample, setSample] = useState<Sample | null>(null);
   const [history, setHistory] = useState<Sample[]>([]);
+  const [metricsBuf, setMetricsBuf] = useState<Sample[]>([]);
   const [notes, setNotes] = useState("");
   const [sessions, setSessions] = useState<Session[]>(() => loadSessions());
   const [active, setActive] = useState<Session | null>(null);
@@ -92,10 +94,16 @@ export default function App() {
       source.current.stop();
       return;
     }
+    setHistory([]);
+    setMetricsBuf([]);
     const unsub = source.current.subscribe((next) => {
       setSample(next);
       setHistory((prev) => {
-        const kept = prev.filter((s) => next.t - s.t <= HISTORY_MS);
+        const kept = prev.filter((s) => next.t - s.t <= HISTORY_MS && s.t <= next.t);
+        return [...kept, next];
+      });
+      setMetricsBuf((prev) => {
+        const kept = prev.filter((s) => next.t - s.t <= METRICS_MS && s.t <= next.t);
         return [...kept, next];
       });
       if (mode === "recording") {
@@ -148,7 +156,7 @@ export default function App() {
     const t1 = history[history.length - 1].t;
     return compareSession.samples.filter((s) => s.t >= t0 && s.t <= t1);
   }, [compareSession, history]);
-  const metricsSamples = mode === "replay" && active ? active.samples : history;
+  const metricsSamples = mode === "replay" && active ? active.samples : metricsBuf;
 
   function startRecording() {
     bufferRef.current = [];

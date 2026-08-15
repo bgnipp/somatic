@@ -1,7 +1,7 @@
 import { meanAbdomen, meanLeft, meanRight, meanRibCage } from "../mock/synthesize";
 import type { Sample } from "../types";
 
-const MIN_WINDOW_MS = 8000;
+const MIN_WINDOW_MS = 10000;
 const MIN_PROMINENCE = 1;
 const MIN_PEAK_GAP_MS = 1500;
 
