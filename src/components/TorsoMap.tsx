@@ -7,6 +7,10 @@ import {
   saveStoredDepth,
   type AnatomyDepth,
 } from "../anatomy/layers";
+import { BlobField } from "../field/BlobField";
+import { sitesFromSample } from "../field/sites";
+import { ViewToggle } from "../field/ViewToggle";
+import { loadStoredView, saveStoredView, type MapView } from "../field/view";
 import { motionFill, motionGlow, motionStroke } from "../lib/color";
 import { meanAbdomen, meanRibCage } from "../mock/synthesize";
 import type { CompartmentId, Sample } from "../types";
@@ -35,6 +39,7 @@ export function TorsoMap({
 }: Props) {
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
+  const [view, setView] = useState<MapView>(loadStoredView);
   const [reduceMotion, setReduceMotion] = useState(() =>
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -46,6 +51,8 @@ export function TorsoMap({
   const scale = 1 + Math.min(total, 22) * 0.0012;
   const flatten =
     reduceMotion || depth > 2 ? 0 : Math.min(1, belly / 9.5);
+  const sites = sitesFromSample(sample);
+  const showField = view === "field";
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -60,9 +67,18 @@ export function TorsoMap({
   }, [storedDepth, depthProp]);
 
   useEffect(() => {
+    saveStoredView(view);
+  }, [view]);
+
+  useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
+      if (e.key === "v" || e.key === "V") {
+        e.preventDefault();
+        setView((v) => (v === "field" ? "regions" : "field"));
+        return;
+      }
       if (e.key !== "[" && e.key !== "]") return;
       if (depthProp !== undefined) return;
       e.preventDefault();
@@ -105,31 +121,37 @@ export function TorsoMap({
           <path className="torso-context" d={TORSO} />
           <AnatomyStack depth={depth} flatten={flatten} />
           <g clipPath="url(#torso-clip)">
-            {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
-              const mm = sample?.compartments[id].displacementMm ?? 0;
-              return (
-                <path
-                  key={`${id}-glow`}
-                  d={PATHS[id]}
-                  fill={motionGlow(mm, ceiling)}
-                  filter="url(#motion-glow)"
-                  className="compartment-glow"
-                  pointerEvents="none"
-                />
-              );
-            })}
-            {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
-              const mm = sample?.compartments[id].displacementMm ?? 0;
-              return (
-                <path
-                  key={`${id}-wash`}
-                  d={PATHS[id]}
-                  fill={motionFill(mm, ceiling)}
-                  className="compartment-glow"
-                  pointerEvents="none"
-                />
-              );
-            })}
+            {showField ? (
+              <BlobField sites={sites} />
+            ) : (
+              <>
+                {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
+                  const mm = sample?.compartments[id].displacementMm ?? 0;
+                  return (
+                    <path
+                      key={`${id}-glow`}
+                      d={PATHS[id]}
+                      fill={motionGlow(mm, ceiling)}
+                      filter="url(#motion-glow)"
+                      className="compartment-glow"
+                      pointerEvents="none"
+                    />
+                  );
+                })}
+                {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
+                  const mm = sample?.compartments[id].displacementMm ?? 0;
+                  return (
+                    <path
+                      key={`${id}-wash`}
+                      d={PATHS[id]}
+                      fill={motionFill(mm, ceiling)}
+                      className="compartment-glow"
+                      pointerEvents="none"
+                    />
+                  );
+                })}
+              </>
+            )}
             {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
               const mm = sample?.compartments[id].displacementMm ?? 0;
               return (
@@ -161,16 +183,22 @@ export function TorsoMap({
       </svg>
       <DepthRail depth={depth} onChange={setDepth} />
       </div>
+      <ViewToggle view={view} onChange={setView} />
       <div className="torso-caption">
         {hover && sample ? (
           <>
             <strong>{COMPARTMENT_LABELS[hover]}</strong>
             <span>{sample.compartments[hover].displacementMm.toFixed(1)} mm from rest</span>
           </>
+        ) : showField ? (
+          <>
+            <strong>Motion field</strong>
+            <span>Interpolated from 6 regions · higher is more motion.</span>
+          </>
         ) : (
           <>
             <strong>Front view</strong>
-            <span>Brighter is more motion. [ and ] peel layers.</span>
+            <span>Brighter is more motion. [ and ] peel layers. V toggles field.</span>
           </>
         )}
       </div>

@@ -413,6 +413,27 @@ h1 {
   line-height: 1.4;
 }
 
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.45rem;
+}
+
+.view-toggle button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.view-toggle button.active {
+  background: #2a2618;
+  border-color: #6d5a2c;
+  color: var(--gold);
+}
+
 .torso-caption {
   margin-top: 0.6rem;
   display: flex;
