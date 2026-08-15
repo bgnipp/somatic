@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-15 (revised same day from assessment-only to handoff-ready)
 **Status:** Implemented (B1–B4), plus her iMessage follow-up edits (solid-at-full activation gradient, exhale rib depression, SCM). Remaining work is her review of the quiet-breath choreography table — not code.
-**Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`).
+**Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`), plus a fourth, longer video she endorsed as "right on" (assessed below; captions at `context/transcripts/2026-08-15-physician-youtube-rib-unbunching-captions.txt`).
 
 ## What she asked for, in her words (condensed)
 
@@ -35,6 +35,17 @@ This framing resolves the red/blue color question cleanly:
 2. **Flail chest / paradoxical motion** ([youtube.com/shorts/RPWhYBFt2N8](https://www.youtube.com/shorts/RPWhYBFt2N8)) — a chest-wall segment moving *opposite* to the rest, plus a clear explanation of diaphragm → negative intrathoracic pressure → airflow. The trauma is irrelevant; the **concept of paradoxical (direction-reversed) motion is very relevant**: "reverse breathing" is one of the most common patterns a somatic teacher corrects, and our data contract is magnitude-only today. Logged in `docs/roadmap.md` backlog (signed displacement + reverse-breather preset) — **not part of this spec.**
 3. **Nanolive growth cone** ([youtube.com/shorts/SngXAGa4_as](https://www.youtube.com/shorts/SngXAGa4_as)) — label-free microscopy of undulating cell motion. No feature content; it sets the **aesthetic bar**: subtle, continuous, organic. Gentle oscillation, not a bouncy cartoon.
 
+### Fourth video — rib-cage geometry ("Unbunch Your Ribs", endorsed as "right on", 2026-08-15)
+
+["Unbunch Your Ribs to Set the Conditions for Full Thoracic Breathing"](https://www.youtube.com/watch?v=Io6sKFSk-0Y) (6 min, Alexander Technique / Jan Masoero lineage). Full captions preserved in `context/transcripts/`. This one is different in kind from the shorts: it is about the **habitual static shape of the rib cage as a precondition for breath**, not the breath cycle itself. Four takeaways:
+
+1. **Direct product-thesis validation.** The video's operative instruction is: *"Use visual feedback to confirm that you're actually doing what you intend to do."* That is Somatic's founding sentence, from a source the physician endorses. It also names the mechanism our product serves: the problem is "subconscious movements," not strength — exactly the interoception gap in `docs/mvp-plan.md`.
+2. **The posterior expansion problem.** The video's central claim: the **back and upper rib cage are where expansion matters most**, and habitual "bunching" (upper sternum pulled back/down, lower ribs pushed forward/up) blocks it — people then **puff the chest and belly forward to compensate**. Two consequences for us:
+   - **Capture-era:** a front-only camera literally cannot see the expansion this school cares most about. Posterior/multi-view capture moves from nice-to-have to a named requirement (logged in the roadmap backlog). OEP, the reference standard, always measured the full circumference.
+   - **Framing:** large *anterior* motion can be compensation for a restricted back — which is precisely why our measured views say "brightness is motion, not a problem." Do not ever "upgrade" that copy to imply more motion = better; this video is the counterexample.
+3. **Candidate third Guide script — "Lengthening the rib cage" (directions, not a breath).** The video teaches a specific coordination: upper sternum **forward and up**, lowest ribs **back and up** (never dropped, away from the pelvis), lower front ribs **narrowing** — lengthening the rib cage top to bottom (his elastic-band procedure). This is a choreography of *directions* (Alexander sense), not a breath cycle, but it maps cleanly onto our existing drivers (sternum/rib geometry + the sagittal side inset, which is exactly where "sternum forward-up, lower ribs back" lives). Explicitly *not* reps — a slow, held coordination loop would be the right rendering. **Pending her confirmation at the review session before any implementation** — it imports a school's postural doctrine, which is a step beyond neutral physiology.
+4. **A nuance to guard in the supported script:** her exhale has the ribs pulled "in, together, and down" — a *dynamic, phasic* action. The video warns against ribs held *habitually* bunched — a static set. These are compatible (contract through the exhale, release fully for the inhale), but the Guide must always show the supported exhale's rib depression **fully releasing** into the next inhale, never settling into a narrowed rest position. The current `ribExpand` curve already returns to rest; keep it that way.
+
 ### Her physiology model, captured as choreography
 
 The clinical actions she cites, arranged into the loop the animation plays. **This table is the data model** — each row becomes an activation curve keyed to breath phase. It describes an **actively supported breath** (singing/trained support) and ships as the script named "Supported breath." A second script, "Quiet breath," ships alongside it (her decision, 2026-08-15) — its table follows below.
@@ -49,7 +60,7 @@ The clinical actions she cites, arranged into the loop the animation plays. **Th
 | Intercostals | Active with rib expansion (red) | Fading through exhale | One layer tint; the internal/external split is a Track H refinement |
 | Scalenes | Assist rib elevation (red, subtle) | Relax (blue) | Schematic neck hints, Guide view only |
 | Traps (upper) | **Relax (blue)** to free the thoracic cavity | Neutral | Ties to the scapular-glide video; rhomboids are posterior — represented by the trap outline in front view |
-| Platysma | — | — | **Deferred** (open question 2); purely cosmetic in front view |
+| Platysma | Relaxes (blue, gentle) | Neutral | Shipped with the iMessage follow-up (neck roster complete) |
 | Rib cage + whole figure | Expands (geometry, not just tint) | Settles | "The entire animation should oscillate" |
 
 ### Quiet breath choreography (second script)
@@ -206,7 +217,8 @@ Full messages preserved at `context/transcripts/2026-08-15-physician-imessage-fo
 ## Open questions for the physician
 
 1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the review session.
-2. ~~**Scope of the neck**~~ **Answered 2026-08-15 (follow-up above): include neck & shoulder muscles.** Scalenes, SCM, and upper traps ship; platysma deferred; extend the figure crop only if she asks.
+2. ~~**Scope of the neck**~~ **Answered 2026-08-15 (follow-up above): include neck & shoulder muscles.** Scalenes, SCM, upper traps, and platysma all ship; extend the figure crop only if she asks.
+4. **(New, from the rib-geometry video)** Does she want the "lengthening the rib cage" directions as a third Guide script? See the fourth-video assessment above — mapped out but deliberately not implemented without her confirmation.
 3. ~~**Confirm the color scope**~~ **Effectively confirmed** by the follow-up: she engaged with red/blue as the Guide encoding ("transparency gradient…") and confirmed the visualization-first framing. Measured views stay gold.
 
 ## Guardrails carried forward
