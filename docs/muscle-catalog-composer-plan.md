@@ -1,7 +1,7 @@
 # Muscle Catalog, Back View & Composer — Implementation Plan
 
 **Date:** 2026-08-15
-**Status:** Planned, not started. Written for agent handoff; each phase is independently commit-able.
+**Status:** Implemented (C1–C5), 2026-08-15. Remaining work is physician review (BT osteopathy link, back-figure art, composer flow) — not code.
 **Sources:** The physician's in-flight messages of 2026-08-15 (`context/transcripts/2026-08-15-physician-inflight-muscle-roster.txt`, screenshots in `context/muscle-roster/`), assessed in `docs/breath-animation-plan.md` §Physician follow-up #2. Her three asks, in her words:
 
 1. *"See how in the BT osteopathy animation the pec minor assists with breathing, the pec major assists by relaxing."*

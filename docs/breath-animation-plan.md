@@ -225,7 +225,7 @@ Messages + three Essential Anatomy screenshots preserved at `context/transcripts
 
 Recommended sequencing: (1) pec pair into the supported script now — small, front-view-visible, her explicit example; (2) get the BT video link; (3) decide the back-view question with her at the review session; (4) then plan the catalog + composer as its own track.
 
-**Update, same day:** planned in full as the C-track — see `docs/muscle-catalog-composer-plan.md` (C1 catalog refactor, C2 pec pair, C3 schematic back figure, C4 composer, C5 polish). The back figure ships schematic without waiting on her session (easy to iterate); detailed posterior choreography in canonical scripts still waits on the BT link and her review.
+**Update, same day:** planned and implemented as the C-track — see `docs/muscle-catalog-composer-plan.md` (C1 catalog, C2 pec pair, C3 schematic back figure, C4 composer, C5 polish). The back figure ships schematic; detailed posterior choreography in canonical scripts still waits on the BT link and her review. The composer is the path for her full roster meanwhile.
 
 ## Open questions for the physician
 
@@ -233,9 +233,9 @@ Recommended sequencing: (1) pec pair into the supported script now — small, fr
 2. ~~**Scope of the neck**~~ **Answered 2026-08-15 (follow-up above): include neck & shoulder muscles.** Scalenes, SCM, upper traps, and platysma all ship; extend the figure crop only if she asks.
 3. ~~**Confirm the color scope**~~ **Effectively confirmed** by the follow-up: she engaged with red/blue as the Guide encoding ("transparency gradient…") and confirmed the visualization-first framing. Measured views stay gold.
 4. **(From the rib-geometry video)** The "Rib lengthening" directions now ship as a third Guide script (implemented at the user's direction — see the fourth-video assessment). **Her review decides whether it stays**, since it renders one school's postural doctrine; removal is trivial if she declines.
-5. **(From follow-up #2)** Link to the "BT osteopathy animation" she references — needed before encoding anything beyond the pec pair.
-6. **(From follow-up #2)** Back view: her full muscle roster is mostly posterior spinal musculature a front view cannot show. Does she want a back-view figure, and at what fidelity (schematic now vs. Track-H renders)?
-7. **(From follow-up #2)** Composer scope: confirm the select-engage-group / select-relax-group authoring flow and how ordered "light up in the order selected" should read on screen before it gets its own plan.
+5. **(From follow-up #2)** Link to the "BT osteopathy animation" she references — still needed before encoding richer default curves beyond the pec pair (which shipped in C2).
+6. **(From follow-up #2)** Back-figure review: a schematic posterior view now ships in Guide (`Front | Back`, `b`). Are the erector columns, levatores, intertransversarii, and rhomboids drawn and grouped the way she teaches?
+7. **(From follow-up #2)** Composer review: Compose mode lets her pick ordered engage/release groups; muscles light in the order selected. Does that match, or does she want editable per-muscle onsets?
 
 ## Guardrails carried forward
 

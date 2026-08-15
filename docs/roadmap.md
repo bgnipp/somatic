@@ -20,16 +20,11 @@
 | **Paradoxical timing preset** (belly anti-phase to ribs — the "reverse breather", magnitude-only) + mock-stream phase pill hidden in Guide view | (was backlog) | `e2b17a9` |
 | **Platysma** + **sagittal side inset** showing the supported exhale's slight C-curve (front view can't show sagittal flexion) | (was backlog) | `e59f254` |
 | **Third Guide script "Rib lengthening"** (held directions loop from the endorsed video: sternum forward/up, ribs back/up, lower front narrowing; no activation tints; new `ribLift`/`sternumLift` drivers; side inset data-driven) | `docs/breath-animation-plan.md` §Fourth video | this commit |
+| **C-track (C1–C5):** muscle catalog as data; pec pair in supported script; schematic back figure (`Front \| Back`, `b`); composer compiles ordered engage/release groups into a `GuideScript` | `docs/muscle-catalog-composer-plan.md` | `e56ed64`, `c02e810`, `dea13cb`, `5c99745` |
 
 ## Remaining — agent work, ready now
 
-| Work | Plan doc | Notes |
-|---|---|---|
-| **C1:** muscle catalog — roster becomes data (`src/anatomy/catalog.ts`), scripts become sparse | `docs/muscle-catalog-composer-plan.md` §C1 | Prerequisite refactor, no visible change |
-| **C2:** pec pair in the supported script (major relaxes, minor assists) | `docs/muscle-catalog-composer-plan.md` §C2 | Her explicit example; front-view visible today |
-| **C3:** schematic back figure, Guide-only, `Front \| Back` toggle (`b`) — her posterior roster becomes visible | `docs/muscle-catalog-composer-plan.md` §C3 | Choreography beyond uncontroversial tone stays sparse until the BT link / her review |
-| **C4:** composer — ordered engage/release groups compile to a `GuideScript`, muscles light in the order selected | `docs/muscle-catalog-composer-plan.md` §C4 | Renderer unchanged; composition persists in localStorage |
-| **C5:** polish + docs + regression pass | `docs/muscle-catalog-composer-plan.md` §C5 | — |
+None. Next agent work is blocked on human items below.
 
 ## Remaining — human work
 
@@ -40,8 +35,8 @@
 | **Therapist success-gate session** | `docs/mvp-plan.md` §Success gate | Gates all capture (Phase 2) work |
 | **Physician review of the quiet-breath choreography table** | `docs/breath-animation-plan.md` §Open questions | Neck scope and color scope were answered in her 2026-08-15 iMessage follow-up (acted on same day) |
 | **Physician review of the "Rib lengthening" Guide script** | `docs/breath-animation-plan.md` §Fourth video | Implemented at the user's direction from the video she endorsed; her review decides whether it stays (it renders one school's postural doctrine — trivial to remove) |
-| **Get the "BT osteopathy animation" link from her** | `docs/breath-animation-plan.md` §Follow-up #2 | Needed before encoding muscle actions beyond the pec pair |
-| **Back-view decision with her** | `docs/breath-animation-plan.md` §Follow-up #2 | Her full roster (iliocostalis, longissimus, intertransversarii, levatores costarum) is posterior — invisible in the front view; scope and fidelity are her call |
+| **Get the "BT osteopathy animation" link from her** | `docs/breath-animation-plan.md` §Follow-up #2 | Needed before encoding richer default curves for the posterior roster and pec-minor detail |
+| **Physician review of the back figure and composer** | `docs/muscle-catalog-composer-plan.md` §Open questions | Schematic back roster + select-order-as-light-order shipped; her eye decides grouping, art, and whether onsets should become editable |
 
 ## Remaining — agent work, blocked
 
