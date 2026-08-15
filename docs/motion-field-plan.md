@@ -1,7 +1,7 @@
 # Motion Field ("Heat Signature") — Plan
 
 **Date:** 2026-08-15 (revised same day: relief shading promoted from non-goal to target — see "Why relief")
-**Status:** Plan only. Not implemented.
+**Status:** Ready for handoff. Implementing agent: start at "Handoff notes", execute F1 then F2.
 **Reference:** `docs/reference/motion-field/field-ref-*.png` — frames from a Schrödinger-equation animation the physician shared: a continuous field rendered as smooth animated peaks, intensity rising where amplitude is high.
 
 ## The idea, translated to our product
@@ -65,6 +65,24 @@ Build A first to prove the plumbing, then B+C together as one phase. A remains a
 - **Compare / replay / traces / Konno–Mead / metrics:** untouched; they read samples, not pixels.
 - **Reduced motion:** the field itself is not an animation (it just re-renders per sample like everything else), so no special handling beyond what exists.
 - **Left-quiet and frozen presets** are the acceptance stress test: in Field view, a quiet region must read as a *dim area*, not disappear into its bright neighbor's blob. This is the main tuning risk of Approach A — blob radii must not be so generous that they wash over a frozen neighbor.
+
+## Handoff notes for the implementing agent
+
+The agent implements **F1 and F2**. F3 is a human tuning session — do not attempt it; leave tunables (light angle, height exaggeration, falloff radius, ramp) as named constants in one place so the session can adjust them quickly.
+
+Orientation (same repo rules as `docs/layered-anatomy-plan.md`, which was implemented successfully — read its "Agent orientation" section first):
+
+- Stack: React + TypeScript + Vite, zero runtime dependencies beyond React. Keep it that way. No three.js, no WebGL, no chart/interp libraries.
+- Where things live now: `src/components/TorsoMap.tsx` renders the figure — anatomy stack (`src/anatomy/AnatomyStack.tsx`, 6 layers with a depth stepper), then a glow pass and a wash pass over the compartment `PATHS` (from `src/components/torsoPaths.ts`), then bone lines, then landmarks. Color ramps are in `src/lib/color.ts`. The torso viewBox is `0 0 240 250`, clip path id `torso-clip`.
+- The **Field view replaces the glow + wash passes** when active; anatomy stack, bone lines, landmarks, and the invisible hover hit-paths stay in both views.
+- **Field sites**: derive centroids from the six compartment `PATHS` (hardcoding sensible centroid coordinates next to `PATHS` is fine — they're stable), plus the two lateral points from `sample.lateral` when present, mapped to the lateral rib landmarks. Keep the derivation in one pure function.
+- Canvas integration (F2): render the height field on an offscreen canvas, draw it into the SVG via an `<image>` (data URL or `createImageBitmap` → object URL each frame is wasteful; prefer drawing the canvas positioned under/inside the SVG stage with CSS, clipped via `clip-path`, or use `<foreignObject>`). Choose the simplest approach that clips to the torso and layers correctly between anatomy and landmarks; document the choice in a comment.
+- Keyboard: `v` toggles the view. Guard against typing targets exactly like the existing handlers (see the `[`/`]` handler in `TorsoMap.tsx`). Taken keys: space, arrows, `[`, `]`.
+- `prefers-reduced-motion`: the relief (F2) falls back to the flat F1 render. There's an existing `matchMedia` listener in `TorsoMap.tsx` to reuse.
+- Persistence: localStorage, follow the pattern of `somatic.anatomyDepth.v2` in `src/anatomy/layers.ts`.
+- Verify with `npm run build` after each phase; check wide and ~420 px layouts in `npm run dev`. GitHub Pages base is `/somatic/` — no hardcoded absolute asset paths.
+- Language guardrails: education not assessment; the caption strings in this plan are the approved wording. Never "heat", never "problem areas".
+- Commit per phase, one-line messages matching history; push when both phases build clean.
 
 ## Phases
 
