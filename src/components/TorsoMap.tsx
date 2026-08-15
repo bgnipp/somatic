@@ -8,6 +8,7 @@ import {
   type AnatomyDepth,
 } from "../anatomy/layers";
 import { BlobField } from "../field/BlobField";
+import { ReliefField } from "../field/ReliefField";
 import { sitesFromSample } from "../field/sites";
 import { ViewToggle } from "../field/ViewToggle";
 import { loadStoredView, saveStoredView, type MapView } from "../field/view";
@@ -122,7 +123,11 @@ export function TorsoMap({
           <AnatomyStack depth={depth} flatten={flatten} />
           <g clipPath="url(#torso-clip)">
             {showField ? (
-              <BlobField sites={sites} />
+              reduceMotion ? (
+                <BlobField sites={sites} />
+              ) : (
+                <ReliefField sites={sites} depth={depth} />
+              )
             ) : (
               <>
                 {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
@@ -193,7 +198,7 @@ export function TorsoMap({
         ) : showField ? (
           <>
             <strong>Motion field</strong>
-            <span>Interpolated from 6 regions · higher is more motion.</span>
+            <span>Interpolated from 6 regions · higher is more motion · ~10× actual.</span>
           </>
         ) : (
           <>
