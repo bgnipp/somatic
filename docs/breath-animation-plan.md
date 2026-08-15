@@ -2,14 +2,14 @@
 
 **Date:** 2026-08-15
 **Status:** Assessment + plan only. Do NOT implement yet — one physiology question must be settled with the physician first (see "Open questions"), and she should confirm the mode split below matches her intent.
-**Sources:** Voice memo from the physician ("breath animation", 3.3 min, transcribed 2026-08-15) plus three YouTube shorts she sent (assessed below).
+**Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`).
 
 ## What she asked for, in her words (condensed)
 
-- Overall look: like the **Essential Anatomy 3D** app (the same app our `docs/reference/anatomy-layers/` screenshots and peel video come from).
+- Overall look: like the **Essential Anatomy 3D** app (the same app our `context/anatomy-layers/` screenshots and peel video come from).
 - **The entire animation should oscillate** — muscles and ribs visibly expand and settle with the breath, not just overlays lighting up on a static figure.
 - Include **the pelvic floor** in the layer stack.
-- Show **which muscles relax during inhalation and which contract during exhalation**, using the heat-signature style of the Paul G "Schrödinger's Equation Animation" video (our existing `docs/reference/motion-field/` reference): **activating muscles turn red, relaxing muscles turn blue**.
+- Show **which muscles relax during inhalation and which contract during exhalation**, using the heat-signature style of the Paul G "Schrödinger's Equation Animation" video (our existing `context/motion-field/` reference): **activating muscles turn red, relaxing muscles turn blue**.
 - Her choreography of the breath:
   - The breath **starts with engaging the pelvic floor** and the diaphragm pulling down, "squishing the abdominal contents closer together."
   - **While the diaphragm relaxes, the rectus contracts** (exhale).

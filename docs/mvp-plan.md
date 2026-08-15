@@ -1,8 +1,18 @@
 # Somatic Breath Map — MVP Plan
 
 **Date:** 2026-08-14
-**Status:** Draft, pre-build
-**Source material:** `notes/2026-08-14-breath-measurement-conversation.txt`
+**Status:** Phase 0 built and deployed (see status update below). This document remains the product thesis and constraints; newer work is planned in the follow-on docs.
+**Source material:** `context/transcripts/2026-08-14-breath-measurement-conversation.txt` (kept local-only, not in the repo)
+
+## Status update (2026-08-15)
+
+Phase 0 (mock studio) is built and live on GitHub Pages, and has grown past the original v0 scope:
+
+- **Everything in the v0 table below ships:** six-compartment torso map, seven mock presets (the original five plus two singing-support presets), traces, Konno–Mead loop, record/replay/scrub, export/import, notes, compare view, live metrics (breaths/min, chest:belly, left:right, phase gap), URL-shareable scenarios.
+- **Layered anatomy** (`docs/layered-anatomy-plan.md`): the figure now peels through six anatomical strata (skeleton → diaphragm & deep → rib wall → abdominal wall → chest & shoulder → body) via a depth rail, with schematic placeholder art; realistic Blender renders are a pending human task (Track H).
+- **Motion field** (`docs/motion-field-plan.md`): a continuous interpolated motion view (`Regions | Field` toggle) rendered as a lit relief surface — the belly visibly swells with the breath. Therapist tuning pass (F3) pending.
+- **Physician feedback received** (voice memo + reference videos, transcripts in `context/transcripts/`): assessed in `docs/breath-animation-plan.md`, which plans a model-driven teaching animation of the coordinated breath (muscle activation states, pelvic floor, whole-figure oscillation). Blocked on physiology questions for her; not implemented.
+- **Next gate is unchanged:** put it in front of the therapist and run the success gate below before any capture work.
 
 ## One-line summary
 
@@ -78,7 +88,7 @@ A local web app, no backend, that the therapist and client look at together on o
 - Lung volume computation (that's the clinical product; ours is relative excursion + phase)
 - Pose estimation (ruled out even later — see accuracy table)
 - Accounts, cloud, sync
-- EMG / ultrasound / "activation" (we measure displacement in space; contraction is a different question)
+- EMG / ultrasound / "activation" (we measure displacement in space; contraction is a different question). *2026-08-15 note: activation now appears in plans as a scripted teaching animation (`docs/breath-animation-plan.md`) — modeled, clearly labeled, never presented as the user's measurement. The measurement exclusion stands.*
 - Head position tracking (later overlay, not v0)
 - Any diagnostic scoring or normative comparison
 

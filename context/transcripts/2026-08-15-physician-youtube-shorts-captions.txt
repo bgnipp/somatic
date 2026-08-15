@@ -1,0 +1,39 @@
+Three YouTube shorts sent by the physician — auto-captions
+===========================================================
+
+Date received:   2026-08-15
+Assessed in:     docs/breath-animation-plan.md ("Assessment of the three videos")
+Captions below are the videos' own transcripts (auto-generated, unpunctuated).
+
+1. Scapular glide on the rib cage
+   https://www.youtube.com/shorts/1V8PDPoxFT4
+----------------------------------------------------------------
+to raise your arm above your head the scapula has to Glide along the rib cage
+like this there's three specific muscles that are primarily involved in this
+motion the serratus anterior the levator scapula and the romboid muscle
+
+2. Flail chest / paradoxical chest-wall motion
+   https://www.youtube.com/shorts/RPWhYBFt2N8
+----------------------------------------------------------------
+what exactly is going on here this is a pretty gnarly example of what we call
+flail chest typically caused by blunt thoracic trauma little chest is defined
+as fractures of three or more ribs in two or more places which create a
+floating segment that loses its mechanical continuity with the remainder of
+the chest wall the fractured portion of the rib cage or the flail segment
+separates from the rest of the chest wall and moves in a paradoxical motion on
+respiration normally when we breathe in or Inspire our lungs create a vacuum
+by Contracting the diaphragm and moving it downward causing the rib cage to
+expand this causes a negative intrathoracic pressure during inspiration which
+allows air to enter Then when we expire and breathe outward the diaphragm
+relaxes causing positive intrathoracic pressure allowing air to be pushed out
+of the chest cavity when we have these rib fractures the flail segment moves
+with the interthoracic pressure and is no longer held in place with the entire
+rib cage moving inward during inspiration and outward during expiration
+
+3. Nanolive imaging — neuron growth cone dynamics
+   https://www.youtube.com/shorts/SngXAGa4_as
+----------------------------------------------------------------
+High temporal resolution reveals the fine details of growth cone dynamics in
+real-time as a neuron searches for another cell. We see undulating movements
+of the growth cone and the long filopodia as actin bundles are restructured,
+thanks to the label-free, high spatial resolution of Nanolive imaging.

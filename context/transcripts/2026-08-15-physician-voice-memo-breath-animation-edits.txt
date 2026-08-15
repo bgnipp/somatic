@@ -1,0 +1,42 @@
+Physician voice memo — requested edits to the breath animation
+================================================================
+
+Date received:   2026-08-15
+Source file:     "breath animation.m4a" (3 min 18 s voice memo, kept out of the repo)
+Transcription:   Whisper (small.en), lightly cleaned; recording ends mid-sentence
+Acted on in:     docs/breath-animation-plan.md (assessment + plan)
+Related refs:    context/anatomy-layers/ (Essential Anatomy 3D peel screenshots)
+                 context/motion-field/ (Paul G "Schrödinger's Equation Animation" frames)
+
+Transcript
+----------
+
+First, I imagine the animation to be similar to the Essential Anatomy 3D app.
+
+The entire animation should oscillate, so the muscles and ribs should expand.
+
+The breath should include the layers of the pelvic floor, as well as
+demonstrate the muscles that relax during inhalation and the ones that
+contract during exhalation.
+
+So, while the diaphragm relaxes, the rectus contracts. The transversus always
+maintains tone, and the breath starts with contracting the pelvic floor and
+pulling the diaphragm down, squishing the abdominal contents closer together,
+while the most external layers of the body's muscles — such as the traps and
+rhomboids — relax to let the thoracic cavity expand.
+
+Relaxation and activation can be animated in movement with the heat-signature
+animation that is seen in the YouTube video by Paul G., "Schrödinger's
+Equation Animation."
+
+The clinical definition of the action of the individual muscles can be used to
+frame the coordination of movement and action of breathing.
+
+Starting with engaging the pelvic floor, the levators can be seen; the
+transversus; internal and external obliques; the intercostal muscles; the
+scalenes of the neck; and the platysma.
+
+Those can be seen relaxing — so, like, turning blue — while the muscles being
+activated are turning red, and…
+
+[recording ends]

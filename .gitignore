@@ -2,7 +2,7 @@ node_modules
 dist
 .DS_Store
 *.local
-notes/
+context/transcripts/2026-08-14-breath-measurement-conversation.txt
 .vscode
 .idea
 vid.mov

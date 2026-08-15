@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-15 (revised same day: relief shading promoted from non-goal to target — see "Why relief")
 **Status:** Ready for handoff. Implementing agent: start at "Handoff notes", execute F1 then F2.
-**Reference:** `docs/reference/motion-field/field-ref-*.png` — frames from a Schrödinger-equation animation the physician shared: a continuous field rendered as smooth animated peaks, intensity rising where amplitude is high.
+**Reference:** `context/motion-field/field-ref-*.png` — frames from a Schrödinger-equation animation the physician shared: a continuous field rendered as smooth animated peaks, intensity rising where amplitude is high.
 
 ## The idea, translated to our product
 

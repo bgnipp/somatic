@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-15
 **Status:** Ready for handoff. An implementing agent should start at "Handoff: division of labor" and execute the G-phases in order.
-**Reference material:** `docs/reference/anatomy-layers/` (14 screenshots from a commercial 3D anatomy app showing a progressive muscle "peel" from superficial pecs/obliques down to intercostals, diaphragm, psoas, and bare skeleton, plus the layer-toggle rail UI)
+**Reference material:** `context/anatomy-layers/` (14 screenshots from a commercial 3D anatomy app showing a progressive muscle "peel" from superficial pecs/obliques down to intercostals, diaphragm, psoas, and bare skeleton, plus the layer-toggle rail UI)
 
 ## Goal
 
@@ -56,7 +56,7 @@ Five anatomy layers, deep → superficial, matching the teaching story ("what's 
 | 5 | `superficial` | Pec major, deltoid, serratus | The palpable layer; what a hand on the client touches |
 | 6 | `surface` | Skin-tone-neutral body silhouette (subtle) | Softens the figure; optional, lowest priority |
 
-*(Updated 2026-08-15 after reviewing the reference video (`docs/reference/anatomy-layers/vid-*.png`): the app's trunk peel treats the abdominal wall as its own stratum, and it earns the slot — rectus/obliques are the singing-support muscles. Six layers, still muscle strata only, no extra systems.)*
+*(Updated 2026-08-15 after reviewing the reference video (`context/anatomy-layers/vid-*.png`): the app's trunk peel treats the abdominal wall as its own stratum, and it earns the slot — rectus/obliques are the singing-support muscles. Six layers, still muscle strata only, no extra systems.)*
 
 *(Physician feedback addendum, 2026-08-15 — see `docs/breath-animation-plan.md` for the full memo and assessment. Two future layer-roster changes are queued but NOT part of the current tracks: a seventh `pelvic_floor` layer (levator ani dome in the pelvic bowl — her breath choreography starts there), and neck musculature (scalenes, platysma), which would extend the figure above the current crop. The scapular-glide video she sent also argues the superficial layer should eventually include traps/rhomboids/levator scapulae — the girdle muscles that must relax for rib expansion. She additionally wants the whole figure to visibly oscillate with breath (ribs widening, silhouette swelling), which builds on the G4 diaphragm morph. None of this changes Track G/H acceptance criteria yet; Track H renderers should know the layer list will grow.)*
 
@@ -79,7 +79,7 @@ A single **depth stepper** (or 5-stop slider) in the stage: each step peels one 
 3. **Style pass.** Matte materials only. Desaturate: muscle to muted umber (≈ our `--gold`/brown family), bone to warm off-white ivory, tendon/aponeurosis to pale parchment. Single soft key light, no speculars, near-black background, render with alpha.
 4. **Render each layer to PNG** at 2× display size (~1200×1600), transparent background. Layers render *cumulatively from the back*: e.g. the `intercostal` render includes skeleton behind it, OR render each in isolation and let the app stack them — **choose isolation** (each layer alone with alpha) so the app controls compositing and opacity per layer independently.
 5. **Optimize**: `oxipng`/`pngquant` to keep each layer ≲ 300 KB. Total budget ≤ 1.5 MB.
-6. **Commit** renders to `public/anatomy/` with the source `.blend` settings documented in `docs/reference/anatomy-layers/PIPELINE.md` so re-renders are reproducible.
+6. **Commit** renders to `public/anatomy/` with the source `.blend` settings documented in `context/anatomy-layers/PIPELINE.md` so re-renders are reproducible.
 7. **Fallback asset**: none needed — the existing vector torso stays in the code and shows until images load (and forever if assets fail).
 
 Estimated effort: 1–2 days for someone comfortable in Blender; the styling pass is most of it. This is human work (Track H below) — it does **not** block the in-app layer architecture, which ships first with schematic placeholders.

@@ -13,4 +13,4 @@ Drop Track H PNGs here. Filenames must match the manifest in `src/anatomy/layers
 
 Each file is isolated (that layer only, transparent background), framed to the torso SVG viewBox `0 0 240 250`. See the anchor table at the top of `src/anatomy/layers.ts`. Until a file is present, the app draws the schematic SVG placeholder.
 
-Do not commit imagery traced from the commercial reference screenshots in `docs/reference/anatomy-layers/`.
+Do not commit imagery traced from the commercial reference screenshots in `context/anatomy-layers/`.
