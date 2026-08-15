@@ -15,6 +15,9 @@
 | Metrics flicker fix (16 s metrics buffer, deadband hold) | (bug fix) | `16b9c51` |
 | Physician feedback captured: voice memo + 3 videos transcribed, assessed, planned | `docs/breath-animation-plan.md`, `context/transcripts/` | `ba60252`, `c77fd57` |
 | **Guide view (B1–B4):** scripted Quiet / Supported breath animation — red/blue activation tints, pelvic floor, rib oscillation, `Regions \| Field \| Guide` toggle (`g` key), pause/scrub, reduced-motion freeze | `docs/breath-animation-plan.md` | `0290b9a`, `b20d19b`, `a86d2e5`, `29f08c0` |
+| Physician iMessage follow-up applied: solid-at-full activation gradient, exhale rib pull-in/down, SCM | `docs/breath-animation-plan.md` §Physician follow-up | `31ddc6e` |
+| **Paradoxical timing preset** (belly anti-phase to ribs — the "reverse breather", magnitude-only) + mock-stream phase pill hidden in Guide view | (was backlog) | `e2b17a9` |
+| **Platysma** + **sagittal side inset** showing the supported exhale's slight C-curve (front view can't show sagittal flexion) | (was backlog) | `e59f254` |
 
 ## Remaining — agent work, ready now
 
@@ -37,9 +40,8 @@ None. Next agent work is blocked on human items below.
 
 ## Backlog (captured, not planned in detail)
 
-- **Signed displacement + "reverse breather" preset.** Insight from the flail-chest video: direction of motion matters, not just magnitude. Would extend `CompartmentSample` with a signed convention (or a `paradoxical` flag per region in mocks) and a preset where the belly draws in on inhale. Needs its own mini-plan before implementation — touches color ramps (what does "inward" look like?), metrics, and the relief field.
-- **Side view for sagittal mechanics.** Her follow-up describes a slight C-curve of the spine during the active exhale — sagittal-plane motion a front view cannot show. A future side-view figure (or a small side inset) is the honest way to render it.
+- **Signed displacement** (true negative excursion in the data contract). The paradoxical-timing preset ships the observable half (anti-phase timing, magnitude-only); real signed data would additionally let a region read "drawn inward" at capture time. Revisit in the camera era — touches color ramps, metrics, and the relief field.
 - **Motion recording, later versions (physician, 2026-08-15):** after the basic breath is mapped, add motion recording — possibly a combination of EMG, acupuncture-needle mapping, and motion tracking. Aligns with the existing Phase 2 capture plan; EMG would also make the Guide's activation colors measurable someday.
-- **Platysma** (superficial neck): deferred from the neck scope; cosmetic in front view.
+- **Full side-view figure.** The Guide's schematic side inset covers the C-curve for now; a full side view with its own compartments is a capture-era question.
 - **Phase 2 capture spike** (4 markers + webcam behind `BreathSource`): gated on the therapist success-gate session.
 - **Installation mode / back view / therapist-named presets:** parked open questions in `docs/mvp-plan.md`.
