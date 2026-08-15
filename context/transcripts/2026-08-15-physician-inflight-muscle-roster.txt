@@ -1,0 +1,47 @@
+Source: Messages from the physician, 2026-08-15, 11:28–11:29 AM, sent from a
+flight ("im on a flight and for some reason my text not getting through with
+images"). Accompanied by three screenshots from the Essential Anatomy 3D app,
+preserved in context/muscle-roster/.
+
+--- Her messages, verbatim ---
+
+im on a flight and for some reason my text not getting through with images
+
+[t]he important layers: see how in the BT osteopathy animation the pec minor
+assists with breathing, the pec major assists by relaxing.
+
+the animation needs to include every muscle listed.
+
+we can input the action of each muscle to make visualization accurate
+this is the minutia required
+
+once we put in all relevant anatomy and define their movements we will select
+a group of muscles to engage and activate, they will light up in the order
+selected (same with group of relaxing muscles)
+see action here and muscle isolated
+
+--- Screenshot contents (Essential Anatomy 3D) ---
+
+Screenshot 1 — muscle isolated, posterior view of neck/upper back, one muscle
+highlighted:
+  Iliocostalis — Cervical Part (Right) (Musculus iliocostalis cervicis)
+  ORIGIN: Angles of the 3rd - 7th ribs.
+  INSERTION: Transverse processes of the C4-C6 cervical [vertebrae]
+
+Screenshot 2 — "Multiple Selection Mode", posterior/lateral view of rib cage
+with several muscles selected; visible in the selection list:
+  Subclavius (Right)
+  Levatores Costarum Longi (Right)
+  Levatores Costarum Brevis (Right)
+
+Screenshot 3 — "Multiple Selection Mode", posterior view of skeleton with
+pectoralis major/minor highlighted orange (seen through the rib cage);
+visible in the selection list:
+  Intertransversarii Thoracis (Right)
+  Longissimus Cervicis (Right)
+  Intertransversarii Cervicis Posteriores (Right)
+
+Note: the selection lists are scrollable; the roster shown is what was visible
+in the screenshots, and "every muscle listed" may include more. The "BT
+osteopathy animation" she references (pec minor assisting inhalation, pec
+major assisting by relaxing) is a video we do not yet have a link for.
