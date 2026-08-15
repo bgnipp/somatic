@@ -25,7 +25,11 @@
 
 | Work | Plan doc | Notes |
 |---|---|---|
-| **Pec pair in the supported script:** pec major relaxes (blue) on inhale; pec minor assists (schematic: fold into the existing `anatomy-pec` paths, minor's separate art is Track-H-era) | `docs/breath-animation-plan.md` §Follow-up #2 | Her explicit example from the BT osteopathy animation; front-view visible today |
+| **C1:** muscle catalog — roster becomes data (`src/anatomy/catalog.ts`), scripts become sparse | `docs/muscle-catalog-composer-plan.md` §C1 | Prerequisite refactor, no visible change |
+| **C2:** pec pair in the supported script (major relaxes, minor assists) | `docs/muscle-catalog-composer-plan.md` §C2 | Her explicit example; front-view visible today |
+| **C3:** schematic back figure, Guide-only, `Front \| Back` toggle (`b`) — her posterior roster becomes visible | `docs/muscle-catalog-composer-plan.md` §C3 | Choreography beyond uncontroversial tone stays sparse until the BT link / her review |
+| **C4:** composer — ordered engage/release groups compile to a `GuideScript`, muscles light in the order selected | `docs/muscle-catalog-composer-plan.md` §C4 | Renderer unchanged; composition persists in localStorage |
+| **C5:** polish + docs + regression pass | `docs/muscle-catalog-composer-plan.md` §C5 | — |
 
 ## Remaining — human work
 
@@ -51,7 +55,6 @@
 - **Motion recording, later versions (physician, 2026-08-15):** after the basic breath is mapped, add motion recording — possibly a combination of EMG, acupuncture-needle mapping, and motion tracking. Aligns with the existing Phase 2 capture plan; EMG would also make the Guide's activation colors measurable someday.
 - **Full side-view figure.** The Guide's schematic side inset covers the C-curve for now; a full side view with its own compartments is a capture-era question.
 - **Posterior expansion capture (capture-era requirement, upgraded from nice-to-have):** the rib-geometry video's school holds that the back and upper rib cage expand most; a front-only camera cannot see it, and large anterior motion can be *compensation* for a blocked back. Multi-view or posterior capture should be a named requirement of the Phase 2+ design — and the "brightness is motion, not a problem" copy must never drift toward "more motion = better."
-- **Muscle catalog + composer (physician, follow-up #2):** move the muscle roster from hand-coded structures to a data catalog (per-muscle clinical action), and add an authoring mode — select an engage group and a relax group, ordered, and the app compiles the selection into a `GuideScript` ("they will light up in the order selected"). Renderer unchanged; needs its own mini-plan after the back-view decision and the BT video link.
-- **Back-view figure:** upgraded from parked question — two independent physician-endorsed pushes (posterior expansion in the rib-geometry video; her posterior muscle roster in follow-up #2).
+- ~~Muscle catalog + composer~~ and ~~back-view figure~~: **promoted to the C-track above** — planned in detail in `docs/muscle-catalog-composer-plan.md`.
 - **Phase 2 capture spike** (4 markers + webcam behind `BreathSource`): gated on the therapist success-gate session.
 - **Installation mode / therapist-named presets:** parked open questions in `docs/mvp-plan.md` (back view promoted to its own item above).

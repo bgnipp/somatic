@@ -225,6 +225,8 @@ Messages + three Essential Anatomy screenshots preserved at `context/transcripts
 
 Recommended sequencing: (1) pec pair into the supported script now — small, front-view-visible, her explicit example; (2) get the BT video link; (3) decide the back-view question with her at the review session; (4) then plan the catalog + composer as its own track.
 
+**Update, same day:** planned in full as the C-track — see `docs/muscle-catalog-composer-plan.md` (C1 catalog refactor, C2 pec pair, C3 schematic back figure, C4 composer, C5 polish). The back figure ships schematic without waiting on her session (easy to iterate); detailed posterior choreography in canonical scripts still waits on the BT link and her review.
+
 ## Open questions for the physician
 
 1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the review session.
