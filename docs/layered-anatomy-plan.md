@@ -58,6 +58,8 @@ Five anatomy layers, deep → superficial, matching the teaching story ("what's 
 
 *(Updated 2026-08-15 after reviewing the reference video (`docs/reference/anatomy-layers/vid-*.png`): the app's trunk peel treats the abdominal wall as its own stratum, and it earns the slot — rectus/obliques are the singing-support muscles. Six layers, still muscle strata only, no extra systems.)*
 
+*(Physician feedback addendum, 2026-08-15 — see `docs/breath-animation-plan.md` for the full memo and assessment. Two future layer-roster changes are queued but NOT part of the current tracks: a seventh `pelvic_floor` layer (levator ani dome in the pelvic bowl — her breath choreography starts there), and neck musculature (scalenes, platysma), which would extend the figure above the current crop. The scapular-glide video she sent also argues the superficial layer should eventually include traps/rhomboids/levator scapulae — the girdle muscles that must relax for rib expansion. She additionally wants the whole figure to visibly oscillate with breath (ribs widening, silhouette swelling), which builds on the G4 diaphragm morph. None of this changes Track G/H acceptance criteria yet; Track H renderers should know the layer list will grow.)*
+
 On top of the anatomy stack, always-on overlay layers (existing functionality, unchanged in role):
 
 - **Heatmap compartments** — the six regions, now rendered as translucent tinted glows over the anatomy instead of opaque fills

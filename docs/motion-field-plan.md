@@ -22,6 +22,8 @@ What stays out is the *true 3D scene* — orbiting camera, tilted dish, mesh geo
 
 **3. Color: keep one channel.** The reference's cyan/magenta/yellow rainbow is the wrong lesson — multi-hue reads as categories ("red = danger"). The field stays our single gold ramp: transparent at rest, brighter with motion. No thermal palette.
 
+*(2026-08-15 addendum: the physician's voice memo asks for red = contracting / blue = relaxing coloring. That request is scoped to the model-driven **teaching animation** (`docs/breath-animation-plan.md`), where the data is a script, not a measurement — the gold-only rule here applies to measured views and stands unchanged. Her memo also confirms this reference video is exactly the "heat-signature" style she wants for activation.)*
+
 The genuinely valuable part of the reference is the **continuity and the animation**: seams disappear, motion looks alive, asymmetry (left dim, right bright) reads as one organic picture instead of a bar chart painted on a body.
 
 ## What NOT to take from the reference
