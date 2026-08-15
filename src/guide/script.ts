@@ -131,6 +131,9 @@ const supported: GuideScript = {
       if (p < supportedInhale) return -Math.sin((p / supportedInhale) * Math.PI) * 0.6;
       return 0;
     },
+    erector_iliocostalis: constant(0.15),
+    erector_longissimus: constant(0.15),
+    levatores_costarum: (phase) => inhaleWave(phase, supportedInhale) * 0.3,
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, supportedInhale),
   /**

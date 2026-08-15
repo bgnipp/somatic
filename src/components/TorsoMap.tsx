@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnatomyStack } from "../anatomy/AnatomyStack";
+import { BackFigure } from "../anatomy/backPlaceholders";
+import type { FigureAspect } from "../anatomy/catalog";
 import { DepthRail } from "../anatomy/DepthRail";
 import { ScaleneHints } from "../anatomy/placeholders";
 import {
@@ -13,6 +15,8 @@ import { ReliefField } from "../field/ReliefField";
 import { sitesFromSample } from "../field/sites";
 import { ViewToggle } from "../field/ViewToggle";
 import type { MapView } from "../field/view";
+import { AspectToggle } from "../guide/AspectToggle";
+import { loadStoredAspect, saveStoredAspect } from "../guide/aspect";
 import { GuideLegend } from "../guide/GuideLegend";
 import { ScriptToggle } from "../guide/ScriptToggle";
 import { SideInset } from "../guide/SideInset";
@@ -57,6 +61,7 @@ export function TorsoMap({
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
   const [scriptId, setScriptId] = useState<GuideScriptId>(loadStoredScript);
+  const [aspect, setAspect] = useState<FigureAspect>(loadStoredAspect);
   const [paused, setPaused] = useState(false);
   const [scrub, setScrub] = useState(0.2);
   const [reduceMotion, setReduceMotion] = useState(() =>
@@ -76,6 +81,7 @@ export function TorsoMap({
   const total = sample ? meanRibCage(sample) + belly : 0;
   const script = scriptById(scriptId);
   const showGuide = view === "guide";
+  const showBack = showGuide && aspect === "back";
   const held = reduceMotion || paused;
   const phase = useGuideClock(script.cycleMs, {
     reduceMotion,
@@ -120,6 +126,14 @@ export function TorsoMap({
   }, [scriptId]);
 
   useEffect(() => {
+    saveStoredAspect(aspect);
+  }, [aspect]);
+
+  useEffect(() => {
+    if (view !== "guide") setAspect("front");
+  }, [view]);
+
+  useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
@@ -135,6 +149,11 @@ export function TorsoMap({
         onViewChangeRef.current(
           v === "guide" ? "regions" : v === "field" ? "regions" : "field",
         );
+        return;
+      }
+      if ((e.key === "b" || e.key === "B") && viewRef.current === "guide") {
+        e.preventDefault();
+        setAspect((a) => (a === "back" ? "front" : "back"));
         return;
       }
       if (e.key !== "[" && e.key !== "]") return;
@@ -158,7 +177,7 @@ export function TorsoMap({
         viewBox="0 0 240 250"
         className="torso-svg"
         role="img"
-        aria-label="Front torso motion map"
+        aria-label={showBack ? "Back torso anatomy" : "Front torso motion map"}
       >
         <defs>
           <clipPath id="torso-clip">
@@ -177,17 +196,21 @@ export function TorsoMap({
           <path className="torso-limb" d={LEFT_ARM} />
           <path className="torso-limb" d={RIGHT_ARM} />
           <path className="torso-context" d={TORSO} />
-          <AnatomyStack
-            depth={depth}
-            flatten={flatten}
-            expand={expand}
-            ribLift={ribLift}
-            pelvicLift={pelvicLift}
-            activations={activations}
-          />
-          {showGuide && <ScaleneHints activations={activations} />}
+          {showBack ? (
+            <BackFigure expand={expand} ribLift={ribLift} activations={activations} />
+          ) : (
+            <AnatomyStack
+              depth={depth}
+              flatten={flatten}
+              expand={expand}
+              ribLift={ribLift}
+              pelvicLift={pelvicLift}
+              activations={activations}
+            />
+          )}
+          {showGuide && !showBack && <ScaleneHints activations={activations} />}
           <g clipPath="url(#torso-clip)">
-            {showGuide ? null : showField ? (
+            {showGuide || showBack ? null : showField ? (
               reduceMotion ? (
                 <BlobField sites={sites} />
               ) : (
@@ -222,7 +245,8 @@ export function TorsoMap({
                 })}
               </>
             )}
-            {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
+            {!showBack &&
+              (Object.keys(PATHS) as CompartmentId[]).map((id) => {
               const mm = sample?.compartments[id].displacementMm ?? 0;
               return (
                 <path
@@ -237,13 +261,18 @@ export function TorsoMap({
                 />
               );
             })}
-            <path className="bone-line" d={CLAVICLE_L} />
-            <path className="bone-line" d={CLAVICLE_R} />
-            <path className="bone-line" d={COSTAL_ARCH} />
-            <line x1="120" y1="66" x2="120" y2="217" className="midline" />
+            {!showBack && (
+              <>
+                <path className="bone-line" d={CLAVICLE_L} />
+                <path className="bone-line" d={CLAVICLE_R} />
+                <path className="bone-line" d={COSTAL_ARCH} />
+                <line x1="120" y1="66" x2="120" y2="217" className="midline" />
+              </>
+            )}
           </g>
         </g>
         {showLandmarks &&
+          !showBack &&
           LANDMARKS.map((mark) => (
             <g key={mark.id} className="landmark">
               <circle cx={mark.x} cy={mark.y} r="2.1" />
@@ -251,7 +280,7 @@ export function TorsoMap({
             </g>
           ))}
       </svg>
-      <DepthRail depth={depth} onChange={setDepth} />
+      {!showBack && <DepthRail depth={depth} onChange={setDepth} />}
       </div>
       <ViewToggle view={view} onChange={onViewChange} />
       <div className="torso-caption">
@@ -262,8 +291,8 @@ export function TorsoMap({
           </>
         ) : showGuide ? (
           <>
-            <strong>Guide · {script.label}</strong>
-            <span>A scripted reference loop. G returns to your data.</span>
+            <strong>Guide · {script.label}{showBack ? " · back" : ""}</strong>
+            <span>A scripted reference loop. G returns to your data. B flips the figure.</span>
           </>
         ) : showField ? (
           <>
@@ -279,9 +308,12 @@ export function TorsoMap({
       </div>
       {showGuide && (
         <>
-          <ScriptToggle scriptId={scriptId} onChange={setScriptId} />
+          <div className="guide-toggles">
+            <ScriptToggle scriptId={scriptId} onChange={setScriptId} />
+            <AspectToggle aspect={aspect} onChange={setAspect} />
+          </div>
           <p className="guide-blurb">{script.blurb}</p>
-          {script.sideCaption && <SideInset script={script} phase={phase} />}
+          {script.sideCaption && !showBack && <SideInset script={script} phase={phase} />}
           <div className="guide-controls">
             <button
               type="button"

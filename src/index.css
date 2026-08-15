@@ -426,6 +426,78 @@ h1 {
   opacity: 0.7;
 }
 
+.anatomy-subclavius {
+  fill: none;
+  stroke: #5c5346;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.anatomy-spine-line {
+  fill: none;
+  stroke: #6a6558;
+  stroke-width: 1.2;
+}
+
+.anatomy-vertebra {
+  stroke: #8a8070;
+  stroke-width: 0.7;
+}
+
+.anatomy-scapula {
+  fill: #2a261c;
+  fill-opacity: 0.22;
+  stroke: #6a6558;
+  stroke-width: 0.8;
+}
+
+.anatomy-erector-il,
+.anatomy-erector-lo {
+  fill: #2a261c;
+  fill-opacity: 0.4;
+  stroke: #5c5346;
+  stroke-width: 0.6;
+}
+
+.anatomy-erector-fiber {
+  fill: none;
+  stroke: #6a5a48;
+  stroke-width: 0.45;
+  stroke-linecap: round;
+  opacity: 0.65;
+}
+
+.anatomy-levator {
+  fill: none;
+  stroke: #5a4e40;
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.anatomy-intertrans {
+  fill: none;
+  stroke: #5a4e40;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.anatomy-rhomboid {
+  fill: #2a261c;
+  fill-opacity: 0.32;
+  stroke: #5c5346;
+  stroke-width: 0.65;
+}
+
+.anatomy-trap-back {
+  fill: #2a261c;
+  fill-opacity: 0.22;
+  stroke: #5c5346;
+  stroke-width: 0.7;
+}
+
 .anatomy-tint {
   pointer-events: none;
 }
@@ -520,12 +592,34 @@ h1 {
   color: var(--gold);
 }
 
-.script-toggle {
+.guide-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem 0.85rem;
+  margin-top: 0.55rem;
+}
+
+.script-toggle,
+.aspect-toggle {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.25rem;
-  margin-top: 0.55rem;
+}
+
+.aspect-toggle button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+}
+
+.aspect-toggle button.active {
+  background: #2a2618;
+  border-color: #6d5a2c;
+  color: var(--gold);
 }
 
 .script-toggle button {

@@ -26,6 +26,7 @@ export const STRUCTURE_CLASSES: Partial<Record<MuscleId, string>> = {
   platysma: "anatomy-platysma",
   pec_major: "anatomy-pec",
   pec_minor: "anatomy-pec-minor",
+  subclavius: "anatomy-subclavius",
 };
 
 type Activations = Partial<Record<MuscleId, number>>;
@@ -42,12 +43,12 @@ function act(activations: Activations | undefined, id: MuscleId): number {
   return activations?.[id] ?? 0;
 }
 
-function TintFill({ d, a }: { d: string; a: number }) {
+export function TintFill({ d, a }: { d: string; a: number }) {
   if (Math.abs(a) < 0.02) return null;
   return <path d={d} fill={activationColor(a)} stroke="none" className="anatomy-tint" pointerEvents="none" />;
 }
 
-function TintStroke({ d, a, width = 2.1 }: { d: string; a: number; width?: number }) {
+export function TintStroke({ d, a, width = 2.1 }: { d: string; a: number; width?: number }) {
   if (Math.abs(a) < 0.02) return null;
   return (
     <path
@@ -139,6 +140,8 @@ const PEC_MINOR = [
   "M108 108 L98 118 L92 74 Z",
   "M132 108 L142 118 L148 74 Z",
 ];
+
+const SUBCLAVIUS = ["M100 68 C96 70 92 72 90 76", "M140 68 C144 70 148 72 150 76"];
 
 const SCALENES = [
   "M114 44 L110 58",
@@ -286,6 +289,7 @@ function SuperficialLayer({ activations }: LayerProps) {
   const trapA = act(activations, "traps");
   const majorA = act(activations, "pec_major");
   const minorA = act(activations, "pec_minor");
+  const subA = act(activations, "subclavius");
   return (
     <g className="anatomy-placeholder anatomy-superficial">
       {PEC_MINOR.map((d) => (
@@ -299,6 +303,12 @@ function SuperficialLayer({ activations }: LayerProps) {
       ))}
       {PEC_MAJOR.map((d) => (
         <TintFill key={`${d}-tint`} d={d} a={majorA} />
+      ))}
+      {SUBCLAVIUS.map((d) => (
+        <path key={d} className="anatomy-subclavius" d={d} />
+      ))}
+      {SUBCLAVIUS.map((d) => (
+        <TintStroke key={`${d}-tint`} d={d} a={subA} width={1.5} />
       ))}
       {TRAPS.map((d) => (
         <path key={d} className="anatomy-trap" d={d} />
