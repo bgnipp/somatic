@@ -5,7 +5,7 @@ Drop Track H PNGs here. Filenames must match the manifest in `src/anatomy/layers
 | File | Layer | Depth |
 |------|-------|-------|
 | `skeleton.png` | Rib cage, sternum, clavicles, lumbar hint, pelvis | 1 |
-| `deep.png` | Diaphragm, psoas, transversus | 2 |
+| `deep.png` | Diaphragm, psoas, transversus, pelvic floor | 2 |
 | `intercostal.png` | Intercostal wall | 3 |
 | `ab-wall.png` | Rectus abdominis, internal/external obliques | 4 |
 | `superficial.png` | Pec major, deltoid | 5 |

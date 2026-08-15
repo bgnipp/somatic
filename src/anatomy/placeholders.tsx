@@ -1,16 +1,61 @@
+import { activationColor } from "../lib/color";
+import type { GuideStructureId } from "../guide/script";
 import { TORSO } from "../components/torsoPaths";
+import type { AnatomyLayerId } from "./layers";
 
 /**
  * Schematic medical-diagram placeholders, registered to the current
  * torso viewBox. Dim line art — the motion heatmap stays the bright signal.
  *
- * `flatten` (0–1) lowers the diaphragm dome on inhale. Unused until G4
- * wires live abdominal displacement; G1 renders rest (0).
+ * `flatten` (0–1) lowers the diaphragm dome on inhale.
+ * `expand` (0–1) widens/raises the rib arcs.
+ * `pelvicLift` (−1..1) raises (engaged) or lowers (yielded) the pelvic floor.
+ * `activations` tints structures in Guide view only; omitted elsewhere.
  */
+
+export const STRUCTURE_CLASSES: Record<GuideStructureId, string> = {
+  pelvic_floor: "anatomy-pelvic-floor",
+  diaphragm: "anatomy-diaphragm",
+  transversus: "anatomy-transversus",
+  rectus: "anatomy-rectus",
+  obliques: "anatomy-oblique",
+  intercostals: "anatomy-intercostal",
+  scalenes: "anatomy-scalene",
+  traps: "anatomy-trap",
+};
+
+type Activations = Partial<Record<GuideStructureId, number>>;
 
 type LayerProps = {
   flatten?: number;
+  expand?: number;
+  pelvicLift?: number;
+  activations?: Activations;
 };
+
+function act(activations: Activations | undefined, id: GuideStructureId): number {
+  return activations?.[id] ?? 0;
+}
+
+function TintFill({ d, a }: { d: string; a: number }) {
+  if (Math.abs(a) < 0.02) return null;
+  return <path d={d} fill={activationColor(a)} stroke="none" className="anatomy-tint" pointerEvents="none" />;
+}
+
+function TintStroke({ d, a, width = 2.1 }: { d: string; a: number; width?: number }) {
+  if (Math.abs(a) < 0.02) return null;
+  return (
+    <path
+      d={d}
+      fill="none"
+      stroke={activationColor(a)}
+      strokeWidth={width}
+      strokeLinecap="round"
+      className="anatomy-tint"
+      pointerEvents="none"
+    />
+  );
+}
 
 function ribPair(attachY: number, halfWidth: number, lateralY: number): [string, string] {
   const rise = lateralY - attachY;
@@ -44,7 +89,51 @@ export function diaphragmRim(flatten = 0): string {
   return `M90 178 C96 ${mid} 108 ${apex + 6} 120 ${apex} C132 ${apex + 6} 144 ${mid} 150 178`;
 }
 
-function SkeletonLayer() {
+/** Shallow bowl in the pelvic rim. Positive lift raises it; negative drops it. */
+export function pelvicFloorPath(lift = 0): string {
+  const t = Math.min(1, Math.max(-1, lift));
+  const apex = 216 - t * 3;
+  const attach = 210 - t * 1.2;
+  const bowl = attach + 5 + Math.max(0, -t) * 1.5;
+  return `M102 ${attach} C108 ${apex} 114 ${apex + 1} 120 ${apex} C126 ${apex + 1} 132 ${apex} 138 ${attach} C132 ${bowl} 126 ${bowl + 0.6} 120 ${bowl} C114 ${bowl + 0.6} 108 ${bowl} 102 ${attach} Z`;
+}
+
+const TRANSVERSUS = [
+  "M96 184 C108 180 132 180 144 184",
+  "M98 194 C110 190 130 190 142 194",
+  "M100 204 C112 200 128 200 140 204",
+];
+
+const RECTUS: string[] = [150, 166, 182].flatMap((y0) => {
+  const y1 = y0 === 150 ? 163 : y0 === 166 ? 179 : 198;
+  return [
+    `M107 ${y0 + 1} C110 ${y0} 115 ${y0} 118 ${y0 + 1} L118 ${y1 - 1} C115 ${y1} 110 ${y1} 107 ${y1 - 1} Z`,
+    `M122 ${y0 + 1} C125 ${y0} 130 ${y0} 133 ${y0 + 1} L133 ${y1 - 1} C130 ${y1} 125 ${y1} 122 ${y1 - 1} Z`,
+  ];
+});
+
+const OBLIQUES = [
+  "M92 128 C88 148 90 170 97 192 C101 182 104 168 105 154 C100 146 95 137 92 128 Z",
+  "M148 128 C152 148 150 170 143 192 C139 182 136 168 135 154 C140 146 145 137 148 128 Z",
+];
+
+const TRAPS = [
+  "M108 62 L90 74 L111 70 Z",
+  "M132 62 L150 74 L129 70 Z",
+];
+
+const SCALENES = [
+  "M114 44 L110 58",
+  "M117 43 L114 58",
+  "M120 42 L118 58",
+  "M120 42 L122 58",
+  "M123 43 L126 58",
+  "M126 44 L130 58",
+];
+
+function SkeletonLayer({ expand = 0 }: LayerProps) {
+  const widthScale = 1 + expand * 0.05;
+  const lift = expand * 2;
   return (
     <g className="anatomy-placeholder anatomy-skeleton">
       <path
@@ -52,7 +141,7 @@ function SkeletonLayer() {
         d="M115 66 C113 68 113 72 115 76 L117 80 L117 144 C117 148 118 151 120 152 C122 151 123 148 123 144 L123 80 L125 76 C127 72 127 68 125 66 C123 64 117 64 115 66 Z"
       />
       {RIBS.map(([attachY, halfWidth, lateralY], i) => {
-        const [left, right] = ribPair(attachY, halfWidth, lateralY);
+        const [left, right] = ribPair(attachY, halfWidth * widthScale, lateralY - lift);
         return (
           <g key={i} className={i >= 5 ? "anatomy-cartilage" : "anatomy-bone"}>
             <path d={left} />
@@ -75,28 +164,41 @@ function SkeletonLayer() {
   );
 }
 
-function DeepLayer({ flatten = 0 }: LayerProps) {
+function DeepLayer({ flatten = 0, pelvicLift = 0, activations }: LayerProps) {
+  const dome = diaphragmPath(flatten);
+  const floor = pelvicFloorPath(pelvicLift);
+  const diaA = act(activations, "diaphragm");
+  const tvA = act(activations, "transversus");
+  const pfA = act(activations, "pelvic_floor");
   return (
     <g className="anatomy-placeholder anatomy-deep">
-      <path className="anatomy-diaphragm" d={diaphragmPath(flatten)} />
+      <path className="anatomy-diaphragm" d={dome} />
       <path className="anatomy-diaphragm-rim" d={diaphragmRim(flatten)} />
+      <TintFill d={dome} a={diaA} />
       <path className="anatomy-psoas" d="M116 158 C114 176 108 196 102 214" />
       <path className="anatomy-psoas" d="M124 158 C126 176 132 196 138 214" />
-      <path className="anatomy-transversus" d="M96 184 C108 180 132 180 144 184" />
-      <path className="anatomy-transversus" d="M98 194 C110 190 130 190 142 194" />
-      <path className="anatomy-transversus" d="M100 204 C112 200 128 200 140 204" />
+      {TRANSVERSUS.map((d) => (
+        <path key={d} className="anatomy-transversus" d={d} />
+      ))}
+      {TRANSVERSUS.map((d) => (
+        <TintStroke key={`${d}-tint`} d={d} a={tvA} width={1.8} />
+      ))}
+      <path className="anatomy-pelvic-floor" d={floor} />
+      <TintFill d={floor} a={pfA} />
     </g>
   );
 }
 
-function IntercostalLayer() {
+function IntercostalLayer({ expand = 0, activations }: LayerProps) {
+  const widthScale = 1 + expand * 0.05;
+  const lift = expand * 2;
   const hatches: string[] = [];
   for (let i = 0; i < RIBS.length - 1; i++) {
     const [y0, w0, ly0] = RIBS[i];
     const [y1, w1, ly1] = RIBS[i + 1];
     const midAttach = (y0 + y1) / 2;
-    const midW = (w0 + w1) / 2;
-    const midLat = (ly0 + ly1) / 2;
+    const midW = ((w0 + w1) / 2) * widthScale;
+    const midLat = (ly0 + ly1) / 2 - lift;
     for (const side of [-1, 1]) {
       const x0 = 120 + side * 6;
       const x1 = 120 + side * (midW - 3);
@@ -109,43 +211,37 @@ function IntercostalLayer() {
       );
     }
   }
+  const a = act(activations, "intercostals");
   return (
     <g className="anatomy-placeholder anatomy-intercostal">
       {hatches.map((d, i) => (
         <path key={i} d={d} />
       ))}
+      {hatches.map((d, i) => (
+        <TintStroke key={`tint-${i}`} d={d} a={a} width={1.4} />
+      ))}
     </g>
   );
 }
 
-function AbWallLayer() {
+function AbWallLayer({ activations }: LayerProps) {
+  const rectA = act(activations, "rectus");
+  const oblA = act(activations, "obliques");
   return (
     <g className="anatomy-placeholder anatomy-ab-wall">
-      {[
-        [150, 163],
-        [166, 179],
-        [182, 198],
-      ].map(([y0, y1]) => (
-        <g key={y0}>
-          <path
-            className="anatomy-rectus"
-            d={`M107 ${y0 + 1} C110 ${y0} 115 ${y0} 118 ${y0 + 1} L118 ${y1 - 1} C115 ${y1} 110 ${y1} 107 ${y1 - 1} Z`}
-          />
-          <path
-            className="anatomy-rectus"
-            d={`M122 ${y0 + 1} C125 ${y0} 130 ${y0} 133 ${y0 + 1} L133 ${y1 - 1} C130 ${y1} 125 ${y1} 122 ${y1 - 1} Z`}
-          />
-        </g>
+      {RECTUS.map((d) => (
+        <path key={d} className="anatomy-rectus" d={d} />
+      ))}
+      {RECTUS.map((d) => (
+        <TintFill key={`${d}-tint`} d={d} a={rectA} />
       ))}
       <path className="anatomy-linea" d="M120 148 L120 206" />
-      <path
-        className="anatomy-oblique"
-        d="M92 128 C88 148 90 170 97 192 C101 182 104 168 105 154 C100 146 95 137 92 128 Z"
-      />
-      <path
-        className="anatomy-oblique"
-        d="M148 128 C152 148 150 170 143 192 C139 182 136 168 135 154 C140 146 145 137 148 128 Z"
-      />
+      {OBLIQUES.map((d) => (
+        <path key={d} className="anatomy-oblique" d={d} />
+      ))}
+      {OBLIQUES.map((d) => (
+        <TintFill key={`${d}-tint`} d={d} a={oblA} />
+      ))}
       {["M96 140 L106 148", "M94 156 L104 164", "M96 172 L105 180"].map((d) => (
         <path key={d} className="anatomy-oblique-fiber" d={d} />
       ))}
@@ -156,7 +252,8 @@ function AbWallLayer() {
   );
 }
 
-function SuperficialLayer() {
+function SuperficialLayer({ activations }: LayerProps) {
+  const trapA = act(activations, "traps");
   return (
     <g className="anatomy-placeholder anatomy-superficial">
       <path
@@ -175,6 +272,12 @@ function SuperficialLayer() {
         className="anatomy-pec"
         d="M152 74 C156 80 158 90 157 100 C154 94 151 86 148 80 Z"
       />
+      {TRAPS.map((d) => (
+        <path key={d} className="anatomy-trap" d={d} />
+      ))}
+      {TRAPS.map((d) => (
+        <TintFill key={`${d}-tint`} d={d} a={trapA} />
+      ))}
     </g>
   );
 }
@@ -187,24 +290,45 @@ function SurfaceLayer() {
   );
 }
 
+/** Neck scalenes sit outside #torso-clip — mount unclipped, Guide view only. */
+export function ScaleneHints({ activation = 0 }: { activation?: number }) {
+  return (
+    <g className="anatomy-placeholder anatomy-scalenes" pointerEvents="none" aria-hidden="true">
+      {SCALENES.map((d) => (
+        <path key={d} className="anatomy-scalene" d={d} />
+      ))}
+      {SCALENES.map((d) => (
+        <TintStroke key={`${d}-tint`} d={d} a={activation} width={1.8} />
+      ))}
+    </g>
+  );
+}
+
 export function AnatomyPlaceholder({
   id,
   flatten = 0,
+  expand = 0,
+  pelvicLift = 0,
+  activations,
 }: {
-  id: "skeleton" | "deep" | "intercostal" | "ab_wall" | "superficial" | "surface";
+  id: AnatomyLayerId;
   flatten?: number;
+  expand?: number;
+  pelvicLift?: number;
+  activations?: Activations;
 }) {
+  const props: LayerProps = { flatten, expand, pelvicLift, activations };
   switch (id) {
     case "skeleton":
-      return <SkeletonLayer />;
+      return <SkeletonLayer {...props} />;
     case "deep":
-      return <DeepLayer flatten={flatten} />;
+      return <DeepLayer {...props} />;
     case "intercostal":
-      return <IntercostalLayer />;
+      return <IntercostalLayer {...props} />;
     case "ab_wall":
-      return <AbWallLayer />;
+      return <AbWallLayer {...props} />;
     case "superficial":
-      return <SuperficialLayer />;
+      return <SuperficialLayer {...props} />;
     case "surface":
       return <SurfaceLayer />;
   }

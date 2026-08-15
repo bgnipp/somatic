@@ -381,6 +381,62 @@ h1 {
   stroke: none;
 }
 
+.anatomy-pelvic-floor {
+  fill: #2a241c;
+  fill-opacity: 0.5;
+  stroke: #6a5a48;
+  stroke-width: 0.95;
+}
+
+.anatomy-trap {
+  fill: #2a261c;
+  fill-opacity: 0.35;
+  stroke: #5c5346;
+  stroke-width: 0.7;
+}
+
+.anatomy-scalene {
+  fill: none;
+  stroke: #5a4e40;
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.anatomy-tint {
+  pointer-events: none;
+}
+
+.guide-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  margin-top: 0.35rem;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+}
+
+.guide-legend strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.guide-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.guide-swatch-red {
+  background: hsla(4, 68%, 48%, 0.7);
+}
+
+.guide-swatch-blue {
+  background: hsla(210, 60%, 52%, 0.7);
+}
+
 .compartment-glow {
   pointer-events: none;
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { GuideStructureId } from "../guide/script";
 import { AnatomyPlaceholder } from "./placeholders";
 import {
   ANATOMY_LAYERS,
@@ -31,10 +32,16 @@ function AnatomyLayerView({
   layer,
   depth,
   flatten,
+  expand,
+  pelvicLift,
+  activations,
 }: {
   layer: AnatomyLayer;
   depth: AnatomyDepth;
   flatten: number;
+  expand: number;
+  pelvicLift: number;
+  activations?: Partial<Record<GuideStructureId, number>>;
 }) {
   const href = layerHref(layer.filename);
   const hasImage = useLayerImage(href);
@@ -56,7 +63,13 @@ function AnatomyLayerView({
           preserveAspectRatio="xMidYMid meet"
         />
       ) : (
-        <AnatomyPlaceholder id={layer.id} flatten={flatten} />
+        <AnatomyPlaceholder
+          id={layer.id}
+          flatten={flatten}
+          expand={expand}
+          pelvicLift={pelvicLift}
+          activations={activations}
+        />
       )}
     </g>
   );
@@ -66,9 +79,21 @@ type Props = {
   depth: AnatomyDepth;
   /** 0 = rest dome, 1 = flattened on inhale. */
   flatten?: number;
+  /** 0–1 rib widening / rise. */
+  expand?: number;
+  /** −1 descended, 0 rest, +1 lifted. */
+  pelvicLift?: number;
+  /** Guide-view activation tints. Omit in measured views. */
+  activations?: Partial<Record<GuideStructureId, number>>;
 };
 
-export function AnatomyStack({ depth, flatten = 0 }: Props) {
+export function AnatomyStack({
+  depth,
+  flatten = 0,
+  expand = 0,
+  pelvicLift = 0,
+  activations,
+}: Props) {
   return (
     <g className="anatomy-stack" clipPath="url(#torso-clip)">
       {ANATOMY_LAYERS.map((layer) => (
@@ -77,6 +102,9 @@ export function AnatomyStack({ depth, flatten = 0 }: Props) {
           layer={layer}
           depth={depth}
           flatten={flatten}
+          expand={expand}
+          pelvicLift={pelvicLift}
+          activations={activations}
         />
       ))}
     </g>

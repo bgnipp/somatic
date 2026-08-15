@@ -42,7 +42,7 @@ export type AnatomyLayer = {
 
 export const ANATOMY_LAYERS: AnatomyLayer[] = [
   { id: "skeleton", depth: 1, label: "Skeleton", filename: "skeleton.png" },
-  { id: "deep", depth: 2, label: "Diaphragm & deep", filename: "deep.png" },
+  { id: "deep", depth: 2, label: "Diaphragm & core", filename: "deep.png" },
   { id: "intercostal", depth: 3, label: "Rib wall", filename: "intercostal.png" },
   { id: "ab_wall", depth: 4, label: "Abdominal wall", filename: "ab-wall.png" },
   { id: "superficial", depth: 5, label: "Chest & shoulder", filename: "superficial.png" },
