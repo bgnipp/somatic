@@ -1,7 +1,7 @@
-# Breath Anatomy Animation — Physician Feedback, Assessment, Plan
+# Breath Anatomy Animation ("Guide" view) — Physician Feedback, Assessment, Implementation Spec
 
-**Date:** 2026-08-15
-**Status:** Assessment + plan only. Do NOT implement yet — one physiology question must be settled with the physician first (see "Open questions"), and she should confirm the mode split below matches her intent.
+**Date:** 2026-08-15 (revised same day from assessment-only to handoff-ready)
+**Status:** Ready for handoff. Implementing agent: read "Agent orientation", then execute phases B1–B4 in order. The physician's open questions (bottom) are **confirmation items, not blockers** — the defaults chosen below are safe to build.
 **Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`).
 
 ## What she asked for, in her words (condensed)
@@ -20,58 +20,161 @@
 
 ## Assessment — what this actually is
 
-This is not an edit to the motion map. It is a **second mode**: a choreographed, model-driven teaching animation of the coordinated breath — "how a breath works," played on the layered anatomy figure. It differs from everything built so far in one fundamental way:
+This is not an edit to the motion map. It is a **third stage view**: a choreographed, model-driven teaching animation of the coordinated breath — "how a breath works," played on the layered anatomy figure. It differs from everything built so far in one fundamental way:
 
-**Muscle activation is modeled, not measured.** Displacement (our current signal) is observable by camera; activation state (contracting vs relaxing) is not — that would need sEMG. So this animation cannot and must not present itself as biofeedback. It is a reference loop, like the Essential Anatomy app itself: canonical, scripted, always the same. That's fine — arguably it's the missing half of the product. The teaching mirror shows *your* breath; this shows *the* breath. Side by side they answer "what am I doing?" and "what should it look like?"
+**Muscle activation is modeled, not measured.** Displacement (our current signal) is observable by camera; activation state (contracting vs relaxing) is not — that would need sEMG. So this animation cannot and must not present itself as biofeedback. It is a reference loop, like the Essential Anatomy app itself: canonical, scripted, always the same. That's fine — arguably it's the missing half of the product. The teaching mirror shows *your* breath; this shows *the* breath.
 
-This framing also resolves the red/blue color question cleanly:
+This framing resolves the red/blue color question cleanly:
 
 - **Measured views (Regions, Field): gold only, unchanged.** Brightness = motion. The single-channel guardrail in `docs/motion-field-plan.md` stands — in a measurement view, red/blue would smuggle in "good/bad."
-- **Teaching animation (this mode): red/blue is correct.** Red = contracting, blue = relaxing/lengthening is a standard physiological convention (her explicit request), the data is a script rather than a measurement, and a persistent on-screen legend states the semantics. No assessment language; "contracting/relaxing" are the only words.
+- **Guide view (this feature): red/blue is correct.** Red = contracting, blue = relaxing/lengthening is a standard physiological convention (her explicit request), the data is a script rather than a measurement, and a persistent on-screen legend states the semantics. No assessment language; "contracting/relaxing" are the only words.
 
 ### Assessment of the three videos she sent
 
-1. **Scapular glide** ([youtube.com/shorts/1V8PDPoxFT4](https://www.youtube.com/shorts/1V8PDPoxFT4)) — scapula gliding on the rib cage; serratus anterior, levator scapulae, rhomboids. **Directly relevant.** It supports her "traps and rhomboids relax" point: the shoulder girdle rides *on* the rib cage, so girdle tension caps rib expansion — a core singing-technique issue (shoulder/clavicular breathing). Implication: the superficial layer's roster should include the girdle muscles that must release (traps, rhomboids, levator scapulae), and the choreography animates them relaxing (blue) on inhale.
-2. **Flail chest / paradoxical motion** ([youtube.com/shorts/RPWhYBFt2N8](https://www.youtube.com/shorts/RPWhYBFt2N8)) — a chest-wall segment moving *opposite* to the rest during breathing, plus a clear explanation of diaphragm → negative intrathoracic pressure → airflow. The trauma itself is irrelevant to us, but the **concept of paradoxical (direction-reversed) motion is very relevant**: "reverse breathing" (belly drawing in on inhale) is one of the most common patterns a somatic teacher corrects. Today our data contract is magnitude-only (`displacementMm ≥ 0`); direction is invisible. Insight logged: a future signed-displacement extension and a "paradoxical / reverse breather" mock preset would let the measured views show this pattern honestly. Also: the pressure-mechanics narration is a good script model for the teaching animation's caption text.
-3. **Nanolive growth cone** ([youtube.com/shorts/SngXAGa4_as](https://www.youtube.com/shorts/SngXAGa4_as)) — label-free microscopy of a neuron's growth cone undulating in real time. No feature content for us; read it as an **aesthetic bar**: subtle, continuous, organic motion made visible without exaggeration. That is the quality target for the oscillation (gentle, alive), not a bouncy cartoon.
+1. **Scapular glide** ([youtube.com/shorts/1V8PDPoxFT4](https://www.youtube.com/shorts/1V8PDPoxFT4)) — scapula gliding on the rib cage; serratus anterior, levator scapulae, rhomboids. **Directly relevant.** It supports her "traps and rhomboids relax" point: the shoulder girdle rides *on* the rib cage, so girdle tension caps rib expansion — a core singing-technique issue (shoulder/clavicular breathing). Implication: the superficial layer gains schematic upper-trap outlines, animated relaxing (blue) on inhale.
+2. **Flail chest / paradoxical motion** ([youtube.com/shorts/RPWhYBFt2N8](https://www.youtube.com/shorts/RPWhYBFt2N8)) — a chest-wall segment moving *opposite* to the rest, plus a clear explanation of diaphragm → negative intrathoracic pressure → airflow. The trauma is irrelevant; the **concept of paradoxical (direction-reversed) motion is very relevant**: "reverse breathing" is one of the most common patterns a somatic teacher corrects, and our data contract is magnitude-only today. Logged in `docs/roadmap.md` backlog (signed displacement + reverse-breather preset) — **not part of this spec.**
+3. **Nanolive growth cone** ([youtube.com/shorts/SngXAGa4_as](https://www.youtube.com/shorts/SngXAGa4_as)) — label-free microscopy of undulating cell motion. No feature content; it sets the **aesthetic bar**: subtle, continuous, organic. Gentle oscillation, not a bouncy cartoon.
 
 ### Her physiology model, captured as choreography
 
-The clinical actions she cites, arranged into the loop the animation would play. This table is the data model — each row becomes an activation curve keyed to breath phase.
+The clinical actions she cites, arranged into the loop the animation plays. **This table is the data model** — each row becomes an activation curve keyed to breath phase. Note this describes an **actively supported breath** (singing/trained support) — see open question 1; it ships as the script named "Supported breath."
 
 | Structure | Inhale | Exhale | Notes |
 |---|---|---|---|
-| Pelvic floor (levator ani) | **Engages first** (per her memo — see open question) | Releases | She has the breath *start* here |
-| Diaphragm | Contracts, descends (red) | Relaxes, domes up (blue) | Existing dome morph is the skeleton of this |
-| Transversus abdominis | Tonic — **always maintains tone** | Tonic | Constant neutral-warm tint, never blue |
+| Pelvic floor (levator ani) | **Engages first** (leads the cycle by ~5% of phase) | Releases | She has the breath *start* here |
+| Diaphragm | Contracts, descends (red) | Relaxes, domes up (blue) | Existing dome morph (`flatten`) is the geometry half of this |
+| Transversus abdominis | Tonic — **always maintains tone** | Tonic | Constant neutral-warm tint, never blue, never bright red |
 | Rectus abdominis | Relaxes/yields (blue) | **Contracts** (red) | "While the diaphragm relaxes, the rectus contracts" |
 | Internal/external obliques | Yield (blue) | Contract (red) | Exhale/support musculature |
-| Intercostals | External set active with rib expansion | Internal set with rib descent | Show as one layer tint unless she wants the split |
-| Scalenes | Assist rib elevation (red, subtle) | Relax (blue) | Neck layer — new territory for the figure |
-| Platysma | Relaxes | — | New; superficial neck |
-| Traps & rhomboids | **Relax (blue)** to free the thoracic cavity | Neutral | Ties to the scapular-glide video |
+| Intercostals | Active with rib expansion (red) | Fading through exhale | One layer tint; the internal/external split is a Track H refinement |
+| Scalenes | Assist rib elevation (red, subtle) | Relax (blue) | Schematic neck hints, Guide view only |
+| Traps (upper) | **Relax (blue)** to free the thoracic cavity | Neutral | Ties to the scapular-glide video; rhomboids are posterior — represented by the trap outline in front view |
+| Platysma | — | — | **Deferred** (open question 2); purely cosmetic in front view |
 | Rib cage + whole figure | Expands (geometry, not just tint) | Settles | "The entire animation should oscillate" |
 
-## Open questions for the physician (blockers, ask before building)
+---
 
-1. **Which breath is this?** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an **actively supported breath** (singing/trained support), not quiet tidal breathing (where the pelvic floor typically descends and lengthens on inhale and exhale is passive). Both are legitimate; they are *different animations*. Does she want (a) quiet breath, (b) supported/singing breath, or (c) both as selectable protocols? The table above records her memo verbatim; do not "correct" it — ask.
-2. **Scope of the neck:** scalenes and platysma extend the figure above the current crop. Extend the viewBox/figure, or defer the neck to a later pass?
-3. **Confirm the mode split:** measured views stay gold; the red/blue activation encoding lives only in the teaching animation. Does that match her intent, or did she want activation colors on the live map? (If the latter, we need the "modeled, not measured" conversation.)
+## Implementation spec
 
-## Plan (do not implement until questions above are answered)
+### Decisions locked (do not relitigate during implementation)
 
-**B1 — Choreography data model.** A typed script: per-structure activation curves (0–1, signed for contract/relax) as pure functions of breath phase, one script per protocol (quiet / supported). No rendering. Mirrors how presets work today — this is just presets for *activation* instead of displacement.
+1. **Guide is a third stage view:** the toggle becomes `Regions | Field | Guide`. Same figure, same depth rail. The Guide runs on an internal phase clock, **not** the sample stream — the mock source keeps running (traces/metrics stay live) but the torso ignores it while in Guide.
+2. **Separation from "your data" is done with wording + legend, not a separate page.** Caption and legend text below are approved copy.
+3. **Her memo's choreography ships as the first and only script**, id `supported`, label "Supported breath." The script type supports multiple protocols so a `quiet` script can be added after she answers open question 1 — adding one must require only a new script object, no renderer changes.
+4. **Pelvic floor joins the `deep` layer** (diaphragm & deep) rather than becoming a 7th depth stop. Teaching-wise the pairing is right — the "two domes" of the core — and it avoids churning `AnatomyDepth`, the rail, and stored-depth migration. Update the `deep` label to "Diaphragm & core" and `public/anatomy/README.md` accordingly. Revisit as a separate stop only if she asks.
+5. **Red/blue exists only in Guide view.** `src/lib/color.ts` gains an `activationColor()`; no existing gold ramp changes.
+6. **Zero new dependencies.** Everything is React state + SVG + the existing CSS.
 
-**B2 — Activation tinting on the anatomy layers.** The existing placeholder muscle groups (and later the Track H renders) gain a red↔blue tint driven by the script, with legend ("red = contracting · blue = relaxing · reference animation, not your data"). Reuses the layer stack and depth stepper as-is; at any depth you see that stratum's activation.
+### Agent orientation (read before coding)
 
-**B3 — Whole-figure oscillation + pelvic floor layer.** Rib cage arcs widen and the silhouette scales subtly with phase (a few viewBox units, honoring `prefers-reduced-motion`); a seventh anatomy layer `pelvic_floor` (schematic dome in the pelvic bowl, placeholder first, Track H render later) that lifts/releases per the script. The diaphragm morph (G4) becomes part of this choreography.
-**B4 — Mode entry + review.** A clearly separated "Guide" (name TBD) entry so nobody mistakes the reference loop for their own data; then a review session with the physician, same format as the F3 tuning pass.
+- Stack: React + TypeScript + Vite, zero runtime deps beyond React. `npm run build` must pass after each phase; check wide and ~420 px layouts in `npm run dev`. GitHub Pages base is `/somatic/` — use `import.meta.env.BASE_URL` for any asset URL. Commit per phase, one-line messages matching `git log` style; push when all phases build clean.
+- Key files and current facts (verified 2026-08-15):
+  - `src/components/TorsoMap.tsx` — the figure. ViewBox `0 0 240 250`, clip `#torso-clip`. Holds `view` state (`MapView`), `depth` state, `reduceMotion` matchMedia state, the `v` and `[`/`]` key handler (guarded against `TEXTAREA|INPUT|SELECT` targets). Whole-figure breathing scale exists: the `g.torso-breathe` group scales by `1 + min(total, 22) * 0.0012` around origin `120px 96px`. The diaphragm morph is the `flatten` prop (0–1) into `AnatomyStack`, currently `min(1, meanAbdomen/9.5)`, zeroed when `reduceMotion || depth > 2`.
+  - `src/field/view.ts` — `MapView = "regions" | "field"`, storage key `somatic.mapView.v1`, `loadStoredView()` validates the raw string. `src/field/ViewToggle.tsx` renders the two buttons.
+  - `src/anatomy/layers.ts` — 6-layer manifest, `AnatomyDepth = 1..6`, `layerOpacity()`, storage key `somatic.anatomyDepth.v2`, image-or-placeholder swap via `layerHref`.
+  - `src/anatomy/placeholders.tsx` — all schematic art. Structures already drawn as class-named paths: `anatomy-diaphragm`, `anatomy-psoas`, `anatomy-transversus` (3 arcs), `anatomy-rectus` (6 segment blocks), `anatomy-oblique` (+ `anatomy-oblique-fiber`), `anatomy-intercostal` (hatch group), `anatomy-pec` (4 paths), ribs via `ribPair(attachY, halfWidth, lateralY)` over the `RIBS` table, `diaphragmPath(flatten)` / `diaphragmRim(flatten)` exported. **No pelvic floor, traps, or scalenes exist yet.**
+  - `src/anatomy/AnatomyStack.tsx` — maps the manifest to `<g class="anatomy-layer anatomy-layer-{id}">` with opacity from `layerOpacity`; threads `flatten` into placeholders; PNG replaces placeholder when it loads.
+  - `src/App.tsx` — keyboard handler owns space/arrow keys; TorsoMap's handler owns `v`, `[`, `]`. **Taken keys: space, ArrowLeft/Right, `[`, `]`, `v`. Use `g` for Guide.**
+  - `src/index.css` — all styling; `.anatomy-*` classes set stroke/fill of placeholder art; a `prefers-reduced-motion` block exists.
+- Language guardrails: education not assessment. Allowed words: "contracting", "relaxing", "tone", "reference animation". Forbidden: "correct/incorrect", "should", "weak", "tight", "dysfunction", "heat".
+- The tint must never leak into Regions/Field views, and the gold motion visuals must never render in Guide view.
 
-Dependencies: B2–B3 build on the existing anatomy stack (`docs/layered-anatomy-plan.md`) and coexist with the motion field (`docs/motion-field-plan.md`) — one is a script player, the other a sample renderer; they never share a color channel.
+### Data model (B1)
+
+New directory `src/guide/`:
+
+```ts
+// src/guide/script.ts
+export type GuideStructureId =
+  | "pelvic_floor" | "diaphragm" | "transversus" | "rectus"
+  | "obliques" | "intercostals" | "scalenes" | "traps";
+
+/**
+ * Activation at a phase point. Range [-1, 1]:
+ *   +1 fully contracting (red), -1 fully relaxing/lengthening (blue),
+ *   0 neutral. Tonic structures hover at a small positive constant.
+ */
+export type ActivationFn = (phase: number) => number; // phase in [0, 1)
+
+export type GuideScript = {
+  id: "supported";            // widen to a union when "quiet" is added
+  label: string;              // "Supported breath"
+  cycleMs: number;            // 5000 — 12 breaths/min teaching pace
+  inhaleFraction: number;     // 0.4 — inhale [0, 0.4), exhale [0.4, 1)
+  activations: Record<GuideStructureId, ActivationFn>;
+  /** Geometry drivers, phase → 0..1 */
+  diaphragmFlatten: (phase: number) => number; // feeds existing `flatten`
+  ribExpand: (phase: number) => number;        // feeds skeleton/figure oscillation
+  pelvicLift: (phase: number) => number;       // 0 = descended/released, 1 = lifted/engaged
+};
+```
+
+Implementation notes:
+
+- Build activations from one shared easing helper (half-cosine ramps), not per-structure ad-hoc math, so curves stay smooth and the quiet script is easy to add. Encode the table above: pelvic floor leads by ~5% of phase; transversus is a constant ~+0.25; rectus/obliques go negative during inhale and ramp positive through exhale; diaphragm positive during inhale, negative during exhale; intercostals positive during inhale fading through exhale; scalenes small positive late-inhale; traps negative during inhale, ~0 during exhale.
+- Also export `guidePhase(nowMs, script): number` — pure, testable: `(nowMs % cycleMs) / cycleMs`.
+- The clock lives in a small hook `src/guide/useGuideClock.ts`: `requestAnimationFrame` loop that yields `phase`, paused (returns a fixed phase) when `reduceMotion` — see B4.
+
+*Accept B1:* module compiles with unit-testable pure functions; no UI change; build clean. Commit.
+
+### Rendering (B2) — activation tint on the placeholder anatomy
+
+1. **Color:** add to `src/lib/color.ts`:
+
+```ts
+/** Red for contracting (+), blue for relaxing (−), transparent near 0. */
+export function activationColor(a: number): string {
+  const t = Math.min(1, Math.abs(a));
+  const eased = t * t * (3 - 2 * t);
+  return a >= 0
+    ? `hsla(4, 68%, ${40 + eased * 14}%, ${eased * 0.55})`   // muted red
+    : `hsla(210, 60%, ${46 + eased * 12}%, ${eased * 0.5})`; // muted blue
+}
+```
+
+   Tune lightness/alpha in place; keep both hues desaturated enough that the anatomy line art stays legible under the tint (same principle as the gold treatment: G3's lesson was that full-strength color buries the drawing).
+
+2. **Threading:** `AnatomyStack` and `AnatomyPlaceholder` gain an optional `activations?: Record<GuideStructureId, number>` prop (current numeric values, already sampled from the script by the caller — placeholders stay dumb). When present, each structure's paths get an overlaid tint: for filled shapes (rectus, obliques, diaphragm, pec/traps) render a duplicate path filled with `activationColor(a)` on top of the line art; for stroke-only structures (transversus arcs, intercostal hatches, scalenes) apply the color to `stroke` with widened `strokeWidth`. Keep the mapping structure→class-names in one exported table in `placeholders.tsx` so Track H tint overlays can reuse it.
+3. **New placeholder art** (schematic, dim line art like everything else in that file):
+   - `pelvic_floor` inside `DeepLayer`: a shallow upward-curving dome spanning the pelvic bowl (x ≈ 102–138, y ≈ 208–218), drawn with `pelvicLift` moving it up/down by ~3 viewBox units — mirror of `diaphragmPath`'s parameterization. Class `anatomy-pelvic-floor`.
+   - `traps` in `SuperficialLayer`: two small triangles at the neck-shoulder line (from neck base ≈ (108, 62)/(132, 62) out toward the shoulder), class `anatomy-trap`.
+   - `scalenes`: 2–3 short lines per side on the neck (the `NECK` path region, y ≈ 40–64) — note the neck sits **outside** `#torso-clip`, so render these in a separate unclipped group that only mounts in Guide view. Class `anatomy-scalene`.
+   - Update the `deep` layer label to "Diaphragm & core" in `layers.ts`, and `public/anatomy/README.md` (deep.png now includes the pelvic floor; Track H list unchanged otherwise).
+4. **Legend** component `src/guide/GuideLegend.tsx`: one line, always visible in Guide view, under the figure next to the caption: red swatch "contracting" · blue swatch "relaxing" · the text **"Reference animation — not your data."** That exact sentence is the approved copy.
+
+*Accept B2:* with a hardcoded test activation record, tints render on the correct structures at every depth 1–6 and never appear in Regions/Field; line art stays legible under full tint; build clean. Commit.
+
+### Guide view integration (B3) — the oscillating figure
+
+1. **View plumbing:** `MapView` becomes `"regions" | "field" | "guide"`; bump storage key to `somatic.mapView.v2` (validate the stored string against the union; old key can be ignored — default `regions`). `ViewToggle` gains a third button "Guide". Keyboard: `g` toggles Guide ↔ previous view, `v` continues to toggle Regions ↔ Field (from Guide, `v` goes to Regions); extend the existing handler in `TorsoMap.tsx`, same input-target guard.
+2. **In Guide view, per frame** (phase from `useGuideClock`):
+   - Sample every `ActivationFn` once into a record; pass to `AnatomyStack`.
+   - `flatten` = `script.diaphragmFlatten(phase)` (replaces the sample-driven value; the `depth > 2` zeroing no longer applies in Guide — the dome should move at *every* depth since it's the star of the show, but keep the existing behavior in the other views).
+   - **Whole-figure oscillation:** drive the existing `torso-breathe` scale from `ribExpand` (same magnitude budget as today: scale 1 → ~1.02) and pass `ribExpand` into the skeleton placeholder: `ribPair` half-widths multiply by `1 + expand * 0.05` and lateral y-anchors shift up by `expand * 2` viewBox units, so the ribs visibly widen and rise. Thread as an optional `expand?: number` prop alongside `flatten`.
+   - Gold visuals (compartment glow/wash, blob field, relief) do **not** render. Bone lines, midline, landmarks, hover hit-paths stay; hover mm readouts still work (they read the live sample — that's fine, they're labeled as measurements).
+   - Caption (the existing `torso-caption` slot): **"Guide · Supported breath — a reference loop of the coordinated breath. G returns to your data."** plus the legend component.
+3. **Depth rail** works unchanged; verify the choreography reads at each depth (e.g. at depth 5 you mostly see traps relaxing; at depth 2 the two domes work; at depth 4 rectus/obliques trade with the diaphragm).
+4. Traces/metrics/record buttons keep running on the live sample stream — do not pause the source. Recording while in Guide view is allowed (it records the mock stream as always); no special casing.
+
+*Accept B3:* the full loop plays at ~5 s/cycle; pelvic floor visibly leads; diaphragm and rectus visibly alternate; ribs and silhouette oscillate; toggling to Regions/Field instantly restores the gold measured views; `g`/`v` keys work and don't fire in inputs; persistence works across reload; both breakpoints; build clean. Commit.
+
+### Reduced motion + polish (B4)
+
+1. Under `prefers-reduced-motion` the clock freezes at phase 0.2 (mid-inhale) and a **phase slider** appears next to the legend (range 0–1, step 0.01, labeled "Breath phase") so the loop can be scrubbed manually. The slider is also available via a small "pause" toggle for everyone (teaching benefit: the therapist can hold a phase and talk).
+2. `aria-live` is NOT used for the guide (it's decorative motion); the legend and caption are plain text. The Guide button gets `aria-pressed` like its siblings.
+3. Final pass: check tint alphas over every depth, confirm no gold/red-blue crossover in any view, run the full preset list in Regions/Field to confirm zero regression, `npm run build`, commit, push.
+
+*Accept B4:* reduced-motion shows a static, scrubable frame; pause+scrub works for everyone; no regressions in the measured views; build clean, pushed.
+
+## Open questions for the physician (confirmation items — the defaults above are safe)
+
+1. **Which breath is this?** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an **actively supported breath** (singing/trained support), not quiet tidal breathing (where the pelvic floor typically descends and lengthens on inhale and exhale is passive). Both are legitimate; they are *different scripts*. **Default shipped:** her memo verbatim, labeled "Supported breath." If she wants quiet breathing (or both), that's one new `GuideScript` object.
+2. **Scope of the neck:** scalenes ship as schematic hints on the existing neck; platysma is deferred. Extend the figure upward only if she asks.
+3. **Confirm the color scope:** red/blue lives only in the Guide view; measured views stay gold. If she wanted activation colors on the *live* map, we need the "modeled, not measured" conversation before changing anything.
 
 ## Guardrails carried forward
 
 - Education, not assessment: "contracting/relaxing," never "weak/tight/dysfunctional."
-- The legend and mode separation must make it impossible to read the animation as the user's own measurement.
-- Zero new dependencies; the choreography is math + the existing SVG/canvas machinery.
-- Layer additions (pelvic floor, neck) update `public/anatomy/README.md` and the Track H render list when implemented.
+- The legend sentence ("Reference animation — not your data.") is mandatory and always visible in Guide view.
+- Zero new dependencies; the choreography is math + the existing SVG machinery.
+- Track H note: realistic renders will need per-structure tint overlay shapes (the vector tint paths from B2 double as these); the structure→shape table in `placeholders.tsx` is the contract.

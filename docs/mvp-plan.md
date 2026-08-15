@@ -6,7 +6,7 @@
 
 ## Status update (2026-08-15)
 
-Phase 0 (mock studio) is built and live on GitHub Pages, and has grown past the original v0 scope:
+**Current project state and the done-vs-remaining ledger live in `docs/roadmap.md` — read that first.** Summary as of this date: Phase 0 (mock studio) is built and live on GitHub Pages, and has grown past the original v0 scope:
 
 - **Everything in the v0 table below ships:** six-compartment torso map, seven mock presets (the original five plus two singing-support presets), traces, Konno–Mead loop, record/replay/scrub, export/import, notes, compare view, live metrics (breaths/min, chest:belly, left:right, phase gap), URL-shareable scenarios.
 - **Layered anatomy** (`docs/layered-anatomy-plan.md`): the figure now peels through six anatomical strata (skeleton → diaphragm & deep → rib wall → abdominal wall → chest & shoulder → body) via a depth rail, with schematic placeholder art; realistic Blender renders are a pending human task (Track H).
