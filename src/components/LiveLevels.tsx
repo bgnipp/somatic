@@ -1,4 +1,4 @@
-import { motionFill } from "../lib/color";
+import { motionSolid } from "../lib/color";
 import type { Sample } from "../types";
 import { COMPARTMENT_IDS, COMPARTMENT_LABELS } from "../types";
 
@@ -24,7 +24,7 @@ export function LiveLevels({ sample }: Props) {
             <li key={id}>
               <span className="level-label">{COMPARTMENT_LABELS[id]}</span>
               <span className="level-bar">
-                <i style={{ width: `${pct}%`, background: motionFill(mm, 12) }} />
+                <i style={{ width: `${pct}%`, background: motionSolid(mm, 12) }} />
               </span>
               <span className="level-value">{mm.toFixed(1)}</span>
             </li>

@@ -1,4 +1,4 @@
-import { motionFill } from "../lib/color";
+import { motionSolid } from "../lib/color";
 import type { Sample } from "../types";
 
 type Props = {
@@ -28,7 +28,7 @@ export function CrossSection({ sample }: Props) {
           cy="60"
           rx={46 + (ax + px) / 6}
           ry={32 + (ly + ry) / 6}
-          fill={motionFill((anterior + left + right) / 3, 14)}
+          fill={motionSolid((anterior + left + right) / 3, 14)}
           opacity="0.85"
           stroke="rgba(228,184,106,0.45)"
         />

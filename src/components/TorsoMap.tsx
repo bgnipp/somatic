@@ -7,7 +7,7 @@ import {
   saveStoredDepth,
   type AnatomyDepth,
 } from "../anatomy/layers";
-import { motionFill, motionStroke } from "../lib/color";
+import { motionFill, motionGlow, motionStroke } from "../lib/color";
 import { meanAbdomen, meanRibCage } from "../mock/synthesize";
 import type { CompartmentId, Sample } from "../types";
 import { COMPARTMENT_LABELS, LANDMARKS } from "../types";
@@ -76,6 +76,13 @@ export function TorsoMap({
           <clipPath id="torso-clip">
             <path d={TORSO} />
           </clipPath>
+          <filter id="motion-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.7" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
         <ellipse className="torso-context" cx="120" cy="30" rx="17" ry="20" />
         <path className="torso-neck" d={NECK} />
@@ -92,10 +99,25 @@ export function TorsoMap({
               const mm = sample?.compartments[id].displacementMm ?? 0;
               return (
                 <path
-                  key={id}
+                  key={`${id}-glow`}
                   d={PATHS[id]}
                   fill={motionFill(mm, ceiling)}
-                  stroke={motionStroke(mm, ceiling)}
+                  stroke={motionGlow(mm, ceiling)}
+                  strokeWidth={2.1}
+                  filter="url(#motion-glow)"
+                  className="compartment-glow"
+                  pointerEvents="none"
+                />
+              );
+            })}
+            {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
+              const mm = sample?.compartments[id].displacementMm ?? 0;
+              return (
+                <path
+                  key={id}
+                  d={PATHS[id]}
+                  fill="transparent"
+                  stroke={hover === id ? motionStroke(mm, ceiling) : "transparent"}
                   strokeWidth={hover === id ? 1.6 : 0.75}
                   className="compartment"
                   onMouseEnter={() => setHover(id)}

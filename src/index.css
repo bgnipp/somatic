@@ -373,9 +373,12 @@ h1 {
   stroke: none;
 }
 
+.compartment-glow {
+  pointer-events: none;
+}
+
 .compartment {
   cursor: crosshair;
-  fill-opacity: 0.7;
   transition: stroke-width 80ms linear;
 }
 
