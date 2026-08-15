@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnatomyStack } from "../anatomy/AnatomyStack";
 import { DepthRail } from "../anatomy/DepthRail";
+import { ScaleneHints } from "../anatomy/placeholders";
 import {
   clampDepth,
   loadStoredDepth,
@@ -12,6 +13,16 @@ import { ReliefField } from "../field/ReliefField";
 import { sitesFromSample } from "../field/sites";
 import { ViewToggle } from "../field/ViewToggle";
 import { loadStoredView, saveStoredView, type MapView } from "../field/view";
+import { GuideLegend } from "../guide/GuideLegend";
+import { ScriptToggle } from "../guide/ScriptToggle";
+import {
+  activationsAt,
+  loadStoredScript,
+  saveStoredScript,
+  scriptById,
+  type GuideScriptId,
+} from "../guide/script";
+import { useGuideClock } from "../guide/useGuideClock";
 import { motionFill, motionGlow, motionStroke } from "../lib/color";
 import { meanAbdomen, meanRibCage } from "../mock/synthesize";
 import type { CompartmentId, Sample } from "../types";
@@ -41,17 +52,30 @@ export function TorsoMap({
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
   const [view, setView] = useState<MapView>(loadStoredView);
+  const [scriptId, setScriptId] = useState<GuideScriptId>(loadStoredScript);
   const [reduceMotion, setReduceMotion] = useState(() =>
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+  const lastMeasured = useRef<Exclude<MapView, "guide">>("regions");
   const depth = depthProp ?? storedDepth;
   const ceiling = 12;
   const belly = sample ? meanAbdomen(sample) : 0;
   const total = sample ? meanRibCage(sample) + belly : 0;
-  const scale = 1 + Math.min(total, 22) * 0.0012;
-  const flatten =
-    reduceMotion || depth > 2 ? 0 : Math.min(1, belly / 9.5);
+  const script = scriptById(scriptId);
+  const showGuide = view === "guide";
+  const phase = useGuideClock(script.cycleMs, { reduceMotion });
+  const activations = showGuide ? activationsAt(script, phase) : undefined;
+  const flatten = showGuide
+    ? script.diaphragmFlatten(phase)
+    : reduceMotion || depth > 2
+      ? 0
+      : Math.min(1, belly / 9.5);
+  const expand = showGuide ? script.ribExpand(phase) : 0;
+  const pelvicLift = showGuide ? script.pelvicLift(phase) : 0;
+  const scale = showGuide
+    ? 1 + expand * 0.02
+    : 1 + Math.min(total, 22) * 0.0012;
   const sites = sitesFromSample(sample);
   const showField = view === "field";
 
@@ -69,15 +93,28 @@ export function TorsoMap({
 
   useEffect(() => {
     saveStoredView(view);
+    if (view !== "guide") lastMeasured.current = view;
   }, [view]);
+
+  useEffect(() => {
+    saveStoredScript(scriptId);
+  }, [scriptId]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
+      if (e.key === "g" || e.key === "G") {
+        e.preventDefault();
+        setView((v) => (v === "guide" ? lastMeasured.current : "guide"));
+        return;
+      }
       if (e.key === "v" || e.key === "V") {
         e.preventDefault();
-        setView((v) => (v === "field" ? "regions" : "field"));
+        setView((v) => {
+          if (v === "guide") return "regions";
+          return v === "field" ? "regions" : "field";
+        });
         return;
       }
       if (e.key !== "[" && e.key !== "]") return;
@@ -120,9 +157,18 @@ export function TorsoMap({
           <path className="torso-limb" d={LEFT_ARM} />
           <path className="torso-limb" d={RIGHT_ARM} />
           <path className="torso-context" d={TORSO} />
-          <AnatomyStack depth={depth} flatten={flatten} />
+          <AnatomyStack
+            depth={depth}
+            flatten={flatten}
+            expand={expand}
+            pelvicLift={pelvicLift}
+            activations={activations}
+          />
+          {showGuide && (
+            <ScaleneHints activation={activations?.scalenes ?? 0} />
+          )}
           <g clipPath="url(#torso-clip)">
-            {showField ? (
+            {showGuide ? null : showField ? (
               reduceMotion ? (
                 <BlobField sites={sites} />
               ) : (
@@ -195,6 +241,11 @@ export function TorsoMap({
             <strong>{COMPARTMENT_LABELS[hover]}</strong>
             <span>{sample.compartments[hover].displacementMm.toFixed(1)} mm from rest</span>
           </>
+        ) : showGuide ? (
+          <>
+            <strong>Guide · {script.label}</strong>
+            <span>A reference loop of the coordinated breath. G returns to your data.</span>
+          </>
         ) : showField ? (
           <>
             <strong>Motion field</strong>
@@ -203,10 +254,17 @@ export function TorsoMap({
         ) : (
           <>
             <strong>Front view</strong>
-            <span>Brighter is more motion. [ and ] peel layers. V toggles field.</span>
+            <span>Brighter is more motion. [ and ] peel layers. V toggles field. G opens the guide.</span>
           </>
         )}
       </div>
+      {showGuide && (
+        <>
+          <ScriptToggle scriptId={scriptId} onChange={setScriptId} />
+          <p className="guide-blurb">{script.blurb}</p>
+          <GuideLegend />
+        </>
+      )}
     </div>
   );
 }

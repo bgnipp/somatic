@@ -1,12 +1,16 @@
-export type MapView = "regions" | "field";
+export type MapView = "regions" | "field" | "guide";
 
-export const MAP_VIEW_KEY = "somatic.mapView.v1";
+export const MAP_VIEW_KEY = "somatic.mapView.v2";
 export const DEFAULT_MAP_VIEW: MapView = "regions";
+
+function parseView(raw: string | null): MapView {
+  if (raw === "field" || raw === "guide" || raw === "regions") return raw;
+  return DEFAULT_MAP_VIEW;
+}
 
 export function loadStoredView(): MapView {
   try {
-    const raw = localStorage.getItem(MAP_VIEW_KEY);
-    return raw === "field" ? "field" : DEFAULT_MAP_VIEW;
+    return parseView(localStorage.getItem(MAP_VIEW_KEY));
   } catch {
     return DEFAULT_MAP_VIEW;
   }

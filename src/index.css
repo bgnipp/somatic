@@ -497,6 +497,34 @@ h1 {
   color: var(--gold);
 }
 
+.script-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.55rem;
+}
+
+.script-toggle button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+}
+
+.script-toggle button.active {
+  background: #2a2618;
+  border-color: #6d5a2c;
+  color: var(--gold);
+}
+
+.guide-blurb {
+  margin: 0.35rem 0 0;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .torso-caption {
   margin-top: 0.6rem;
   display: flex;

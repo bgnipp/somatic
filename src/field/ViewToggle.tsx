@@ -5,25 +5,26 @@ type Props = {
   onChange: (view: MapView) => void;
 };
 
+const OPTIONS: { id: MapView; label: string }[] = [
+  { id: "regions", label: "Regions" },
+  { id: "field", label: "Field" },
+  { id: "guide", label: "Guide" },
+];
+
 export function ViewToggle({ view, onChange }: Props) {
   return (
     <div className="view-toggle" role="group" aria-label="Motion view">
-      <button
-        type="button"
-        className={view === "regions" ? "active" : undefined}
-        aria-pressed={view === "regions"}
-        onClick={() => onChange("regions")}
-      >
-        Regions
-      </button>
-      <button
-        type="button"
-        className={view === "field" ? "active" : undefined}
-        aria-pressed={view === "field"}
-        onClick={() => onChange("field")}
-      >
-        Field
-      </button>
+      {OPTIONS.map((opt) => (
+        <button
+          key={opt.id}
+          type="button"
+          className={view === opt.id ? "active" : undefined}
+          aria-pressed={view === opt.id}
+          onClick={() => onChange(opt.id)}
+        >
+          {opt.label}
+        </button>
+      ))}
     </div>
   );
 }
