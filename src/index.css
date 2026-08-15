@@ -231,8 +231,94 @@ h1 {
   stroke-linecap: round;
 }
 
+.anatomy-layer {
+  pointer-events: none;
+}
+
+.anatomy-bone,
+.anatomy-cartilage,
+.anatomy-spine rect {
+  fill: none;
+  stroke: #7a7468;
+  stroke-width: 0.95;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.anatomy-sternum,
+.anatomy-pelvis,
+.anatomy-spine rect {
+  fill: #2c2a24;
+  fill-opacity: 0.85;
+}
+
+.anatomy-cartilage {
+  stroke: #6a6458;
+  stroke-width: 0.8;
+}
+
+.anatomy-diaphragm {
+  fill: #2a241c;
+  fill-opacity: 0.55;
+  stroke: #6a5a48;
+  stroke-width: 1.05;
+}
+
+.anatomy-diaphragm-rim {
+  fill: none;
+  stroke: #8a7a64;
+  stroke-width: 1.15;
+  stroke-linecap: round;
+}
+
+.anatomy-psoas {
+  fill: none;
+  stroke: #5a4e40;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.anatomy-transversus {
+  fill: none;
+  stroke: #5a4e40;
+  stroke-width: 0.7;
+  stroke-dasharray: 2 2;
+  opacity: 0.55;
+}
+
+.anatomy-intercostal path {
+  fill: none;
+  stroke: #5a4e40;
+  stroke-width: 0.55;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.anatomy-pec,
+.anatomy-rectus,
+.anatomy-oblique {
+  fill: #2a261c;
+  fill-opacity: 0.35;
+  stroke: #5c5346;
+  stroke-width: 0.7;
+}
+
+.anatomy-linea {
+  fill: none;
+  stroke: #6a6458;
+  stroke-width: 0.6;
+}
+
+.anatomy-surface path {
+  fill: #3a3428;
+  fill-opacity: 1;
+  stroke: none;
+}
+
 .compartment {
   cursor: crosshair;
+  fill-opacity: 0.7;
   transition: stroke-width 80ms linear;
 }
 
