@@ -1,7 +1,7 @@
 # Breath Anatomy Animation ("Guide" view) — Physician Feedback, Assessment, Implementation Spec
 
 **Date:** 2026-08-15 (revised same day from assessment-only to handoff-ready)
-**Status:** Ready for handoff. Implementing agent: read "Agent orientation", then execute phases B1–B4 in order. The physician's open questions (bottom) are **confirmation items, not blockers** — the defaults chosen below are safe to build.
+**Status:** Ready for handoff. Implementing agent: read "Agent orientation", then execute phases B1–B4 in order. Open question 1 was **answered 2026-08-15: both quiet and supported breath ship as selectable scripts** — the spec below reflects that. Remaining open questions are confirmation items, not blockers.
 **Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`).
 
 ## What she asked for, in her words (condensed)
@@ -37,7 +37,7 @@ This framing resolves the red/blue color question cleanly:
 
 ### Her physiology model, captured as choreography
 
-The clinical actions she cites, arranged into the loop the animation plays. **This table is the data model** — each row becomes an activation curve keyed to breath phase. Note this describes an **actively supported breath** (singing/trained support) — see open question 1; it ships as the script named "Supported breath."
+The clinical actions she cites, arranged into the loop the animation plays. **This table is the data model** — each row becomes an activation curve keyed to breath phase. It describes an **actively supported breath** (singing/trained support) and ships as the script named "Supported breath." A second script, "Quiet breath," ships alongside it (her decision, 2026-08-15) — its table follows below.
 
 | Structure | Inhale | Exhale | Notes |
 |---|---|---|---|
@@ -52,6 +52,24 @@ The clinical actions she cites, arranged into the loop the animation plays. **Th
 | Platysma | — | — | **Deferred** (open question 2); purely cosmetic in front view |
 | Rib cage + whole figure | Expands (geometry, not just tint) | Settles | "The entire animation should oscillate" |
 
+### Quiet breath choreography (second script)
+
+Quiet tidal breathing at rest — standard respiratory physiology, the contrast case that makes the supported script legible. The defining differences: **exhale is passive** (elastic recoil — nothing "does" the exhale), the pelvic floor **yields downward** on inhale instead of engaging, and the abdominal wall stays quiet throughout.
+
+| Structure | Inhale | Exhale | Notes |
+|---|---|---|---|
+| Pelvic floor (levator ani) | Yields / lengthens (blue, gentle) | Recoils to rest (neutral) | Descends with the abdominal contents — opposite of the supported script |
+| Diaphragm | Contracts, descends (red) | Relaxes passively (fades to neutral, brief soft blue) | The only strong actor in the loop |
+| Transversus abdominis | Low resting tone (faint warm, ~+0.1) | Same | Quieter than the supported script's tone |
+| Rectus abdominis | Quiet (neutral) | Quiet (neutral) | No abdominal effort at rest |
+| Internal/external obliques | Quiet (neutral) | Quiet (neutral) | — |
+| Intercostals | External set mildly active (soft red) | Fade to neutral | Smaller amplitude than supported |
+| Scalenes | Barely active (near-neutral) | Neutral | Accessory muscles stay out of a quiet breath |
+| Traps (upper) | Neutral | Neutral | Nothing to release — they were never working |
+| Rib cage + whole figure | Gentle expansion (~60% of supported amplitude) | Settles by recoil | Slower, smaller oscillation |
+
+Geometry drivers for `quiet`: `diaphragmFlatten` peaks lower (~0.7 vs 1.0), `ribExpand` peaks at ~0.6, `pelvicLift` is **inverted relative to supported** — it goes slightly *negative-direction* (implemented as lift 0 → the dome rendered a couple of viewBox units *lower* at peak inhale; give `pelvicLift` range [-1, 1] where negative means descended below rest, positive means lifted above rest, 0 = rest). Cycle a touch slower: `cycleMs: 6000`, `inhaleFraction: 0.42` (near-even in/out with passive tail).
+
 ---
 
 ## Implementation spec
@@ -60,7 +78,7 @@ The clinical actions she cites, arranged into the loop the animation plays. **Th
 
 1. **Guide is a third stage view:** the toggle becomes `Regions | Field | Guide`. Same figure, same depth rail. The Guide runs on an internal phase clock, **not** the sample stream — the mock source keeps running (traces/metrics stay live) but the torso ignores it while in Guide.
 2. **Separation from "your data" is done with wording + legend, not a separate page.** Caption and legend text below are approved copy.
-3. **Her memo's choreography ships as the first and only script**, id `supported`, label "Supported breath." The script type supports multiple protocols so a `quiet` script can be added after she answers open question 1 — adding one must require only a new script object, no renderer changes.
+3. **Two scripts ship, selectable in the Guide view** (her decision, 2026-08-15): id `quiet`, label "Quiet breath," and id `supported`, label "Supported breath" (her memo's choreography). Scripts are plain data objects; the renderer must not special-case either one. **Default: `supported`** (her requested animation and the singing use case) — the therapist can flip the default in review. Selection persists in localStorage (`somatic.guideScript.v1`).
 4. **Pelvic floor joins the `deep` layer** (diaphragm & deep) rather than becoming a 7th depth stop. Teaching-wise the pairing is right — the "two domes" of the core — and it avoids churning `AnatomyDepth`, the rail, and stored-depth migration. Update the `deep` label to "Diaphragm & core" and `public/anatomy/README.md` accordingly. Revisit as a separate stop only if she asks.
 5. **Red/blue exists only in Guide view.** `src/lib/color.ts` gains an `activationColor()`; no existing gold ramp changes.
 6. **Zero new dependencies.** Everything is React state + SVG + the existing CSS.
@@ -96,26 +114,35 @@ export type GuideStructureId =
  */
 export type ActivationFn = (phase: number) => number; // phase in [0, 1)
 
+export type GuideScriptId = "quiet" | "supported";
+
 export type GuideScript = {
-  id: "supported";            // widen to a union when "quiet" is added
-  label: string;              // "Supported breath"
-  cycleMs: number;            // 5000 — 12 breaths/min teaching pace
-  inhaleFraction: number;     // 0.4 — inhale [0, 0.4), exhale [0.4, 1)
+  id: GuideScriptId;
+  label: string;              // "Quiet breath" / "Supported breath"
+  blurb: string;              // one sentence under the selector, education-not-assessment wording
+  cycleMs: number;            // supported: 5000; quiet: 6000
+  inhaleFraction: number;     // supported: 0.4; quiet: 0.42
   activations: Record<GuideStructureId, ActivationFn>;
-  /** Geometry drivers, phase → 0..1 */
-  diaphragmFlatten: (phase: number) => number; // feeds existing `flatten`
-  ribExpand: (phase: number) => number;        // feeds skeleton/figure oscillation
-  pelvicLift: (phase: number) => number;       // 0 = descended/released, 1 = lifted/engaged
+  /** Geometry drivers, phase → number */
+  diaphragmFlatten: (phase: number) => number; // 0..1, feeds existing `flatten`
+  ribExpand: (phase: number) => number;        // 0..1, feeds skeleton/figure oscillation
+  pelvicLift: (phase: number) => number;       // -1..1: negative = descended below rest,
+                                               // positive = lifted/engaged, 0 = rest
 };
+
+export const GUIDE_SCRIPTS: GuideScript[]; // [quiet, supported] — both per the tables above
+export const DEFAULT_GUIDE_SCRIPT: GuideScriptId = "supported";
+export const GUIDE_SCRIPT_KEY = "somatic.guideScript.v1";
+// loadStoredScript() / saveStoredScript() following the pattern in src/field/view.ts
 ```
 
 Implementation notes:
 
-- Build activations from one shared easing helper (half-cosine ramps), not per-structure ad-hoc math, so curves stay smooth and the quiet script is easy to add. Encode the table above: pelvic floor leads by ~5% of phase; transversus is a constant ~+0.25; rectus/obliques go negative during inhale and ramp positive through exhale; diaphragm positive during inhale, negative during exhale; intercostals positive during inhale fading through exhale; scalenes small positive late-inhale; traps negative during inhale, ~0 during exhale.
+- Build activations from one shared easing helper (half-cosine ramps), not per-structure ad-hoc math, so curves stay smooth across both scripts. **Both scripts are built in B1**, encoding their tables above. Supported: pelvic floor leads by ~5% of phase; transversus is a constant ~+0.25; rectus/obliques go negative during inhale and ramp positive through exhale; diaphragm positive during inhale, negative during exhale; intercostals positive during inhale fading through exhale; scalenes small positive late-inhale; traps negative during inhale, ~0 during exhale. Quiet: per its table — diaphragm is the only strong actor, pelvic floor yields (gentle negative activation, negative `pelvicLift`), abdominal wall near-zero, everything recoils passively to neutral on exhale.
 - Also export `guidePhase(nowMs, script): number` — pure, testable: `(nowMs % cycleMs) / cycleMs`.
 - The clock lives in a small hook `src/guide/useGuideClock.ts`: `requestAnimationFrame` loop that yields `phase`, paused (returns a fixed phase) when `reduceMotion` — see B4.
 
-*Accept B1:* module compiles with unit-testable pure functions; no UI change; build clean. Commit.
+*Accept B1:* both scripts compile as data objects with unit-testable pure functions; spot-check a few phase points against the tables (e.g. supported at phase 0.2: diaphragm > 0, rectus < 0; quiet at phase 0.2: rectus ≈ 0, pelvicLift < 0); no UI change; build clean. Commit.
 
 ### Rendering (B2) — activation tint on the placeholder anatomy
 
@@ -147,16 +174,17 @@ export function activationColor(a: number): string {
 ### Guide view integration (B3) — the oscillating figure
 
 1. **View plumbing:** `MapView` becomes `"regions" | "field" | "guide"`; bump storage key to `somatic.mapView.v2` (validate the stored string against the union; old key can be ignored — default `regions`). `ViewToggle` gains a third button "Guide". Keyboard: `g` toggles Guide ↔ previous view, `v` continues to toggle Regions ↔ Field (from Guide, `v` goes to Regions); extend the existing handler in `TorsoMap.tsx`, same input-target guard.
-2. **In Guide view, per frame** (phase from `useGuideClock`):
+2. **Script selector:** in Guide view only, a two-pill toggle (`Quiet breath | Supported breath`) styled like `ViewToggle`, placed with the legend under the figure; `aria-pressed` on the pills; selection persists via `GUIDE_SCRIPT_KEY`; switching scripts keeps the clock running (phase carries over — no jarring restart). Show the selected script's one-line `blurb` beside it. Approved blurbs: quiet — "Breathing at rest. The diaphragm works; the exhale is elastic recoil."; supported — "An actively supported breath, as used in singing. Support musculature works through the exhale."
+3. **In Guide view, per frame** (phase from `useGuideClock`, using the selected script's `cycleMs`):
    - Sample every `ActivationFn` once into a record; pass to `AnatomyStack`.
    - `flatten` = `script.diaphragmFlatten(phase)` (replaces the sample-driven value; the `depth > 2` zeroing no longer applies in Guide — the dome should move at *every* depth since it's the star of the show, but keep the existing behavior in the other views).
    - **Whole-figure oscillation:** drive the existing `torso-breathe` scale from `ribExpand` (same magnitude budget as today: scale 1 → ~1.02) and pass `ribExpand` into the skeleton placeholder: `ribPair` half-widths multiply by `1 + expand * 0.05` and lateral y-anchors shift up by `expand * 2` viewBox units, so the ribs visibly widen and rise. Thread as an optional `expand?: number` prop alongside `flatten`.
    - Gold visuals (compartment glow/wash, blob field, relief) do **not** render. Bone lines, midline, landmarks, hover hit-paths stay; hover mm readouts still work (they read the live sample — that's fine, they're labeled as measurements).
-   - Caption (the existing `torso-caption` slot): **"Guide · Supported breath — a reference loop of the coordinated breath. G returns to your data."** plus the legend component.
-3. **Depth rail** works unchanged; verify the choreography reads at each depth (e.g. at depth 5 you mostly see traps relaxing; at depth 2 the two domes work; at depth 4 rectus/obliques trade with the diaphragm).
-4. Traces/metrics/record buttons keep running on the live sample stream — do not pause the source. Recording while in Guide view is allowed (it records the mock stream as always); no special casing.
+   - Caption (the existing `torso-caption` slot): **"Guide · {script label} — a reference loop of the coordinated breath. G returns to your data."** plus the legend component.
+4. **Depth rail** works unchanged; verify both scripts read at each depth (e.g. at depth 5, supported shows traps relaxing while quiet shows them neutral; at depth 2 the two domes work — pelvic floor lifting in supported, yielding downward in quiet; at depth 4, supported shows rectus/obliques trading with the diaphragm while quiet stays still).
+5. Traces/metrics/record buttons keep running on the live sample stream — do not pause the source. Recording while in Guide view is allowed (it records the mock stream as always); no special casing.
 
-*Accept B3:* the full loop plays at ~5 s/cycle; pelvic floor visibly leads; diaphragm and rectus visibly alternate; ribs and silhouette oscillate; toggling to Regions/Field instantly restores the gold measured views; `g`/`v` keys work and don't fire in inputs; persistence works across reload; both breakpoints; build clean. Commit.
+*Accept B3:* both scripts play (supported ~5 s/cycle, quiet ~6 s); the selector switches between them without a phase jump and persists across reload; in supported, the pelvic floor visibly leads and diaphragm/rectus alternate; in quiet, the diaphragm works alone, the pelvic floor descends, and the abdominal wall stays still; ribs and silhouette oscillate (visibly gentler in quiet); toggling to Regions/Field instantly restores the gold measured views; `g`/`v` keys work and don't fire in inputs; both breakpoints; build clean. Commit.
 
 ### Reduced motion + polish (B4)
 
@@ -166,11 +194,11 @@ export function activationColor(a: number): string {
 
 *Accept B4:* reduced-motion shows a static, scrubable frame; pause+scrub works for everyone; no regressions in the measured views; build clean, pushed.
 
-## Open questions for the physician (confirmation items — the defaults above are safe)
+## Open questions for the physician
 
-1. **Which breath is this?** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an **actively supported breath** (singing/trained support), not quiet tidal breathing (where the pelvic floor typically descends and lengthens on inhale and exhale is passive). Both are legitimate; they are *different scripts*. **Default shipped:** her memo verbatim, labeled "Supported breath." If she wants quiet breathing (or both), that's one new `GuideScript` object.
-2. **Scope of the neck:** scalenes ship as schematic hints on the existing neck; platysma is deferred. Extend the figure upward only if she asks.
-3. **Confirm the color scope:** red/blue lives only in the Guide view; measured views stay gold. If she wanted activation colors on the *live* map, we need the "modeled, not measured" conversation before changing anything.
+1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the B4-era review session.
+2. **Scope of the neck** (confirmation item, default is safe): scalenes ship as schematic hints on the existing neck; platysma is deferred. Extend the figure upward only if she asks.
+3. **Confirm the color scope** (confirmation item, default is safe): red/blue lives only in the Guide view; measured views stay gold. If she wanted activation colors on the *live* map, we need the "modeled, not measured" conversation before changing anything.
 
 ## Guardrails carried forward
 

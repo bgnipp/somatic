@@ -19,7 +19,7 @@
 
 | # | Work | Plan doc | Status |
 |---|---|---|---|
-| 1 | **Breath animation "Guide" view (B1–B4):** scripted muscle activation/relaxation animation per the physician's memo — red/blue tinting on the anatomy layers, pelvic floor, whole-figure oscillation | `docs/breath-animation-plan.md` — **the handoff spec; execute B-phases in order** | Ready. Decisions and defaults are locked in the doc; the physician's open questions are confirmation items, not blockers. |
+| 1 | **Breath animation "Guide" view (B1–B4):** scripted muscle activation/relaxation animation per the physician's memo — red/blue tinting on the anatomy layers, pelvic floor, whole-figure oscillation, **two selectable scripts (Quiet breath / Supported breath — her decision, 2026-08-15)** | `docs/breath-animation-plan.md` — **the handoff spec; execute B-phases in order** | Ready. All decisions locked in the doc; remaining physician questions are confirmation items, not blockers. |
 
 ## Remaining — human work (does not block #1)
 
@@ -28,14 +28,13 @@
 | **Track H:** Blender renders of the 6 anatomy layers from Z-Anatomy (H0 licensing/pipeline spike, H1 full render set) | `docs/layered-anatomy-plan.md` §Track H | Layer list will grow (pelvic floor added to `deep`; see breath-animation plan) — render after B3 lands or re-render later |
 | **F3:** motion-field tuning session with the therapist (light angle, exaggeration, default view) | `docs/motion-field-plan.md` §F3 | Session time, not code time |
 | **Therapist success-gate session** | `docs/mvp-plan.md` §Success gate | Gates all capture (Phase 2) work |
-| **Physician confirmations** for the Guide view | `docs/breath-animation-plan.md` §Open questions | Quiet vs. supported breath; neck scope; color-scope confirmation |
+| **Physician confirmations** for the Guide view | `docs/breath-animation-plan.md` §Open questions | Neck scope; color-scope confirmation; her review of the quiet-breath choreography table (quiet vs. supported was answered 2026-08-15: both ship, selectable) |
 
 ## Remaining — agent work, blocked
 
 | Work | Blocked on | Plan doc |
 |---|---|---|
 | **H2:** re-trace compartment `PATHS`/`LANDMARKS` onto real skeleton render; re-tune glow legibility | Track H renders | `docs/layered-anatomy-plan.md` §H2 |
-| Second Guide script ("quiet breath") if she wants both | Physician's answer to open question 1 | `docs/breath-animation-plan.md` |
 
 ## Backlog (captured, not planned in detail)
 
