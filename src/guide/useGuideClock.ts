@@ -5,32 +5,27 @@ const REDUCED_PHASE = 0.2;
 
 /**
  * Incremental phase clock. Advances by dt / cycleMs so switching scripts
- * changes speed without jumping the phase. Frozen at mid-inhale under
- * reduced motion; `paused` holds the current (or scrubbed) phase.
+ * changes speed without jumping the phase. Frozen under reduced motion or
+ * when paused; `scrub` then sets the held phase.
  */
 export function useGuideClock(
   cycleMs: number,
   options: { reduceMotion: boolean; paused?: boolean; scrub?: number },
 ): number {
   const { reduceMotion, paused = false, scrub } = options;
-  const [phase, setPhase] = useState(reduceMotion ? REDUCED_PHASE : 0);
+  const held = reduceMotion || paused;
+  const initial = reduceMotion ? REDUCED_PHASE : 0;
+  const [phase, setPhase] = useState(initial);
   const phaseRef = useRef(phase);
   const lastRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (reduceMotion) {
-      phaseRef.current = REDUCED_PHASE;
-      setPhase(REDUCED_PHASE);
+    if (held) {
       lastRef.current = null;
-      return;
-    }
-    if (paused) {
-      lastRef.current = null;
-      if (scrub !== undefined) {
-        const next = wrapPhase(scrub);
-        phaseRef.current = next;
-        setPhase(next);
-      }
+      const next =
+        scrub !== undefined ? wrapPhase(scrub) : reduceMotion ? REDUCED_PHASE : phaseRef.current;
+      phaseRef.current = next;
+      setPhase(next);
       return;
     }
 
@@ -47,9 +42,11 @@ export function useGuideClock(
     }
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [cycleMs, reduceMotion, paused, scrub]);
+  }, [cycleMs, held, reduceMotion, scrub]);
 
-  if (reduceMotion) return REDUCED_PHASE;
-  if (paused && scrub !== undefined) return wrapPhase(scrub);
+  if (held) {
+    if (scrub !== undefined) return wrapPhase(scrub);
+    return reduceMotion ? REDUCED_PHASE : phase;
+  }
   return phase;
 }

@@ -53,18 +53,27 @@ export function TorsoMap({
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
   const [view, setView] = useState<MapView>(loadStoredView);
   const [scriptId, setScriptId] = useState<GuideScriptId>(loadStoredScript);
+  const [paused, setPaused] = useState(false);
+  const [scrub, setScrub] = useState(0.2);
   const [reduceMotion, setReduceMotion] = useState(() =>
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
-  const lastMeasured = useRef<Exclude<MapView, "guide">>("regions");
+  const lastMeasured = useRef<Exclude<MapView, "guide">>(
+    loadStoredView() === "field" ? "field" : "regions",
+  );
   const depth = depthProp ?? storedDepth;
   const ceiling = 12;
   const belly = sample ? meanAbdomen(sample) : 0;
   const total = sample ? meanRibCage(sample) + belly : 0;
   const script = scriptById(scriptId);
   const showGuide = view === "guide";
-  const phase = useGuideClock(script.cycleMs, { reduceMotion });
+  const held = reduceMotion || paused;
+  const phase = useGuideClock(script.cycleMs, {
+    reduceMotion,
+    paused,
+    scrub: held ? scrub : undefined,
+  });
   const activations = showGuide ? activationsAt(script, phase) : undefined;
   const flatten = showGuide
     ? script.diaphragmFlatten(phase)
@@ -75,7 +84,9 @@ export function TorsoMap({
   const pelvicLift = showGuide ? script.pelvicLift(phase) : 0;
   const scale = showGuide
     ? 1 + expand * 0.02
-    : 1 + Math.min(total, 22) * 0.0012;
+    : reduceMotion
+      ? 1
+      : 1 + Math.min(total, 22) * 0.0012;
   const sites = sitesFromSample(sample);
   const showField = view === "field";
 
@@ -262,6 +273,35 @@ export function TorsoMap({
         <>
           <ScriptToggle scriptId={scriptId} onChange={setScriptId} />
           <p className="guide-blurb">{script.blurb}</p>
+          <div className="guide-controls">
+            <button
+              type="button"
+              aria-pressed={held}
+              disabled={reduceMotion}
+              onClick={() => {
+                if (!paused) setScrub(phase);
+                setPaused((p) => !p);
+              }}
+            >
+              {held ? "Play" : "Pause"}
+            </button>
+            {held && (
+              <label className="guide-phase">
+                Breath phase
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={scrub}
+                  onChange={(e) => {
+                    setScrub(Number(e.target.value));
+                    if (!paused && !reduceMotion) setPaused(true);
+                  }}
+                />
+              </label>
+            )}
+          </div>
           <GuideLegend />
         </>
       )}

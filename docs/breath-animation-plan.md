@@ -1,7 +1,7 @@
 # Breath Anatomy Animation ("Guide" view) — Physician Feedback, Assessment, Implementation Spec
 
 **Date:** 2026-08-15 (revised same day from assessment-only to handoff-ready)
-**Status:** Ready for handoff. Implementing agent: read "Agent orientation", then execute phases B1–B4 in order. Open question 1 was **answered 2026-08-15: both quiet and supported breath ship as selectable scripts** — the spec below reflects that. Remaining open questions are confirmation items, not blockers.
+**Status:** Implemented (B1–B4). Remaining work is the physician review session (quiet-breath table, neck scope, color-scope confirmation) — not code.
 **Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`).
 
 ## What she asked for, in her words (condensed)

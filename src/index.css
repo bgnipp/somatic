@@ -525,6 +525,34 @@ h1 {
   line-height: 1.4;
 }
 
+.guide-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem 0.85rem;
+  margin-top: 0.45rem;
+}
+
+.guide-controls button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guide-phase {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+}
+
+.guide-phase input[type="range"] {
+  width: 8rem;
+}
+
 .torso-caption {
   margin-top: 0.6rem;
   display: flex;
@@ -906,10 +934,6 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .torso-breathe {
-    transform: none !important;
-  }
-
   .phase-pill,
   .level-bar i,
   .anatomy-layer {

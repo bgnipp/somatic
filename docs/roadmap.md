@@ -14,18 +14,17 @@
 | **Motion field F1 + F2:** field sites, flat blob field, `Regions | Field` toggle (`v` key, `somatic.mapView.v1`), canvas IDW height field with lit relief shading, reduced-motion fallback to blobs | `docs/motion-field-plan.md` | `ea7b5e2`, `b657d76` |
 | Metrics flicker fix (16 s metrics buffer, deadband hold) | (bug fix) | `16b9c51` |
 | Physician feedback captured: voice memo + 3 videos transcribed, assessed, planned | `docs/breath-animation-plan.md`, `context/transcripts/` | `ba60252`, `c77fd57` |
+| **Guide view (B1–B4):** scripted Quiet / Supported breath animation — red/blue activation tints, pelvic floor, rib oscillation, `Regions \| Field \| Guide` toggle (`g` key), pause/scrub, reduced-motion freeze | `docs/breath-animation-plan.md` | `0290b9a`, `b20d19b`, `a86d2e5`, B4 this commit |
 
 ## Remaining — agent work, ready now
 
-| # | Work | Plan doc | Status |
-|---|---|---|---|
-| 1 | **Breath animation "Guide" view (B1–B4):** scripted muscle activation/relaxation animation per the physician's memo — red/blue tinting on the anatomy layers, pelvic floor, whole-figure oscillation, **two selectable scripts (Quiet breath / Supported breath — her decision, 2026-08-15)** | `docs/breath-animation-plan.md` — **the handoff spec; execute B-phases in order** | Ready. All decisions locked in the doc; remaining physician questions are confirmation items, not blockers. |
+None. Next agent work is blocked on human items below.
 
-## Remaining — human work (does not block #1)
+## Remaining — human work
 
 | Work | Plan doc | Notes |
 |---|---|---|
-| **Track H:** Blender renders of the 6 anatomy layers from Z-Anatomy (H0 licensing/pipeline spike, H1 full render set) | `docs/layered-anatomy-plan.md` §Track H | Layer list will grow (pelvic floor added to `deep`; see breath-animation plan) — render after B3 lands or re-render later |
+| **Track H:** Blender renders of the 6 anatomy layers from Z-Anatomy (H0 licensing/pipeline spike, H1 full render set) | `docs/layered-anatomy-plan.md` §Track H | `deep.png` should include the pelvic floor dome (now part of Diaphragm & core) |
 | **F3:** motion-field tuning session with the therapist (light angle, exaggeration, default view) | `docs/motion-field-plan.md` §F3 | Session time, not code time |
 | **Therapist success-gate session** | `docs/mvp-plan.md` §Success gate | Gates all capture (Phase 2) work |
 | **Physician confirmations** for the Guide view | `docs/breath-animation-plan.md` §Open questions | Neck scope; color-scope confirmation; her review of the quiet-breath choreography table (quiet vs. supported was answered 2026-08-15: both ship, selectable) |
