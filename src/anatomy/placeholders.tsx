@@ -129,17 +129,30 @@ function SuperficialLayer() {
         className="anatomy-pec"
         d="M118 72 C108 74 96 80 90 90 C92 104 100 114 112 118 C116 108 118 92 118 72 Z"
       />
-      <path className="anatomy-rectus" d="M112 152 L120 150 L128 152 L128 164 L112 164 Z" />
-      <path className="anatomy-rectus" d="M112 166 L128 166 L128 178 L112 178 Z" />
-      <path className="anatomy-rectus" d="M113 180 L127 180 L126 194 L114 194 Z" />
-      <path className="anatomy-linea" d="M120 150 L120 208" />
+      {[
+        [150, 163],
+        [166, 179],
+        [182, 198],
+      ].map(([y0, y1]) => (
+        <g key={y0}>
+          <path
+            className="anatomy-rectus"
+            d={`M107 ${y0 + 1} C110 ${y0} 115 ${y0} 118 ${y0 + 1} L118 ${y1 - 1} C115 ${y1} 110 ${y1} 107 ${y1 - 1} Z`}
+          />
+          <path
+            className="anatomy-rectus"
+            d={`M122 ${y0 + 1} C125 ${y0} 130 ${y0} 133 ${y0 + 1} L133 ${y1 - 1} C130 ${y1} 125 ${y1} 122 ${y1 - 1} Z`}
+          />
+        </g>
+      ))}
+      <path className="anatomy-linea" d="M120 148 L120 206" />
       <path
         className="anatomy-oblique"
-        d="M90 118 C88 140 92 164 98 186 C104 176 108 164 110 152 C102 140 94 128 90 118 Z"
+        d="M92 128 C88 148 90 170 97 192 C101 182 104 168 105 154 C100 146 95 137 92 128 Z"
       />
       <path
         className="anatomy-oblique"
-        d="M150 118 C152 140 148 164 142 186 C136 176 132 164 130 152 C138 140 146 128 150 118 Z"
+        d="M148 128 C152 148 150 170 143 192 C139 182 136 168 135 154 C140 146 145 137 148 128 Z"
       />
     </g>
   );

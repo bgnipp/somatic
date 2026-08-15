@@ -58,16 +58,27 @@ export function layerHref(filename: string): string {
 }
 
 /**
- * Isolated-stack opacities. Deeper layers stay visible underneath.
- * Depth 1 keeps a hint of the diaphragm (the teaching muscle) over bone.
- * Surface is a wash, never a hide.
+ * Line art cannot occlude the way solid renders do, so "peel" means:
+ * the selected depth's layer at full strength, deeper layers dimmed to
+ * context, more-superficial layers hidden. Depth 1 keeps a diaphragm
+ * hint (the teaching muscle) over bone.
  */
 export function layerOpacity(id: AnatomyLayerId, depth: AnatomyDepth): number {
-  if (id === "skeleton") return 1;
-  if (id === "deep") return depth <= 1 ? 0.42 : 1;
-  if (id === "intercostal") return depth >= 3 ? 0.9 : 0;
-  if (id === "superficial") return depth >= 4 ? 0.85 : 0;
-  if (id === "surface") return depth >= 5 ? 0.32 : 0;
+  if (id === "skeleton") return depth === 1 ? 1 : 0.4;
+  if (id === "deep") {
+    if (depth === 1) return 0.45;
+    if (depth === 2) return 1;
+    return 0.2;
+  }
+  if (id === "intercostal") {
+    if (depth === 3) return 0.9;
+    return depth > 3 ? 0.15 : 0;
+  }
+  if (id === "superficial") {
+    if (depth === 4) return 0.9;
+    return depth === 5 ? 0.35 : 0;
+  }
+  if (id === "surface") return depth === 5 ? 0.32 : 0;
   return 0;
 }
 

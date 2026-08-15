@@ -3,20 +3,20 @@ function tone(mm: number, ceiling: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** Translucent gold wash. Anatomy stays visible underneath. */
+/** Translucent gold wash. Nearly invisible at rest so anatomy reads through. */
 export function motionFill(mm: number, ceiling = 14): string {
   const eased = tone(mm, ceiling);
-  const h = 36 - eased * 4;
-  const s = 40 + eased * 40;
-  const l = 42 + eased * 24;
-  const a = 0.06 + eased * 0.5;
+  const h = 38 - eased * 4;
+  const s = 55 + eased * 25;
+  const l = 48 + eased * 18;
+  const a = 0.03 + eased * 0.3;
   return `hsla(${h}, ${s}%, ${l}%, ${a})`;
 }
 
-/** Soft halo around a moving region. */
+/** Blurred bloom fill. Zero at rest; only moving regions light up. */
 export function motionGlow(mm: number, ceiling = 14): string {
   const eased = tone(mm, ceiling);
-  return `hsla(38, 64%, ${56 + eased * 18}%, ${0.1 + eased * 0.58})`;
+  return `hsla(40, 72%, ${58 + eased * 14}%, ${eased * 0.5})`;
 }
 
 export function motionStroke(mm: number, ceiling = 14): string {

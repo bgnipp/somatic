@@ -90,12 +90,8 @@ export function TorsoMap({
           <clipPath id="torso-clip">
             <path d={TORSO} />
           </clipPath>
-          <filter id="motion-glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="1.7" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+          <filter id="motion-glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" />
           </filter>
         </defs>
         <ellipse className="torso-context" cx="120" cy="30" rx="17" ry="20" />
@@ -115,10 +111,20 @@ export function TorsoMap({
                 <path
                   key={`${id}-glow`}
                   d={PATHS[id]}
-                  fill={motionFill(mm, ceiling)}
-                  stroke={motionGlow(mm, ceiling)}
-                  strokeWidth={2.1}
+                  fill={motionGlow(mm, ceiling)}
                   filter="url(#motion-glow)"
+                  className="compartment-glow"
+                  pointerEvents="none"
+                />
+              );
+            })}
+            {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
+              const mm = sample?.compartments[id].displacementMm ?? 0;
+              return (
+                <path
+                  key={`${id}-wash`}
+                  d={PATHS[id]}
+                  fill={motionFill(mm, ceiling)}
                   className="compartment-glow"
                   pointerEvents="none"
                 />
