@@ -6,7 +6,8 @@ export type GuideStructureId =
   | "obliques"
   | "intercostals"
   | "scalenes"
-  | "traps";
+  | "traps"
+  | "platysma";
 
 export const GUIDE_STRUCTURE_IDS: GuideStructureId[] = [
   "pelvic_floor",
@@ -17,6 +18,7 @@ export const GUIDE_STRUCTURE_IDS: GuideStructureId[] = [
   "intercostals",
   "scalenes",
   "traps",
+  "platysma",
 ];
 
 /**
@@ -38,6 +40,8 @@ export type GuideScript = {
   diaphragmFlatten: (phase: number) => number;
   ribExpand: (phase: number) => number;
   pelvicLift: (phase: number) => number;
+  /** 0..1 sagittal spine flexion (the slight C-curve of the active exhale). */
+  spineFlex: (phase: number) => number;
 };
 
 export const DEFAULT_GUIDE_SCRIPT: GuideScriptId = "supported";
@@ -123,6 +127,7 @@ const supported: GuideScript = {
       if (p < supportedInhale) return -Math.sin((p / supportedInhale) * Math.PI) * 0.75;
       return 0;
     },
+    platysma: (phase) => -inhaleWave(phase, supportedInhale) * 0.35,
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, supportedInhale),
   /**
@@ -144,6 +149,13 @@ const supported: GuideScript = {
     return -dip * (0.5 + 0.5 * Math.cos(u * Math.PI));
   },
   pelvicLift: (phase) => inhaleWave(phase + 0.05, supportedInhale),
+  /** Peaks mid-exhale with the rectus work — her "slight C curve of the spine." */
+  spineFlex: (phase) => {
+    const p = wrapPhase(phase);
+    if (p < supportedInhale) return 0;
+    const t = (p - supportedInhale) / (1 - supportedInhale);
+    return Math.sin(t * Math.PI);
+  },
 };
 
 const quietInhale = 0.42;
@@ -169,10 +181,12 @@ const quiet: GuideScript = {
     intercostals: (phase) => inhaleWave(phase, quietInhale) * 0.4,
     scalenes: (phase) => inhaleWave(phase, quietInhale) * 0.08,
     traps: constant(0),
+    platysma: constant(0),
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, quietInhale) * 0.7,
   ribExpand: (phase) => inhaleWave(phase, quietInhale) * 0.6,
   pelvicLift: (phase) => -inhaleWave(phase, quietInhale) * 0.55,
+  spineFlex: constant(0),
 };
 
 export const GUIDE_SCRIPTS: GuideScript[] = [quiet, supported];

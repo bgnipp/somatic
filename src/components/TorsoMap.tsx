@@ -15,6 +15,7 @@ import { ViewToggle } from "../field/ViewToggle";
 import type { MapView } from "../field/view";
 import { GuideLegend } from "../guide/GuideLegend";
 import { ScriptToggle } from "../guide/ScriptToggle";
+import { SideInset } from "../guide/SideInset";
 import {
   activationsAt,
   loadStoredScript,
@@ -182,9 +183,7 @@ export function TorsoMap({
             pelvicLift={pelvicLift}
             activations={activations}
           />
-          {showGuide && (
-            <ScaleneHints activation={activations?.scalenes ?? 0} />
-          )}
+          {showGuide && <ScaleneHints activations={activations} />}
           <g clipPath="url(#torso-clip)">
             {showGuide ? null : showField ? (
               reduceMotion ? (
@@ -280,6 +279,7 @@ export function TorsoMap({
         <>
           <ScriptToggle scriptId={scriptId} onChange={setScriptId} />
           <p className="guide-blurb">{script.blurb}</p>
+          {script.id === "supported" && <SideInset script={script} phase={phase} />}
           <div className="guide-controls">
             <button
               type="button"

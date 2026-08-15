@@ -22,6 +22,7 @@ export const STRUCTURE_CLASSES: Record<GuideStructureId, string> = {
   intercostals: "anatomy-intercostal",
   scalenes: "anatomy-scalene",
   traps: "anatomy-trap",
+  platysma: "anatomy-platysma",
 };
 
 type Activations = Partial<Record<GuideStructureId, number>>;
@@ -133,6 +134,14 @@ const SCALENES = [
 
 /** Sternocleidomastoid: mastoid down to the sternal notch, each side. */
 const SCM = ["M111 40 C111 47 114 54 118 60", "M129 40 C129 47 126 54 122 60"];
+
+/** Platysma: superficial sheet fanning from the jaw over the clavicles. */
+const PLATYSMA = [
+  "M113 45 C111 51 106 58 99 63",
+  "M117 46 C116 52 112 59 106 65",
+  "M123 46 C124 52 128 59 134 65",
+  "M127 45 C129 51 134 58 141 63",
+];
 
 function SkeletonLayer({ expand = 0 }: LayerProps) {
   const widthScale = 1 + expand * 0.05;
@@ -294,7 +303,9 @@ function SurfaceLayer() {
 }
 
 /** Neck muscles sit outside #torso-clip — mount unclipped, Guide view only. */
-export function ScaleneHints({ activation = 0 }: { activation?: number }) {
+export function ScaleneHints({ activations }: { activations?: Activations }) {
+  const scaleneA = act(activations, "scalenes");
+  const platysmaA = act(activations, "platysma");
   return (
     <g className="anatomy-placeholder anatomy-scalenes" pointerEvents="none" aria-hidden="true">
       {SCALENES.map((d) => (
@@ -303,11 +314,17 @@ export function ScaleneHints({ activation = 0 }: { activation?: number }) {
       {SCM.map((d) => (
         <path key={d} className="anatomy-scm" d={d} />
       ))}
+      {PLATYSMA.map((d) => (
+        <path key={d} className="anatomy-platysma" d={d} />
+      ))}
       {SCALENES.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={activation} width={1.8} />
+        <TintStroke key={`${d}-tint`} d={d} a={scaleneA} width={1.8} />
       ))}
       {SCM.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={activation} width={2} />
+        <TintStroke key={`${d}-tint`} d={d} a={scaleneA} width={2} />
+      ))}
+      {PLATYSMA.map((d) => (
+        <TintStroke key={`${d}-tint`} d={d} a={platysmaA} width={1.6} />
       ))}
     </g>
   );
