@@ -194,8 +194,64 @@ h1 {
 }
 
 .torso-wrap {
-  max-width: 300px;
+  max-width: 360px;
   margin: 0 auto;
+}
+
+.torso-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.depth-rail {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.2rem;
+  padding: 0.15rem 0;
+}
+
+.depth-step {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  padding: 0.2rem 0.15rem;
+  border-radius: 4px;
+  color: var(--ink-dim);
+  text-align: left;
+}
+
+.depth-step:hover {
+  border-color: transparent;
+  color: var(--ink);
+}
+
+.depth-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 99px;
+  border: 1px solid #5a5c52;
+  background: #1b1d18;
+  flex: 0 0 auto;
+}
+
+.depth-step.active .depth-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.depth-step.active {
+  color: var(--ink);
+}
+
+.depth-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  max-width: 5.6rem;
 }
 
 .section-wrap {
@@ -233,6 +289,7 @@ h1 {
 
 .anatomy-layer {
   pointer-events: none;
+  transition: opacity 200ms ease;
 }
 
 .anatomy-bone,
@@ -705,6 +762,21 @@ h1 {
     grid-template-columns: minmax(200px, 320px);
   }
 
+  .torso-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .depth-rail {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.45rem;
+  }
+
+  .depth-label {
+    max-width: none;
+  }
+
   h1 {
     font-size: 2.4rem;
   }
@@ -716,7 +788,8 @@ h1 {
   }
 
   .phase-pill,
-  .level-bar i {
+  .level-bar i,
+  .anatomy-layer {
     transition: none;
   }
 }

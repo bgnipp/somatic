@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnatomyStack } from "../anatomy/AnatomyStack";
+import { DepthRail } from "../anatomy/DepthRail";
 import {
-  DEFAULT_ANATOMY_DEPTH,
+  clampDepth,
+  loadStoredDepth,
+  saveStoredDepth,
   type AnatomyDepth,
 } from "../anatomy/layers";
 import { motionFill, motionStroke } from "../lib/color";
@@ -28,15 +31,41 @@ type Props = {
 export function TorsoMap({
   sample,
   showLandmarks,
-  depth = DEFAULT_ANATOMY_DEPTH,
+  depth: depthProp,
 }: Props) {
   const [hover, setHover] = useState<CompartmentId | null>(null);
+  const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
+  const depth = depthProp ?? storedDepth;
   const ceiling = 12;
   const total = sample ? meanRibCage(sample) + meanAbdomen(sample) : 0;
   const scale = 1 + Math.min(total, 22) * 0.0012;
 
+  useEffect(() => {
+    if (depthProp !== undefined) return;
+    saveStoredDepth(storedDepth);
+  }, [storedDepth, depthProp]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
+      if (e.key !== "[" && e.key !== "]") return;
+      if (depthProp !== undefined) return;
+      e.preventDefault();
+      setStoredDepth((d) => clampDepth(d + (e.key === "]" ? 1 : -1)));
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [depthProp]);
+
+  function setDepth(next: AnatomyDepth) {
+    if (depthProp !== undefined) return;
+    setStoredDepth(next);
+  }
+
   return (
     <div className="torso-wrap">
+      <div className="torso-stage">
       <svg
         viewBox="0 0 240 250"
         className="torso-svg"
@@ -88,6 +117,8 @@ export function TorsoMap({
             </g>
           ))}
       </svg>
+      <DepthRail depth={depth} onChange={setDepth} />
+      </div>
       <div className="torso-caption">
         {hover && sample ? (
           <>
@@ -97,7 +128,7 @@ export function TorsoMap({
         ) : (
           <>
             <strong>Front view</strong>
-            <span>Brighter is more motion. Not a problem map.</span>
+            <span>Brighter is more motion. [ and ] peel layers.</span>
           </>
         )}
       </div>
