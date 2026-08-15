@@ -1,7 +1,7 @@
 # Layered Anatomy Visualization — Implementation Plan
 
 **Date:** 2026-08-15
-**Status:** Plan only, no code yet
+**Status:** Ready for handoff. An implementing agent should start at "Handoff: division of labor" and execute the G-phases in order.
 **Reference material:** `docs/reference/anatomy-layers/` (14 screenshots from a commercial 3D anatomy app showing a progressive muscle "peel" from superficial pecs/obliques down to intercostals, diaphragm, psoas, and bare skeleton, plus the layer-toggle rail UI)
 
 ## Goal
@@ -32,7 +32,7 @@ Three options were considered:
 
 **Decision: Option B**, with Option A's current vector figure kept as the loading/fallback state.
 
-### Asset sourcing and licensing (do this first — it gates everything)
+### Asset sourcing and licensing (gates Track H only, not the app work)
 
 The reference screenshots are from a commercial app (Elsevier/3D4Medical-style). **We cannot copy, trace, or re-render their imagery.** Openly licensed sources to render from:
 
@@ -77,7 +77,7 @@ A single **depth stepper** (or 5-stop slider) in the stage: each step peels one 
 6. **Commit** renders to `public/anatomy/` with the source `.blend` settings documented in `docs/reference/anatomy-layers/PIPELINE.md` so re-renders are reproducible.
 7. **Fallback asset**: none needed — the existing vector torso stays in the code and shows until images load (and forever if assets fail).
 
-Estimated effort: 1–2 days for someone comfortable in Blender; the styling pass is most of it. This is the long pole — start it before any app work.
+Estimated effort: 1–2 days for someone comfortable in Blender; the styling pass is most of it. This is human work (Track H below) — it does **not** block the in-app layer architecture, which ships first with schematic placeholders.
 
 ## Integration into the existing scaffolding
 
@@ -91,29 +91,63 @@ All changes concentrate in `TorsoMap.tsx` plus a small amount of app state; the 
 6. **Diaphragm animation (stretch goal, separate commit).** The `deep` layer's diaphragm can be a *second* small render pair (dome-high / dome-low) crossfaded by breath phase, or a vector dome path morphed by `meanAbdomen` — flattening on inhale. This is the single most valuable animated element in the whole product (it shows the invisible muscle moving with *your* mock breath) but it must not block the static layer work. Respect `prefers-reduced-motion`.
 7. **Cross-section panel** stays as is for now; a future version could get a matching realistic transverse render, but it's out of scope here.
 
+---
+
+## Handoff: division of labor
+
+The Blender asset pipeline **cannot be done by a coding agent** — it needs a human (or a later, separately supervised headless-Blender effort). To avoid blocking, the work splits into two independent tracks:
+
+- **Track G (agent, do now):** build the complete layer architecture, depth stepper, glow heatmap, and an animated diaphragm — using **schematic vector placeholder layers the agent draws itself**. All layer imagery loads through a manifest, so when real renders exist they drop in with zero code changes.
+- **Track H (human, later):** the Blender pipeline above (phases H0/H1). Output: five PNGs + calibration anchor table committed to `public/anatomy/`, filenames matching the manifest.
+
+The agent must NOT attempt to produce "realistic" raster imagery itself — no generated images, no base64 blobs, no downloading anatomy imagery from the web. Schematic vector placeholders only. They should look like clean medical-diagram line art (ribs as arcs, diaphragm as a dome, muscle groups as subtle hatched regions), clearly better than nothing but obviously schematic.
+
+### Agent orientation (read before coding)
+
+- Stack: React + TypeScript + Vite, zero runtime deps beyond React. Keep it that way.
+- Key files: `src/components/TorsoMap.tsx` (the figure — nearly all work lands here), `src/types.ts` (landmarks, compartment ids), `src/lib/color.ts` (heatmap colors), `src/App.tsx` (state, keyboard shortcuts — note existing `space`/arrow-key handlers; don't collide), `src/index.css` (all styling, dark theme, `prefers-reduced-motion` block exists).
+- The SVG `viewBox`, six compartment `PATHS`, `TORSO` silhouette, clip path, landmarks, and hover-mm behavior all exist in `TorsoMap.tsx`. Do not regress them.
+- Verify with `npm run build` after each phase; run `npm run dev` and check both wide and narrow (~420 px) layouts. Deploy is GitHub Pages under base `/somatic/` — asset URLs must respect `import.meta.env.BASE_URL`.
+- Commit per phase with a one-line message, matching the existing history style. Push when all phases build clean.
+- Existing product guardrails (from `docs/improvement-plan.md`): education-not-assessment language everywhere; no new dependencies; keyboard shortcuts must not fire while typing in inputs.
+
 ## Phasing, acceptance criteria, estimates
 
-**Phase L0 — Licensing + pipeline spike (½–1 day).**
-Download Z-Anatomy, confirm license posture, produce ONE test render (skeleton layer) at the target framing/style. *Accept:* a skeleton PNG that drops into the current SVG behind the existing heatmap and registers plausibly with the compartments.
+### Track G — agent, now
 
-**Phase L1 — Full render set (1–2 days, mostly Blender).**
-All five layers rendered, styled, optimized, committed with pipeline doc + credits. *Accept:* stack composites correctly at 1× and 2×; total weight ≤ 1.5 MB; every layer visually consistent.
+**Phase G1 — Layer architecture + manifest + schematic placeholder layers.**
+Define the five-layer model in code (ids per the table above). Create a layer manifest (a typed constants module) where each layer is either a vector placeholder component or an image URL under `public/anatomy/`; at runtime, if the image exists/loads, it replaces the placeholder — this is the swap point for Track H, zero code changes later. Draw the five schematic placeholders as SVG groups within the existing viewBox, registered to the current torso geometry: skeleton (rib arcs, sternum, clavicles, spine hint, pelvis hint), deep (diaphragm dome under the costal arch + psoas hints), intercostal (short hatching between rib arcs), superficial (subtle muscle-group outlines: rectus segments, obliques, pecs), surface (the existing silhouette, dimmed). Desaturated, dim, line-art style — the heatmap must remain the brightest thing.
+*Accept:* all five layers render and stack correctly; existing heatmap/hover/landmarks unaffected; build clean.
 
-**Phase L2 — Layer stack + depth stepper in app (1 day).**
-Images stacked in `TorsoMap`, depth state, stepper UI, keyboard, persistence, fallback vector while loading. *Accept:* peeling works at both breakpoints; heatmap and hover still function at every depth; Pages deploy loads assets under the `/somatic/` base path.
+**Phase G2 — Depth stepper UI.**
+Depth state 1–5, vertical mini-rail beside the figure (horizontal row on narrow screens), hover labels, active highlight, `[`/`]` keyboard (guarded against inputs, no collision with existing shortcuts), localStorage persistence, ~200 ms opacity crossfade, instant cut under `prefers-reduced-motion`. Default depth 2 (diaphragm visible).
+*Accept:* peeling works at both breakpoints; depth persists across reload; keyboard works; reduced-motion honored.
 
-**Phase L3 — Compartment re-trace + heatmap glow (1 day).**
-Regions re-traced onto the skeleton render, landmarks repositioned, glow treatment replacing opaque fills. *Accept:* all seven presets remain distinguishable at a glance at depths 1, 2, and 4; "left quiet" is visibly quiet over real anatomy.
+**Phase G3 — Heatmap glow treatment.**
+Replace opaque compartment fills with translucent gold fill + soft blurred stroke (SVG filter, no deps), opacity scaled by displacement. Tune so all seven presets stay distinguishable at a glance at depths 1, 2, and 4; "left quiet" visibly quiet.
+*Accept:* the preset-distinguishability check passes at every depth; hover mm readout still works.
 
-**Phase L4 — Animated diaphragm (stretch, 1 day).**
-Dome morphs with mock breath at the `deep` depth. *Accept:* inhale visibly flattens the dome in sync with the abdomen trace; disabled under reduced motion.
+**Phase G4 — Animated diaphragm (vector morph).**
+At depths 1–2, the placeholder diaphragm dome morphs with the live sample: dome flattens/descends as mean abdominal displacement rises, returns on exhale. Subtle — a few viewBox units. Disabled under reduced motion. This works with placeholder art and must not wait for renders.
+*Accept:* dome motion visibly syncs with the abdomen trace across presets; off under reduced motion.
+
+### Track H — human, later (gates nothing in Track G)
+
+**Phase H0 — Licensing + pipeline spike (½–1 day).**
+Download Z-Anatomy, confirm license posture, produce ONE test render (skeleton layer) at the target framing/style. *Accept:* a skeleton PNG that drops into the manifest slot and registers plausibly with the compartments.
+
+**Phase H1 — Full render set (1–2 days, mostly Blender).**
+All five layers rendered, styled, optimized, committed to `public/anatomy/` with pipeline doc + credits + calibration anchor table. *Accept:* stack composites correctly at 1× and 2×; total weight ≤ 1.5 MB; consistent style.
+
+**Phase H2 — Re-trace follow-up (agent, after H1).**
+Re-trace compartment `PATHS` and `LANDMARKS` onto the real skeleton render using the calibration anchors; re-tune glow legibility over the real imagery. *Accept:* same preset-distinguishability gate over real anatomy.
 
 ## Risks and mitigations
 
-- **Blender skills/time** — the pipeline is the long pole. Mitigation: L0 spike first; if it stalls badly, interim fallback is an improved flat illustration set (commissioned or drawn from Z-Anatomy *screenshots we render ourselves*, never from the commercial app).
+- **Blender skills/time** — the render pipeline is the long pole, which is why it's decoupled: Track G ships a complete, useful layered UI on schematic art regardless of when (or whether) Track H happens.
 - **Legibility regression** — realistic texture can bury the signal. Mitigation: the design rule up top; test with the "can you tell presets apart in seconds" gate before shipping; keep a "Simple" depth (current vector look) if needed.
 - **Share-alike license contamination worries** — keep CC-BY-SA renders in a dedicated folder with their own LICENSE/credits; app code license unaffected.
-- **Asset weight on Pages** — budget enforced in L1; lazy-load layers 3–5 if first paint suffers.
+- **Asset weight on Pages** — budget enforced in H1; lazy-load layers 3–5 if first paint suffers.
 - **Registration drift** — one camera, one calibration table, anchors documented; re-traces happen against the skeleton render only.
 
 ## What NOT to do
