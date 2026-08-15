@@ -35,10 +35,24 @@ export function TorsoMap({
 }: Props) {
   const [hover, setHover] = useState<CompartmentId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
+  const [reduceMotion, setReduceMotion] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
   const depth = depthProp ?? storedDepth;
   const ceiling = 12;
-  const total = sample ? meanRibCage(sample) + meanAbdomen(sample) : 0;
+  const belly = sample ? meanAbdomen(sample) : 0;
+  const total = sample ? meanRibCage(sample) + belly : 0;
   const scale = 1 + Math.min(total, 22) * 0.0012;
+  const flatten =
+    reduceMotion || depth > 2 ? 0 : Math.min(1, belly / 9.5);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduceMotion(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     if (depthProp !== undefined) return;
@@ -93,7 +107,7 @@ export function TorsoMap({
           <path className="torso-limb" d={LEFT_ARM} />
           <path className="torso-limb" d={RIGHT_ARM} />
           <path className="torso-context" d={TORSO} />
-          <AnatomyStack depth={depth} />
+          <AnatomyStack depth={depth} flatten={flatten} />
           <g clipPath="url(#torso-clip)">
             {(Object.keys(PATHS) as CompartmentId[]).map((id) => {
               const mm = sample?.compartments[id].displacementMm ?? 0;
