@@ -1,25 +1,7 @@
-export type GuideStructureId =
-  | "pelvic_floor"
-  | "diaphragm"
-  | "transversus"
-  | "rectus"
-  | "obliques"
-  | "intercostals"
-  | "scalenes"
-  | "traps"
-  | "platysma";
+import { MUSCLE_IDS, type MuscleId } from "../anatomy/catalog";
 
-export const GUIDE_STRUCTURE_IDS: GuideStructureId[] = [
-  "pelvic_floor",
-  "diaphragm",
-  "transversus",
-  "rectus",
-  "obliques",
-  "intercostals",
-  "scalenes",
-  "traps",
-  "platysma",
-];
+export type GuideStructureId = MuscleId;
+export const GUIDE_STRUCTURE_IDS = MUSCLE_IDS;
 
 /**
  * Activation at a phase point. Range [-1, 1]:
@@ -36,7 +18,7 @@ export type GuideScript = {
   blurb: string;
   cycleMs: number;
   inhaleFraction: number;
-  activations: Record<GuideStructureId, ActivationFn>;
+  activations: Partial<Record<MuscleId, ActivationFn>>;
   diaphragmFlatten: (phase: number) => number;
   ribExpand: (phase: number) => number;
   pelvicLift: (phase: number) => number;
@@ -99,12 +81,12 @@ function holdEnvelope(phase: number): number {
 }
 
 function sampleActivations(
-  activations: Record<GuideStructureId, ActivationFn>,
+  activations: Partial<Record<MuscleId, ActivationFn>>,
   phase: number,
-): Record<GuideStructureId, number> {
-  const out = {} as Record<GuideStructureId, number>;
-  for (const id of GUIDE_STRUCTURE_IDS) {
-    out[id] = activations[id](phase);
+): Record<MuscleId, number> {
+  const out = {} as Record<MuscleId, number>;
+  for (const id of MUSCLE_IDS) {
+    out[id] = activations[id]?.(phase) ?? 0;
   }
   return out;
 }
@@ -112,7 +94,7 @@ function sampleActivations(
 export function activationsAt(
   script: GuideScript,
   phase: number,
-): Record<GuideStructureId, number> {
+): Record<MuscleId, number> {
   return sampleActivations(script.activations, wrapPhase(phase));
 }
 
@@ -194,12 +176,8 @@ const quiet: GuideScript = {
       return -Math.sin(t * Math.PI) * 0.25 * (1 - t);
     },
     transversus: constant(0.1),
-    rectus: constant(0),
-    obliques: constant(0),
     intercostals: (phase) => inhaleWave(phase, quietInhale) * 0.4,
     scalenes: (phase) => inhaleWave(phase, quietInhale) * 0.08,
-    traps: constant(0),
-    platysma: constant(0),
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, quietInhale) * 0.7,
   ribExpand: (phase) => inhaleWave(phase, quietInhale) * 0.6,
@@ -223,17 +201,7 @@ const lengthen: GuideScript = {
     "A coordination, not a breath. Upper sternum forward and up; lowest ribs back and up; lower front ribs narrow.",
   cycleMs: 12000,
   inhaleFraction: 0.3,
-  activations: {
-    pelvic_floor: constant(0),
-    diaphragm: constant(0),
-    transversus: constant(0),
-    rectus: constant(0),
-    obliques: constant(0),
-    intercostals: constant(0),
-    scalenes: constant(0),
-    traps: constant(0),
-    platysma: constant(0),
-  },
+  activations: {},
   diaphragmFlatten: constant(0.3),
   /** Slightly negative: the lower front ribs narrow while the cage lifts. */
   ribExpand: (phase) => -0.18 * holdEnvelope(phase),

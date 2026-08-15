@@ -1,6 +1,6 @@
 import { activationColor } from "../lib/color";
-import type { GuideStructureId } from "../guide/script";
 import { TORSO } from "../components/torsoPaths";
+import type { MuscleId } from "./catalog";
 import type { AnatomyLayerId } from "./layers";
 
 /**
@@ -14,7 +14,7 @@ import type { AnatomyLayerId } from "./layers";
  * `activations` tints structures in Guide view only; omitted elsewhere.
  */
 
-export const STRUCTURE_CLASSES: Record<GuideStructureId, string> = {
+export const STRUCTURE_CLASSES: Partial<Record<MuscleId, string>> = {
   pelvic_floor: "anatomy-pelvic-floor",
   diaphragm: "anatomy-diaphragm",
   transversus: "anatomy-transversus",
@@ -26,7 +26,7 @@ export const STRUCTURE_CLASSES: Record<GuideStructureId, string> = {
   platysma: "anatomy-platysma",
 };
 
-type Activations = Partial<Record<GuideStructureId, number>>;
+type Activations = Partial<Record<MuscleId, number>>;
 
 type LayerProps = {
   flatten?: number;
@@ -36,7 +36,7 @@ type LayerProps = {
   activations?: Activations;
 };
 
-function act(activations: Activations | undefined, id: GuideStructureId): number {
+function act(activations: Activations | undefined, id: MuscleId): number {
   return activations?.[id] ?? 0;
 }
 

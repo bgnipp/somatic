@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GuideStructureId } from "../guide/script";
+import type { MuscleId } from "./catalog";
 import { AnatomyPlaceholder } from "./placeholders";
 import {
   ANATOMY_LAYERS,
@@ -43,7 +43,7 @@ function AnatomyLayerView({
   expand: number;
   ribLift: number;
   pelvicLift: number;
-  activations?: Partial<Record<GuideStructureId, number>>;
+  activations?: Partial<Record<MuscleId, number>>;
 }) {
   const href = layerHref(layer.filename);
   const hasImage = useLayerImage(href);
@@ -89,7 +89,7 @@ type Props = {
   /** −1 descended, 0 rest, +1 lifted. */
   pelvicLift?: number;
   /** Guide-view activation tints. Omit in measured views. */
-  activations?: Partial<Record<GuideStructureId, number>>;
+  activations?: Partial<Record<MuscleId, number>>;
 };
 
 export function AnatomyStack({
