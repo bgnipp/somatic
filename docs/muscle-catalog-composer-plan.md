@@ -163,6 +163,7 @@ export function compileComposition(c: Composition): GuideScript;
 1. **Picker:** muscles from `MUSCLES` grouped by `region`, each row = label + its one-sentence `action` (her minutia, on screen). Two add buttons per row: "engage" / "release". A muscle can be in only one list; adding to the other moves it.
 2. **Sequence lists:** two ordered chip rows ("Engage — in order" / "Release — in order") with per-chip remove (✕) and drag-free reorder via ◂ ▸ buttons (no drag-and-drop dependency).
 3. Selecting a back-only muscle auto-flips the aspect toggle to back (and front-only ↔ front) so the lit muscle is never invisible; if the two lists span both aspects, the user flips manually with `b` — the aspect toggle stays available.
+   - **Addendum (2026-08-16, from live verification):** aspect wasn't the only way a pick could be invisible — the *depth rail* could hide a picked muscle's layer entirely (e.g. "release trapezius" at depth "Diaphragm & core" tinted into a 0-opacity superficial layer). Fixed: in Compose mode, any layer containing a front-aspect picked muscle gets a floor opacity (`REVEAL_OPACITY_FLOOR = 0.85`, just under the featured layer's 0.9) via a `revealLayers` prop on `AnatomyStack`. The depth rail still governs all unpicked layers; measured views and canonical scripts are untouched.
 4. Composition persists on every change; pause/scrub work unchanged (the compiled script is a script like any other).
 5. Empty composition: the figure rests; the panel shows "Add muscles to build a sequence." — no special-cased renderer states.
 

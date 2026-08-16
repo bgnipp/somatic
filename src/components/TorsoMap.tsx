@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnatomyStack } from "../anatomy/AnatomyStack";
 import { BackFigure } from "../anatomy/backPlaceholders";
-import type { FigureAspect } from "../anatomy/catalog";
+import { muscleById, type FigureAspect } from "../anatomy/catalog";
 import { DepthRail } from "../anatomy/DepthRail";
 import { ScaleneHints } from "../anatomy/placeholders";
 import {
@@ -9,6 +9,7 @@ import {
   loadStoredDepth,
   saveStoredDepth,
   type AnatomyDepth,
+  type AnatomyLayerId,
 } from "../anatomy/layers";
 import { BlobField } from "../field/BlobField";
 import { ReliefField } from "../field/ReliefField";
@@ -88,6 +89,18 @@ export function TorsoMap({
   const total = sample ? meanRibCage(sample) + belly : 0;
   const compiled = useMemo(() => compileComposition(composition), [composition]);
   const script = scriptId === "custom" ? compiled : scriptById(scriptId);
+  // Compose mode: picked muscles must tint visibly regardless of the depth
+  // rail, so their layers get a floor opacity (front-aspect picks only —
+  // the back figure has no layer peel).
+  const revealLayers = useMemo(() => {
+    if (scriptId !== "custom") return undefined;
+    const set = new Set<AnatomyLayerId>();
+    for (const id of [...composition.engage, ...composition.release]) {
+      const def = muscleById(id);
+      if (def.aspects.includes("front")) set.add(def.layer);
+    }
+    return set;
+  }, [scriptId, composition]);
   const showGuide = view === "guide";
   const showBack = showGuide && aspect === "back";
   const held = reduceMotion || paused;
@@ -218,6 +231,7 @@ export function TorsoMap({
               ribLift={ribLift}
               pelvicLift={pelvicLift}
               activations={activations}
+              revealLayers={showGuide ? revealLayers : undefined}
             />
           )}
           {showGuide && !showBack && <ScaleneHints activations={activations} />}

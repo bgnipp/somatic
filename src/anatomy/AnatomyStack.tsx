@@ -5,8 +5,10 @@ import {
   ANATOMY_LAYERS,
   layerHref,
   layerOpacity,
+  REVEAL_OPACITY_FLOOR,
   type AnatomyDepth,
   type AnatomyLayer,
+  type AnatomyLayerId,
 } from "./layers";
 
 function useLayerImage(href: string): boolean {
@@ -36,6 +38,7 @@ function AnatomyLayerView({
   ribLift,
   pelvicLift,
   activations,
+  revealLayers,
 }: {
   layer: AnatomyLayer;
   depth: AnatomyDepth;
@@ -44,10 +47,12 @@ function AnatomyLayerView({
   ribLift: number;
   pelvicLift: number;
   activations?: Partial<Record<MuscleId, number>>;
+  revealLayers?: ReadonlySet<AnatomyLayerId>;
 }) {
   const href = layerHref(layer.filename);
   const hasImage = useLayerImage(href);
-  const opacity = layerOpacity(layer.id, depth);
+  const base = layerOpacity(layer.id, depth);
+  const opacity = revealLayers?.has(layer.id) ? Math.max(base, REVEAL_OPACITY_FLOOR) : base;
   return (
     <g
       className={`anatomy-layer anatomy-layer-${layer.id}`}
@@ -90,6 +95,8 @@ type Props = {
   pelvicLift?: number;
   /** Guide-view activation tints. Omit in measured views. */
   activations?: Partial<Record<MuscleId, number>>;
+  /** Compose mode: layers holding picked muscles get a floor opacity. */
+  revealLayers?: ReadonlySet<AnatomyLayerId>;
 };
 
 export function AnatomyStack({
@@ -99,6 +106,7 @@ export function AnatomyStack({
   ribLift = 0,
   pelvicLift = 0,
   activations,
+  revealLayers,
 }: Props) {
   return (
     <g className="anatomy-stack" clipPath="url(#torso-clip)">
@@ -112,6 +120,7 @@ export function AnatomyStack({
           ribLift={ribLift}
           pelvicLift={pelvicLift}
           activations={activations}
+          revealLayers={revealLayers}
         />
       ))}
     </g>

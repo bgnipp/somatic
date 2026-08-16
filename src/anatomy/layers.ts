@@ -88,6 +88,13 @@ export function layerOpacity(id: AnatomyLayerId, depth: AnatomyDepth): number {
   return 0;
 }
 
+/**
+ * Compose mode floors the opacity of layers holding picked muscles so a
+ * selection always tints visibly; kept just under the featured-layer 0.9
+ * so the depth rail's chosen layer still reads as primary.
+ */
+export const REVEAL_OPACITY_FLOOR = 0.85;
+
 export function clampDepth(n: number): AnatomyDepth {
   const depth = Math.round(n);
   if (depth <= 1) return 1;
