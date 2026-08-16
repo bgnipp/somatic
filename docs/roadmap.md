@@ -27,7 +27,18 @@
 
 ## Remaining — agent work, ready now
 
-None. Next agent work is the gated P2-a video-file import, or human items below.
+**E-track — improvement pass 2** (`docs/improvement-pass-2.md`, 2026-08-16 review of the live prototype):
+
+| Phase | Work | Size |
+|---|---|---|
+| E1 | Guide consistency sweep — hide the mock-driven cross-section, hover mm readout, and landmark dots in Guide view (same bug class as the phase pill) | S |
+| E2 | Import robustness — validate sample shape in `parseSession` (current code lets a malformed import crash at open); dedupe imported takes by id | S |
+| E3 | Composer loop-speed control — `holdMs` exists and compiles but has no UI; add a Slow/Medium/Fast pill | S |
+| E4 | Composer action sentences on phones — currently `display:none` under 520 px; clamp instead of hide | S |
+| E5 | Front/back badges on composition chips not visible in the current aspect | S |
+| E6 | URL params for view/script/aspect (shareable review links) | M |
+| E7 | Muscle inspector — tap a tinted muscle to see its catalog name + action | M |
+| E8 | Grab-bag: aspect-persistence dead code, touch readouts, Konno–Mead direction cue, take rename, composer accordion state | S each |
 
 ## Remaining — human work
 
