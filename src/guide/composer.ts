@@ -4,6 +4,7 @@ import { wrapPhase, type ActivationFn, type GuideScript } from "./script";
 export type Composition = {
   engage: MuscleId[];
   release: MuscleId[];
+  stabilize: MuscleId[];
   holdMs: number;
 };
 
@@ -13,7 +14,7 @@ const SETTLE_AT = 0.8;
 const RAMP = 0.08;
 
 export function emptyComposition(): Composition {
-  return { engage: [], release: [], holdMs: DEFAULT_HOLD_MS };
+  return { engage: [], release: [], stabilize: [], holdMs: DEFAULT_HOLD_MS };
 }
 
 function uniqueValid(ids: unknown): MuscleId[] {
@@ -34,11 +35,12 @@ export function loadComposition(): Composition {
       typeof parsed.holdMs === "number" && parsed.holdMs >= 2000 && parsed.holdMs <= 20000
         ? parsed.holdMs
         : DEFAULT_HOLD_MS;
-    return {
-      engage: uniqueValid(parsed.engage),
-      release: uniqueValid(parsed.release).filter((id) => !uniqueValid(parsed.engage).includes(id)),
-      holdMs,
-    };
+    const engage = uniqueValid(parsed.engage);
+    const release = uniqueValid(parsed.release).filter((id) => !engage.includes(id));
+    const stabilize = uniqueValid(parsed.stabilize).filter(
+      (id) => !engage.includes(id) && !release.includes(id),
+    );
+    return { engage, release, stabilize, holdMs };
   } catch {
     return emptyComposition();
   }
@@ -57,8 +59,8 @@ function staggerFor(count: number): number {
   return Math.min(0.08, 0.5 / count);
 }
 
-/** sign is +1 (engage) or −1 (release). Holds after the ramp, eases out after SETTLE_AT. */
-function orderedCurve(index: number, stagger: number, sign: 1 | -1): ActivationFn {
+/** sign is +1 (engage/stabilize) or −1 (release). Holds after the ramp, eases out after SETTLE_AT. */
+function orderedCurve(index: number, stagger: number, sign: 1 | -1, peak = 1): ActivationFn {
   return (phase) => {
     const p = wrapPhase(phase);
     const onset = index * stagger;
@@ -75,7 +77,7 @@ function orderedCurve(index: number, stagger: number, sign: 1 | -1): ActivationF
       const t = (p - SETTLE_AT) / (1 - SETTLE_AT);
       value *= 0.5 + 0.5 * Math.cos(t * Math.PI);
     }
-    return sign * value;
+    return sign * value * peak;
   };
 }
 
@@ -83,10 +85,15 @@ function sampleFn(fn: ActivationFn | undefined, phase: number): number {
   return fn ? fn(phase) : 0;
 }
 
+const STABILIZE_PEAK = 0.45;
+
 export function compileComposition(c: Composition): GuideScript {
   const engage = uniqueValid(c.engage);
   const release = uniqueValid(c.release).filter((id) => !engage.includes(id));
-  const n = Math.max(engage.length, release.length, 1);
+  const stabilize = uniqueValid(c.stabilize).filter(
+    (id) => !engage.includes(id) && !release.includes(id),
+  );
+  const n = Math.max(engage.length, release.length, stabilize.length, 1);
   const stagger = staggerFor(n);
   const activations: Partial<Record<MuscleId, ActivationFn>> = {};
   engage.forEach((id, i) => {
@@ -94,6 +101,9 @@ export function compileComposition(c: Composition): GuideScript {
   });
   release.forEach((id, i) => {
     activations[id] = orderedCurve(i, stagger, -1);
+  });
+  stabilize.forEach((id, i) => {
+    activations[id] = orderedCurve(i, stagger, 1, STABILIZE_PEAK);
   });
 
   const dia = activations.diaphragm;

@@ -95,7 +95,7 @@ export function TorsoMap({
   const revealLayers = useMemo(() => {
     if (scriptId !== "custom") return undefined;
     const set = new Set<AnatomyLayerId>();
-    for (const id of [...composition.engage, ...composition.release]) {
+    for (const id of [...composition.engage, ...composition.release, ...composition.stabilize]) {
       const def = muscleById(id);
       if (def.aspects.includes("front")) set.add(def.layer);
     }

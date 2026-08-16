@@ -525,7 +525,11 @@ h1 {
 }
 
 .guide-swatch-red {
-  background: hsla(4, 68%, 48%, 0.7);
+  background: hsla(4, 68%, 54%, 1);
+}
+
+.guide-swatch-red-faint {
+  background: hsla(4, 68%, 48%, 0.35);
 }
 
 .guide-swatch-blue {

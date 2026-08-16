@@ -246,7 +246,7 @@ Our scripts currently encode two roles — contracting (red) and relaxing/yieldi
 - **Legend copy:** one clause added to the Guide legend so partial red is legible: solid red = full contraction, **faint red = stabilizing tension**. (Keeps her exact gradient semantics; adds no new colors.)
 - **Composer:** a third ordered group — **Stabilize** — alongside Engage and Release: its muscles ramp to partial tension (~0.45) with the engage group's timing. This matches her authoring flow ("select a group of muscles to engage… same with group of relaxing muscles") extended by this follow-up, and compiles into the same `GuideScript` shape, so the renderer is again untouched.
 
-All of the above is **queued in `docs/roadmap.md`, not implemented** — awaiting go-ahead.
+**Implemented 2026-08-16 (D1–D3):** supported-script erector columns and intertransversarii now use the dual-hump stabilizer curve; quiet breath stays sparse; the Guide legend names faint red as stabilizing tension; the composer has a third Stabilize group (peak 0.45). Rhomboid anchoring still waits on open question 8.
 
 ## Open questions for the physician
 

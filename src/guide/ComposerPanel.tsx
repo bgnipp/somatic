@@ -52,7 +52,10 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
     return map;
   }, []);
 
-  const empty = composition.engage.length === 0 && composition.release.length === 0;
+  const empty =
+    composition.engage.length === 0 &&
+    composition.release.length === 0 &&
+    composition.stabilize.length === 0;
 
   function hintAspect(id: MuscleId) {
     const def = muscleById(id);
@@ -65,6 +68,7 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
       ...composition,
       engage: composition.engage.includes(id) ? composition.engage : [...composition.engage, id],
       release: composition.release.filter((x) => x !== id),
+      stabilize: composition.stabilize.filter((x) => x !== id),
     });
   }
 
@@ -74,6 +78,19 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
       ...composition,
       release: composition.release.includes(id) ? composition.release : [...composition.release, id],
       engage: composition.engage.filter((x) => x !== id),
+      stabilize: composition.stabilize.filter((x) => x !== id),
+    });
+  }
+
+  function addStabilize(id: MuscleId) {
+    hintAspect(id);
+    onChange({
+      ...composition,
+      stabilize: composition.stabilize.includes(id)
+        ? composition.stabilize
+        : [...composition.stabilize, id],
+      engage: composition.engage.filter((x) => x !== id),
+      release: composition.release.filter((x) => x !== id),
     });
   }
 
@@ -82,6 +99,7 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
       ...composition,
       engage: composition.engage.filter((x) => x !== id),
       release: composition.release.filter((x) => x !== id),
+      stabilize: composition.stabilize.filter((x) => x !== id),
     });
   }
 
@@ -100,6 +118,14 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
         onRemove={remove}
         onMove={(i, dir) => onChange({ ...composition, release: moveItem(composition.release, i, dir) })}
       />
+      <SequenceRow
+        title="Stabilize — in order"
+        ids={composition.stabilize}
+        onRemove={remove}
+        onMove={(i, dir) =>
+          onChange({ ...composition, stabilize: moveItem(composition.stabilize, i, dir) })
+        }
+      />
       <div className="composer-picker">
         {REGION_ORDER.map((region) => (
           <details
@@ -115,6 +141,7 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
               {grouped[region].map((m) => {
                 const inEngage = composition.engage.includes(m.id);
                 const inRelease = composition.release.includes(m.id);
+                const inStabilize = composition.stabilize.includes(m.id);
                 return (
                   <li key={m.id} className="composer-row">
                     <div>
@@ -137,6 +164,14 @@ export function ComposerPanel({ composition, onChange, onAspectHint }: Props) {
                         onClick={() => addRelease(m.id)}
                       >
                         release
+                      </button>
+                      <button
+                        type="button"
+                        className={inStabilize ? "active" : undefined}
+                        aria-pressed={inStabilize}
+                        onClick={() => addStabilize(m.id)}
+                      >
+                        stabilize
                       </button>
                     </div>
                   </li>

@@ -71,6 +71,28 @@ function constant(value: number): ActivationFn {
   return () => value;
 }
 
+/**
+ * Dual-hump stabilizer: late-inhale counter-tension against the anterior
+ * lift, then eccentric control of the C-curve through the active exhale.
+ * Continuous at the phase boundaries (returns to `rest`).
+ */
+function stabilizerWave(
+  phase: number,
+  inhaleFraction: number,
+  inhalePeak: number,
+  exhalePeak: number,
+  rest = 0.08,
+): number {
+  const p = wrapPhase(phase);
+  if (p < inhaleFraction) {
+    const t = p / inhaleFraction;
+    const late = t < 0.3 ? 0 : Math.sin(((t - 0.3) / 0.7) * Math.PI);
+    return rest + (inhalePeak - rest) * late;
+  }
+  const t = (p - inhaleFraction) / (1 - inhaleFraction);
+  return rest + (exhalePeak - rest) * Math.sin(t * Math.PI);
+}
+
 /** Ease in, hold, release — for held coordinations rather than breath cycles. */
 function holdEnvelope(phase: number): number {
   const p = wrapPhase(phase);
@@ -131,8 +153,9 @@ const supported: GuideScript = {
       if (p < supportedInhale) return -Math.sin((p / supportedInhale) * Math.PI) * 0.6;
       return 0;
     },
-    erector_iliocostalis: constant(0.15),
-    erector_longissimus: constant(0.15),
+    erector_iliocostalis: (phase) => stabilizerWave(phase, supportedInhale, 0.4, 0.5),
+    erector_longissimus: (phase) => stabilizerWave(phase, supportedInhale, 0.4, 0.5),
+    intertransversarii: (phase) => stabilizerWave(phase, supportedInhale, 0.22, 0.28, 0.05),
     levatores_costarum: (phase) => inhaleWave(phase, supportedInhale) * 0.3,
   },
   diaphragmFlatten: (phase) => inhaleWave(phase, supportedInhale),
