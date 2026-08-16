@@ -67,16 +67,19 @@ When `units === "relative"`, the UI shows unitless levels and hides the mm label
 
 ## Recommended path
 
-### P2-a — Webcam spike, profile view first (~$0)
+### P2-a — Video-file import, profile view (~$0) — **the chosen easiest entry, 2026-08-16**
 
-Profile view because it answers the questions the physician has actually raised (supported breath mechanics, paradoxical timing) with the largest, cleanest signal.
+Not live capture: the user films 30–60 s of quiet standing on a phone (propped/tripod, profile view, fitted top), opens the site, and picks the file. **Nothing is uploaded** — there is no backend; the browser decodes and processes the file entirely on-device, and only the derived numbers exist afterward. This is easier than live capture in every dimension:
 
-- `CameraBreathSource implements BreathSource`: `getUserMedia` → downscaled grayscale frames (~320px) → per-ROI optical flow (hand-rolled Lucas–Kanade or block matching; keeps the zero-dependency rule) → band-pass 0.05–1 Hz → `Sample` at ~25 Hz, `units: "relative"`.
-- In profile, the six compartments collapse to a **2×1 column** (chest AP, abdomen AP); L/R mirrors the single measured column with a caption stating so. The UI already handles per-compartment data; this is a source-side mapping decision, honestly captioned.
-- **Setup flow:** camera picker → stand marks → 5 s still baseline (defines rest and measures the sway floor) → live.
-- Front-view mode ships in the same spike where the ROI mapping is the real 6 (lateral + vertical flow components), for the L/R questions.
+- **Reuses replay instead of the live path.** The pipeline produces a `Session` — the same JSON as a recorded take — which lands in Saved takes: scrubbable, replayable, exportable, comparable against mock takes. No `getUserMedia`, no permissions, no real-time budget.
+- **Two-pass processing.** Offline, pass 1 scans the whole clip for the rest baseline and sway floor; pass 2 extracts the signal against them. Live capture has to guess its baseline up front.
+- **Manual ROI placement on a still frame.** Show the first frame; the therapist drags a **chest box** and a **belly box** (profile view), plus a **reference box** on static background/pelvis whose flow is subtracted as common-mode (sway + stabilization residue). More robust than automatic placement and zero dependencies.
+- Pipeline: `<input type="file">` → `<video>` + `requestVideoFrameCallback` (`mediaTime` for timestamps) → downscaled grayscale → per-ROI optical flow (hand-rolled LK/block matching) → reference-box subtraction → band-pass 0.05–1 Hz → `Sample[]`, `units: "relative"`, `source: "camera"`. In profile the six compartments collapse to a 2×1 column (chest, abdomen); L/R mirrors the measured column with a caption stating so.
+- **Video-specific challenges:** iPhone stabilization warps frames to cancel hand shake (fabricates motion — tripod defeats most of it, the reference box catches the rest); auto-exposure drift reads as brightness change (long-press AE/AF lock in the camera app; goes in the filming instructions). Codecs are fine in practice (Safari native HEVC; Chrome hardware HEVC decode).
 
-*Accept:* a person breathing "belly-dominant" vs "chest-dominant" on camera produces visibly different maps and a correct Konno–Mead loop; the paradox pattern reproduces by deliberate reverse breathing; a recorded camera take replays and exports like any mock take.
+*Accept:* a phone clip of belly-dominant vs chest-dominant breathing produces visibly different maps and a correct Konno–Mead loop; deliberate reverse breathing reproduces the paradox pattern; the imported take replays, scrubs, and exports like any mock take. Human required: someone must film and be filmed.
+
+**Live webcam mode** (camera picker, 5 s still baseline, live map) becomes P2-a′ — the same flow code pointed at a stream instead of a file, built only after the file path proves the signal. Front-view mode (true 6-compartment L/R from lateral+vertical flow) ships with whichever comes second.
 
 ### P2-b — Markers + calibration (~$20)
 

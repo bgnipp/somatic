@@ -49,8 +49,8 @@
 
 | Work | Plan doc | Gate |
 |---|---|---|
-| **P2-a — Webcam capture spike** (`CameraBreathSource` behind the existing `BreathSource` interface; profile-view optical flow, relative units, baseline/sway handling) | `docs/capture-plan.md` | Formally the therapist success-gate session; $0 cost, so starting early is a risk decision the user can make |
-| **P2-b — Markers + mm calibration**, **P2-c — depth camera** | `docs/capture-plan.md` | P2-a results + hardware decisions (human) |
+| **P2-a — Video-file import** (film 30–60 s on a phone, open the file in the site — processed fully on-device, no upload; drag chest/belly/reference boxes on the first frame; optical flow → a replayable `Session` in relative units) | `docs/capture-plan.md` §P2-a | Formally the therapist success-gate session; $0 cost, so starting early is a risk decision the user can make |
+| **P2-a′ — live webcam mode**, **P2-b — markers + mm calibration**, **P2-c — depth camera** | `docs/capture-plan.md` | P2-a results + hardware decisions (human) |
 
 ## Remaining — agent work, blocked
 
