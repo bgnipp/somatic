@@ -1,7 +1,7 @@
 # Breath Anatomy Animation ("Guide" view) — Physician Feedback, Assessment, Implementation Spec
 
 **Date:** 2026-08-15 (revised same day from assessment-only to handoff-ready)
-**Status:** Implemented (B1–B4), plus her iMessage follow-up edits (solid-at-full activation gradient, exhale rib depression, SCM). Remaining work is her review of the quiet-breath choreography table — not code.
+**Status:** Implemented (B1–B4), plus her iMessage follow-up edits (solid-at-full activation gradient, exhale rib depression, SCM). Follow-up #3 (2026-08-16, balancing/opposing stabilizers) is assessed below and **queued, not yet implemented**. Also pending: her review of the quiet-breath choreography table.
 **Sources:** Voice memo from the physician ("breath animation", 3.3 min) — full transcript preserved at `context/transcripts/2026-08-15-physician-voice-memo-breath-animation-edits.txt` — plus three YouTube shorts she sent (assessed below; captions preserved at `context/transcripts/2026-08-15-physician-youtube-shorts-captions.txt`), plus a fourth, longer video she endorsed as "right on" (assessed below; captions at `context/transcripts/2026-08-15-physician-youtube-rib-unbunching-captions.txt`).
 
 ## What she asked for, in her words (condensed)
@@ -227,6 +227,27 @@ Recommended sequencing: (1) pec pair into the supported script now — small, fr
 
 **Update, same day:** planned and implemented as the C-track — see `docs/muscle-catalog-composer-plan.md` (C1 catalog, C2 pec pair, C3 schematic back figure, C4 composer, C5 polish). The back figure ships schematic; detailed posterior choreography in canonical scripts still waits on the BT link and her review. The composer is the path for her full roster meanwhile.
 
+## Physician follow-up #3 (2026-08-16) — balancing/opposing stabilizers
+
+Message preserved at `context/transcripts/2026-08-16-physician-balancing-stabilizers.txt`. She sent three reference animations — Muscle&Motion's ["Forced inspiratory breathing"](https://www.youtube.com/shorts/Q5B5SKTB04I), ["5 Muscles That Help With Breathing"](https://www.youtube.com/shorts/qBOYcodXDOM), and the already-assessed [rib-unbunching video](https://www.youtube.com/watch?v=Io6sKFSk-0Y) — and called them **"half way there": they show the prime movers lighting up, but not the increased tension in the opposing/stabilizing muscles that keeps the body balanced.** (The two shorts are visual references only — neither has spoken content; stills preserved in `context/muscle-roster/`.)
+
+### What this is: a third functional role
+
+Our scripts currently encode two roles — contracting (red) and relaxing/yielding (blue) — in a mostly reciprocal pattern. She is asking for **co-activation**: while a prime mover works, the stabilizers opposing it *increase* tension simultaneously. Concretely, in the supported breath:
+
+1. **Inhale, anterior lift needs posterior anchoring.** Scalenes, SCM, and pec minor pull the upper ribs up and forward; the posterior cervical/thoracic stabilizers — **iliocostalis cervicis and longissimus cervicis, exactly her 2026-08-15 roster** — must increase tension so the neck and upper spine aren't dragged forward. This retroactively explains why she sent those muscles: they are the counter-tension system for the anterior accessory muscles, not just extra roster entries.
+2. **Active exhale, flexion needs eccentric control.** Rectus and obliques form the C-curve; the **erector columns increase tension eccentrically** to control the curve and keep the trunk from collapsing — they pay out under load, they don't switch off.
+3. **Pec minor needs a fixed scapula.** Pec minor can only lift ribs 3–5 if the scapula is anchored (otherwise it just protracts the scapula) — which implicates the rhomboids/mid-traps as stabilizers *during* the inhale. This tension **appears to conflict with her voice memo's "traps and rhomboids relax"** — most likely the relax applies to the *upper* traps (freeing the thoracic outlet) while the scapular retractors anchor. Logged as an open question rather than guessed.
+
+### Encoding — the model already supports it; the choreography and copy don't yet
+
+- **No renderer or data-model change needed.** Activation is a scalar in [-1, 1] and her approved "transparency gradient" makes partial alpha literally mean partial tension — a stabilizer holding moderate isometric tension *is* a partial-alpha red. The gap is content, not architecture.
+- **Choreography edits (supported script):** the erector columns are currently flat placeholders (`constant(0.15)`) — replace with dynamic curves: rising through the late inhale (countering the anterior lift, ~0.3–0.45 peak) and rising again through the active exhale (eccentric control of the C-curve, ~0.5 peak), returning to low tone at the phase boundaries. `intertransversarii` (currently silent) gets a gentle segmental version of the same shape. Quiet breath stays sparse — a quiet breath recruits minimal stabilization; that contrast is itself teaching content.
+- **Legend copy:** one clause added to the Guide legend so partial red is legible: solid red = full contraction, **faint red = stabilizing tension**. (Keeps her exact gradient semantics; adds no new colors.)
+- **Composer:** a third ordered group — **Stabilize** — alongside Engage and Release: its muscles ramp to partial tension (~0.45) with the engage group's timing. This matches her authoring flow ("select a group of muscles to engage… same with group of relaxing muscles") extended by this follow-up, and compiles into the same `GuideScript` shape, so the renderer is again untouched.
+
+All of the above is **queued in `docs/roadmap.md`, not implemented** — awaiting go-ahead.
+
 ## Open questions for the physician
 
 1. ~~**Which breath is this?**~~ **Answered 2026-08-15: both.** Her choreography — pelvic floor *contracting* to start the inhale, rectus contracting on exhale — describes an actively supported breath (singing/trained support); quiet tidal breathing (pelvic floor yields on inhale, passive exhale) is the contrast case. Both ship as selectable scripts; see the two choreography tables and the script selector in B3. Her review of the quiet-breath table happens at the review session.
@@ -236,6 +257,7 @@ Recommended sequencing: (1) pec pair into the supported script now — small, fr
 5. **(From follow-up #2)** Link to the "BT osteopathy animation" she references — still needed before encoding richer default curves beyond the pec pair (which shipped in C2).
 6. **(From follow-up #2)** Back-figure review: a schematic posterior view now ships in Guide (`Front | Back`, `b`). Are the erector columns, levatores, intertransversarii, and rhomboids drawn and grouped the way she teaches?
 7. **(From follow-up #2)** Composer review: Compose mode lets her pick ordered engage/release groups; muscles light in the order selected. Does that match, or does she want editable per-muscle onsets?
+8. **(From follow-up #3)** Scapular anchoring vs. "traps and rhomboids relax": her voice memo has traps and rhomboids relaxing on the inhale, but the balancing principle implies the rhomboids/mid-traps *anchor the scapula* while pec minor lifts ribs 3–5. Is the relax upper-traps-only? The stabilizer choreography for the rhomboids waits on this answer.
 
 ## Guardrails carried forward
 

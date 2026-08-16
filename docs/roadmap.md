@@ -1,6 +1,6 @@
 # Roadmap — done vs. remaining
 
-**Date:** 2026-08-15
+**Date:** 2026-08-16
 **Purpose:** The single source of truth for project state. Read this first; each work item links to the plan doc that specifies it. An implementing agent should pick the next "agent, ready" item and follow its plan doc exactly.
 
 ## Done (verified in `main`, deployed to GitHub Pages)
@@ -21,10 +21,16 @@
 | **Platysma** + **sagittal side inset** showing the supported exhale's slight C-curve (front view can't show sagittal flexion) | (was backlog) | `e59f254` |
 | **Third Guide script "Rib lengthening"** (held directions loop from the endorsed video: sternum forward/up, ribs back/up, lower front narrowing; no activation tints; new `ribLift`/`sternumLift` drivers; side inset data-driven) | `docs/breath-animation-plan.md` §Fourth video | this commit |
 | **C-track (C1–C5):** muscle catalog as data; pec pair in supported script; schematic back figure (`Front \| Back`, `b`); composer compiles ordered engage/release groups into a `GuideScript` | `docs/muscle-catalog-composer-plan.md` | `e56ed64`, `c02e810`, `dea13cb`, `5c99745` |
+| Physician follow-up #3 captured (balancing/opposing stabilizer tension; two Muscle&Motion-style reference shorts assessed as visual refs) and turned into the D-track above | `docs/breath-animation-plan.md` §Follow-up #3, `context/transcripts/2026-08-16-physician-balancing-stabilizers.txt` | this commit |
 
 ## Remaining — agent work, ready now
 
-None. Next agent work is blocked on human items below.
+| Work | Plan doc | Notes |
+|---|---|---|
+| **D1 — Stabilizer counter-tension in the supported script** (physician follow-up #3, 2026-08-16: the reference animations are "half way there" — they lack the increased tension in opposing stabilizers that balances the body). Erector columns go from flat `constant(0.15)` to dynamic curves (rise late-inhale against the anterior lift, rise again through the active exhale controlling the C-curve); `intertransversarii` gets a gentle segmental version; quiet breath stays sparse on purpose | `docs/breath-animation-plan.md` §Follow-up #3 | Rhomboid anchoring waits on open question 8 (conflicts with her memo's "traps and rhomboids relax") |
+| **D2 — Legend clause for stabilizing tension** ("solid red = full contraction, faint red = stabilizing tension") | `docs/breath-animation-plan.md` §Follow-up #3 | One line of copy; keeps her transparency-gradient semantics |
+| **D3 — Composer "Stabilize" group**: a third ordered list whose muscles ramp to partial tension (~0.45) with the engage group's timing | `docs/breath-animation-plan.md` §Follow-up #3 | Compiles into the same `GuideScript`; renderer untouched |
+| **D4 — Composer layer-visibility fix** (found in the 2026-08-15 live verification: picks whose anatomy layer is hidden at the current depth tint invisibly — e.g. "release trapezius" at depth "Diaphragm & core" shows nothing). Recommended: in Compose mode, floor the opacity of any layer containing a picked muscle, mirroring the existing aspect auto-flip | `docs/muscle-catalog-composer-plan.md` | Alternatives (depth auto-bump, hidden-pick hint) considered; floor-opacity keeps the depth rail meaningful |
 
 ## Remaining — human work
 
@@ -37,6 +43,7 @@ None. Next agent work is blocked on human items below.
 | **Physician review of the "Rib lengthening" Guide script** | `docs/breath-animation-plan.md` §Fourth video | Implemented at the user's direction from the video she endorsed; her review decides whether it stays (it renders one school's postural doctrine — trivial to remove) |
 | **Get the "BT osteopathy animation" link from her** | `docs/breath-animation-plan.md` §Follow-up #2 | Needed before encoding richer default curves for the posterior roster and pec-minor detail |
 | **Physician review of the back figure and composer** | `docs/muscle-catalog-composer-plan.md` §Open questions | Schematic back roster + select-order-as-light-order shipped; her eye decides grouping, art, and whether onsets should become editable |
+| **Ask her open question 8: scapular anchoring vs. "traps and rhomboids relax"** | `docs/breath-animation-plan.md` §Open questions | Gates the rhomboid stabilizer curve in D1; the rest of D1 doesn't wait on it |
 
 ## Remaining — agent work, blocked
 

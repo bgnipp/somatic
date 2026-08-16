@@ -1,0 +1,43 @@
+Physician feedback on reference animations — balancing/opposing stabilizers
+Relayed 2026-08-16 (via Bryan, with re-sent iMessage screenshots)
+
+Her assessment of the reference animations (Muscle&Motion "Forced inspiratory
+breathing", "5 Muscles That Help With Breathing", and the rib-unbunching video):
+
+  "these are half way there. what they lack is the demonstration [of] the
+  balancing/opposing muscle movement. to balance the body there needs to be
+  increased tension in the stabilizing muscles on the opposite side"
+
+References sent with the message:
+  1. https://www.youtube.com/watch?v=Io6sKFSk-0Y
+     "Unbunch Your Ribs to Set the Conditions for Full Thoracic Breathing"
+     — already transcribed and assessed; see
+     2026-08-15-physician-youtube-rib-unbunching-captions.txt and
+     docs/breath-animation-plan.md §Fourth video.
+  2. https://www.youtube.com/shorts/Q5B5SKTB04I
+     Muscle&Motion, "Forced inspiratory breathing" — whole-body semi-transparent
+     3D figure with accessory inspiratory muscles highlighted red. No spoken
+     content; no captions exist (pure animation). Still frame preserved at
+     context/muscle-roster/2026-08-16-muscle-and-motion-forced-breathing-still.png
+  3. https://www.youtube.com/shorts/qBOYcodXDOM
+     "5 Muscles That Help With Breathing" — auto-captions contain only the
+     title line ("Here are five muscles that help with breathing") over music;
+     the content is on-screen labels of the muscles. Visual reference only.
+
+Screenshots re-sent alongside (previously transcribed in
+2026-08-15-physician-inflight-muscle-roster.txt and
+2026-08-15-physician-imessage-follow-up.txt):
+  - Her "important layers / every muscle listed / input the action of each
+    muscle" messages.
+  - Essential Anatomy 3D: Iliocostalis — Cervical Part (Right), this time with
+    the info panel open showing ORIGIN (angles of the 3rd–7th ribs), INSERTION
+    (transverse processes of C4–C6), ACTION (extension, abduction and rotation
+    of the cervical vertebrae), captioned "see action here and muscle isolated".
+    Preserved at context/muscle-roster/2026-08-16-iliocostalis-action-panel.png
+
+Reading: the reference animations show prime movers lighting up; what she wants
+added is the simultaneous counter-tension — stabilizers on the opposing side
+increasing tension so the body stays balanced while the prime movers act. This
+retroactively explains the posterior roster she sent on 2026-08-15: iliocostalis
+cervicis / longissimus cervicis are the posterior counter-tension for the
+anterior accessory inhale muscles (scalenes, SCM, pec minor).
