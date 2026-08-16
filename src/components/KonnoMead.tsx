@@ -10,6 +10,23 @@ const S = 160;
 const PAD = 22;
 const MAX = 18;
 
+function arrowHead(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+): string | null {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 1.2) return null;
+  const ux = dx / len;
+  const uy = dy / len;
+  const size = 5.5;
+  const bx = to.x - ux * size;
+  const by = to.y - uy * size;
+  const w = size * 0.42;
+  return `${to.x.toFixed(1)},${to.y.toFixed(1)} ${(bx - uy * w).toFixed(1)},${(by + ux * w).toFixed(1)} ${(bx + uy * w).toFixed(1)},${(by - ux * w).toFixed(1)}`;
+}
+
 export function KonnoMead({ history, compare = [] }: Props) {
   const pts = history.map((s) => ({
     x: meanRibCage(s),
@@ -27,6 +44,14 @@ export function KonnoMead({ history, compare = [] }: Props) {
   const older = pts.slice(0, split + 1).map(toPoint).join(" ");
   const recent = pts.slice(split).map(toPoint).join(" ");
   const last = pts[pts.length - 1];
+  const prev = pts[pts.length - 2];
+  const arrow =
+    last && prev
+      ? arrowHead(
+          { x: toX(prev.x), y: toY(prev.y) },
+          { x: toX(last.x), y: toY(last.y) },
+        )
+      : null;
   const cmpLine = cmp.map(toPoint).join(" ");
 
   return (
@@ -64,8 +89,9 @@ export function KonnoMead({ history, compare = [] }: Props) {
         {older && pts.length > 2 && <polyline points={older} className="trace loop old" />}
         {recent && <polyline points={recent} className="trace loop" />}
         {last && <circle cx={toX(last.x)} cy={toY(last.y)} r="3.2" className="loop-now" />}
+        {arrow && <polygon points={arrow} className="loop-arrow" />}
       </svg>
-      <p className="chart-foot">Loop shape is phase. Dotted line is equal excursion.</p>
+      <p className="chart-foot">Loop shape is phase. Arrow is travel direction. Dotted line is equal excursion.</p>
     </div>
   );
 }

@@ -30,6 +30,8 @@ export type Session = {
   scenario?: string;
   samples: Sample[];
   notes: string;
+  /** Optional display name; falls back to the scenario label. */
+  label?: string;
   /** Reserved for a future synchronized take. v0 does not record audio. */
   audio?: {
     mimeType: string;

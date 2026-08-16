@@ -1,5 +1,5 @@
 import type { MuscleId } from "./catalog";
-import { TintFill, TintStroke } from "./placeholders";
+import { MuscleHit, TintFill, TintStroke } from "./placeholders";
 import {
   BACK_RIBS,
   SCAPULA_L,
@@ -87,9 +87,10 @@ type Props = {
   expand?: number;
   ribLift?: number;
   activations?: Activations;
+  onInspect?: (id: MuscleId) => void;
 };
 
-export function BackFigure({ expand = 0, ribLift = 0, activations }: Props) {
+export function BackFigure({ expand = 0, ribLift = 0, activations, onInspect }: Props) {
   const widthScale = 1 + expand * 0.05;
   const lift = expand * 2 + ribLift * 2.5;
   const ilA = act(activations, "erector_iliocostalis");
@@ -100,7 +101,7 @@ export function BackFigure({ expand = 0, ribLift = 0, activations }: Props) {
   const trapA = act(activations, "traps");
 
   return (
-    <g className="anatomy-placeholder anatomy-back" pointerEvents="none" aria-hidden="true">
+    <g className="anatomy-placeholder anatomy-back" aria-hidden={!onInspect}>
       <path className="anatomy-bone anatomy-spine-line" d={SPINE} />
       {VERTEBRA_YS.map((y) => (
         <line key={y} className="anatomy-vertebra" x1="116" y1={y} x2="124" y2={y} />
@@ -117,45 +118,57 @@ export function BackFigure({ expand = 0, ribLift = 0, activations }: Props) {
       <path className="anatomy-scapula" d={SCAPULA_L} />
       <path className="anatomy-scapula" d={SCAPULA_R} />
 
-      {ERECTOR_IL.map((d) => (
-        <path key={d} className="anatomy-erector-il" d={d} />
-      ))}
-      {ERECTOR_IL.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={ilA} />
-      ))}
-      {ERECTOR_LO.map((d) => (
-        <path key={d} className="anatomy-erector-lo" d={d} />
-      ))}
-      {ERECTOR_LO.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={loA} />
-      ))}
-      {ERECTOR_FIBERS.map((d) => (
-        <path key={d} className="anatomy-erector-fiber" d={d} />
-      ))}
+      <MuscleHit id="erector_iliocostalis" onInspect={onInspect}>
+        {ERECTOR_IL.map((d) => (
+          <path key={d} className="anatomy-erector-il" d={d} />
+        ))}
+        {ERECTOR_IL.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={ilA} />
+        ))}
+        {ERECTOR_FIBERS.map((d) => (
+          <path key={d} className="anatomy-erector-fiber" d={d} />
+        ))}
+      </MuscleHit>
+      <MuscleHit id="erector_longissimus" onInspect={onInspect}>
+        {ERECTOR_LO.map((d) => (
+          <path key={d} className="anatomy-erector-lo" d={d} />
+        ))}
+        {ERECTOR_LO.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={loA} />
+        ))}
+      </MuscleHit>
 
-      {LEVATORS.map((d) => (
-        <path key={d} className="anatomy-levator" d={d} />
-      ))}
-      {LEVATORS.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={levA} width={1.6} />
-      ))}
+      <MuscleHit id="levatores_costarum" onInspect={onInspect}>
+        {LEVATORS.map((d) => (
+          <path key={d} className="anatomy-levator" d={d} />
+        ))}
+        {LEVATORS.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={levA} width={1.6} />
+        ))}
+      </MuscleHit>
 
-      {INTERTRANS.map((d) => (
-        <path key={d} className="anatomy-intertrans" d={d} />
-      ))}
-      {INTERTRANS.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={itA} width={1.4} />
-      ))}
+      <MuscleHit id="intertransversarii" onInspect={onInspect}>
+        {INTERTRANS.map((d) => (
+          <path key={d} className="anatomy-intertrans" d={d} />
+        ))}
+        {INTERTRANS.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={itA} width={1.4} />
+        ))}
+      </MuscleHit>
 
-      {RHOMBOIDS.map((d) => (
-        <path key={d} className="anatomy-rhomboid" d={d} />
-      ))}
-      {RHOMBOIDS.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={rhoA} />
-      ))}
+      <MuscleHit id="rhomboids" onInspect={onInspect}>
+        {RHOMBOIDS.map((d) => (
+          <path key={d} className="anatomy-rhomboid" d={d} />
+        ))}
+        {RHOMBOIDS.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={rhoA} />
+        ))}
+      </MuscleHit>
 
-      <path className="anatomy-trap-back" d={TRAPS_BACK} />
-      <TintFill d={TRAPS_BACK} a={trapA} />
+      <MuscleHit id="traps" onInspect={onInspect}>
+        <path className="anatomy-trap-back" d={TRAPS_BACK} />
+        <TintFill d={TRAPS_BACK} a={trapA} />
+      </MuscleHit>
     </g>
   );
 }

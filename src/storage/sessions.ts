@@ -1,4 +1,4 @@
-import type { Session } from "../types";
+import { COMPARTMENT_IDS, type Sample, type Session } from "../types";
 
 const KEY = "somatic.sessions.v1";
 
@@ -29,12 +29,31 @@ export function downloadSession(session: Session): void {
   URL.revokeObjectURL(url);
 }
 
+function isSample(raw: unknown): raw is Sample {
+  if (!raw || typeof raw !== "object") return false;
+  const s = raw as Sample;
+  if (typeof s.t !== "number" || !Number.isFinite(s.t)) return false;
+  if (!s.compartments || typeof s.compartments !== "object") return false;
+  for (const id of COMPARTMENT_IDS) {
+    const c = s.compartments[id];
+    if (!c || typeof c.displacementMm !== "number" || !Number.isFinite(c.displacementMm)) {
+      return false;
+    }
+  }
+  if (s.lateral) {
+    if (typeof s.lateral.leftMm !== "number" || !Number.isFinite(s.lateral.leftMm)) return false;
+    if (typeof s.lateral.rightMm !== "number" || !Number.isFinite(s.lateral.rightMm)) return false;
+  }
+  return true;
+}
+
 export function parseSession(raw: unknown): Session | null {
   if (!raw || typeof raw !== "object") return null;
   const s = raw as Session;
   if (typeof s.id !== "string" || !s.id) return null;
   if (!Array.isArray(s.samples) || s.samples.length === 0) return null;
   if (typeof s.durationMs !== "number" || !Number.isFinite(s.durationMs)) return null;
+  if (!s.samples.every(isSample)) return null;
   return {
     id: s.id,
     startedAt: typeof s.startedAt === "string" ? s.startedAt : new Date().toISOString(),
@@ -43,6 +62,7 @@ export function parseSession(raw: unknown): Session | null {
     scenario: s.scenario,
     samples: s.samples,
     notes: typeof s.notes === "string" ? s.notes : "",
+    label: typeof s.label === "string" && s.label.trim() ? s.label.trim() : undefined,
     audio: s.audio,
   };
 }

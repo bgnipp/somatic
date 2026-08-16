@@ -24,21 +24,11 @@
 | Physician follow-up #3 captured (balancing/opposing stabilizer tension; two Muscle&Motion-style reference shorts assessed as visual refs) and turned into the D-track above | `docs/breath-animation-plan.md` §Follow-up #3, `context/transcripts/2026-08-16-physician-balancing-stabilizers.txt` | `13857af` |
 | **D4 — Composer layer-visibility fix:** picks whose layer the depth rail hid now tint visibly (floor opacity 0.85 on picked muscles' layers in Compose mode; depth rail governs the rest) | `docs/muscle-catalog-composer-plan.md` §C4 addendum | `15b51cf` |
 | **D1–D3 — Stabilizer counter-tension:** dual-hump erector/intertransversarii curves in the supported script; legend names faint red as stabilizing tension; composer Stabilize group (peak 0.45) | `docs/breath-animation-plan.md` §Follow-up #3 | this commit |
+| **E-track (E1–E8):** Guide no longer shows mock-driven cross-section / hover mm / landmarks; import validates samples and dedupes ids; composer speed pill + mobile action sentences + aspect badges; shareable `?view=&script=&aspect=`; tap-to-name muscles; aspect persist, touch pin, Konno arrow, take rename, composer accordion persist | `docs/improvement-pass-2.md` | this commit |
 
 ## Remaining — agent work, ready now
 
-**E-track — improvement pass 2** (`docs/improvement-pass-2.md`, 2026-08-16 review of the live prototype):
-
-| Phase | Work | Size |
-|---|---|---|
-| E1 | Guide consistency sweep — hide the mock-driven cross-section, hover mm readout, and landmark dots in Guide view (same bug class as the phase pill) | S |
-| E2 | Import robustness — validate sample shape in `parseSession` (current code lets a malformed import crash at open); dedupe imported takes by id | S |
-| E3 | Composer loop-speed control — `holdMs` exists and compiles but has no UI; add a Slow/Medium/Fast pill | S |
-| E4 | Composer action sentences on phones — currently `display:none` under 520 px; clamp instead of hide | S |
-| E5 | Front/back badges on composition chips not visible in the current aspect | S |
-| E6 | URL params for view/script/aspect (shareable review links) | M |
-| E7 | Muscle inspector — tap a tinted muscle to see its catalog name + action | M |
-| E8 | Grab-bag: aspect-persistence dead code, touch readouts, Konno–Mead direction cue, take rename, composer accordion state | S each |
+None. Next agent work is the gated P2-a video-file import, or human items below.
 
 ## Remaining — human work
 

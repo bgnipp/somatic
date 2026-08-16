@@ -292,6 +292,19 @@ h1 {
   transition: opacity 200ms ease;
 }
 
+.muscle-hit {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.muscle-hit:focus {
+  outline: none;
+}
+
+.muscle-hit:focus-visible {
+  filter: drop-shadow(0 0 1.5px #e4b86a);
+}
+
 .anatomy-bone,
 .anatomy-cartilage,
 .anatomy-spine rect {
@@ -681,6 +694,28 @@ h1 {
   padding: 0;
 }
 
+.composer-hold {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 0.45rem;
+}
+
+.composer-hold button {
+  padding: 0.15rem 0.45rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.composer-hold button.active {
+  background: #2a2618;
+  border-color: #6d5a2c;
+  color: var(--gold);
+}
+
 .composer-chip {
   display: flex;
   align-items: center;
@@ -689,6 +724,17 @@ h1 {
   border: 1px solid #3a362c;
   background: #1c1b16;
   font-size: 0.68rem;
+}
+
+.composer-aspect {
+  font-style: normal;
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.05rem 0.25rem;
+  border: 1px solid #6d5a2c;
+  background: #2a2618;
 }
 
 .composer-chip button {
@@ -734,6 +780,11 @@ h1 {
   color: var(--ink);
 }
 
+.composer-row > div:first-child {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
 .composer-row span {
   display: block;
   font-size: 0.68rem;
@@ -761,8 +812,15 @@ h1 {
 }
 
 @media (max-width: 520px) {
+  .composer-row {
+    flex-direction: column;
+  }
+
   .composer-row span {
-    display: none;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 }
 
@@ -1049,6 +1107,10 @@ h1 {
   fill: #f2ead4;
 }
 
+.loop-arrow {
+  fill: #f2ead4;
+}
+
 .chart-svg.square {
   max-width: 200px;
 }
@@ -1117,9 +1179,29 @@ h1 {
   gap: 1rem;
 }
 
+.take-rename,
 .take-delete {
   padding: 0.45rem 0.7rem;
   color: var(--ink-dim);
+}
+
+.take-rename:hover {
+  color: var(--gold);
+  border-color: #6d5a2c;
+}
+
+.take-rename-form {
+  flex: 1;
+  display: flex;
+}
+
+.take-rename-form input {
+  width: 100%;
+  padding: 0.4rem 0.55rem;
+  background: #1c1b16;
+  border: 1px solid #6d5a2c;
+  color: var(--ink);
+  font: inherit;
 }
 
 .take-delete:hover {

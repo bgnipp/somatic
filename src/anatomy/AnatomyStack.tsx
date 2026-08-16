@@ -39,6 +39,7 @@ function AnatomyLayerView({
   pelvicLift,
   activations,
   revealLayers,
+  onInspect,
 }: {
   layer: AnatomyLayer;
   depth: AnatomyDepth;
@@ -48,6 +49,7 @@ function AnatomyLayerView({
   pelvicLift: number;
   activations?: Partial<Record<MuscleId, number>>;
   revealLayers?: ReadonlySet<AnatomyLayerId>;
+  onInspect?: (id: MuscleId) => void;
 }) {
   const href = layerHref(layer.filename);
   const hasImage = useLayerImage(href);
@@ -58,7 +60,7 @@ function AnatomyLayerView({
       className={`anatomy-layer anatomy-layer-${layer.id}`}
       style={{ opacity }}
       pointerEvents="none"
-      aria-hidden="true"
+      aria-hidden={onInspect ? undefined : true}
     >
       {hasImage ? (
         <image
@@ -77,6 +79,7 @@ function AnatomyLayerView({
           ribLift={ribLift}
           pelvicLift={pelvicLift}
           activations={activations}
+          onInspect={onInspect}
         />
       )}
     </g>
@@ -97,6 +100,7 @@ type Props = {
   activations?: Partial<Record<MuscleId, number>>;
   /** Compose mode: layers holding picked muscles get a floor opacity. */
   revealLayers?: ReadonlySet<AnatomyLayerId>;
+  onInspect?: (id: MuscleId) => void;
 };
 
 export function AnatomyStack({
@@ -107,6 +111,7 @@ export function AnatomyStack({
   pelvicLift = 0,
   activations,
   revealLayers,
+  onInspect,
 }: Props) {
   return (
     <g className="anatomy-stack" clipPath="url(#torso-clip)">
@@ -121,6 +126,7 @@ export function AnatomyStack({
           pelvicLift={pelvicLift}
           activations={activations}
           revealLayers={revealLayers}
+          onInspect={onInspect}
         />
       ))}
     </g>

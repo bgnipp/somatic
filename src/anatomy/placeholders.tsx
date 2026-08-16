@@ -1,6 +1,7 @@
+import type { ReactNode } from "react";
 import { activationColor } from "../lib/color";
 import { TORSO } from "../components/torsoPaths";
-import type { MuscleId } from "./catalog";
+import { muscleById, type MuscleId } from "./catalog";
 import type { AnatomyLayerId } from "./layers";
 
 /**
@@ -37,7 +38,42 @@ type LayerProps = {
   ribLift?: number;
   pelvicLift?: number;
   activations?: Activations;
+  onInspect?: (id: MuscleId) => void;
 };
+
+export function MuscleHit({
+  id,
+  onInspect,
+  children,
+}: {
+  id: MuscleId;
+  onInspect?: (id: MuscleId) => void;
+  children: ReactNode;
+}) {
+  if (!onInspect) return children;
+  const def = muscleById(id);
+  return (
+    <g
+      className="muscle-hit"
+      role="button"
+      tabIndex={0}
+      aria-label={`${def.label}. ${def.action}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onInspect(id);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onInspect(id);
+        }
+      }}
+    >
+      <title>{`${def.label} — ${def.action}`}</title>
+      {children}
+    </g>
+  );
+}
 
 function act(activations: Activations | undefined, id: MuscleId): number {
   return activations?.[id] ?? 0;
@@ -197,7 +233,7 @@ function SkeletonLayer({ expand = 0, ribLift = 0 }: LayerProps) {
   );
 }
 
-function DeepLayer({ flatten = 0, pelvicLift = 0, activations }: LayerProps) {
+function DeepLayer({ flatten = 0, pelvicLift = 0, activations, onInspect }: LayerProps) {
   const dome = diaphragmPath(flatten);
   const floor = pelvicFloorPath(pelvicLift);
   const diaA = act(activations, "diaphragm");
@@ -205,24 +241,30 @@ function DeepLayer({ flatten = 0, pelvicLift = 0, activations }: LayerProps) {
   const pfA = act(activations, "pelvic_floor");
   return (
     <g className="anatomy-placeholder anatomy-deep">
-      <path className="anatomy-diaphragm" d={dome} />
-      <path className="anatomy-diaphragm-rim" d={diaphragmRim(flatten)} />
-      <TintFill d={dome} a={diaA} />
+      <MuscleHit id="diaphragm" onInspect={onInspect}>
+        <path className="anatomy-diaphragm" d={dome} />
+        <path className="anatomy-diaphragm-rim" d={diaphragmRim(flatten)} />
+        <TintFill d={dome} a={diaA} />
+      </MuscleHit>
       <path className="anatomy-psoas" d="M116 158 C114 176 108 196 102 214" />
       <path className="anatomy-psoas" d="M124 158 C126 176 132 196 138 214" />
-      {TRANSVERSUS.map((d) => (
-        <path key={d} className="anatomy-transversus" d={d} />
-      ))}
-      {TRANSVERSUS.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={tvA} width={1.8} />
-      ))}
-      <path className="anatomy-pelvic-floor" d={floor} />
-      <TintFill d={floor} a={pfA} />
+      <MuscleHit id="transversus" onInspect={onInspect}>
+        {TRANSVERSUS.map((d) => (
+          <path key={d} className="anatomy-transversus" d={d} />
+        ))}
+        {TRANSVERSUS.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={tvA} width={1.8} />
+        ))}
+      </MuscleHit>
+      <MuscleHit id="pelvic_floor" onInspect={onInspect}>
+        <path className="anatomy-pelvic-floor" d={floor} />
+        <TintFill d={floor} a={pfA} />
+      </MuscleHit>
     </g>
   );
 }
 
-function IntercostalLayer({ expand = 0, ribLift = 0, activations }: LayerProps) {
+function IntercostalLayer({ expand = 0, ribLift = 0, activations, onInspect }: LayerProps) {
   const widthScale = 1 + expand * 0.05;
   const lift = expand * 2 + ribLift * 2.5;
   const hatches: string[] = [];
@@ -247,34 +289,40 @@ function IntercostalLayer({ expand = 0, ribLift = 0, activations }: LayerProps) 
   const a = act(activations, "intercostals");
   return (
     <g className="anatomy-placeholder anatomy-intercostal">
-      {hatches.map((d, i) => (
-        <path key={i} d={d} />
-      ))}
-      {hatches.map((d, i) => (
-        <TintStroke key={`tint-${i}`} d={d} a={a} width={1.4} />
-      ))}
+      <MuscleHit id="intercostals" onInspect={onInspect}>
+        {hatches.map((d, i) => (
+          <path key={i} d={d} />
+        ))}
+        {hatches.map((d, i) => (
+          <TintStroke key={`tint-${i}`} d={d} a={a} width={1.4} />
+        ))}
+      </MuscleHit>
     </g>
   );
 }
 
-function AbWallLayer({ activations }: LayerProps) {
+function AbWallLayer({ activations, onInspect }: LayerProps) {
   const rectA = act(activations, "rectus");
   const oblA = act(activations, "obliques");
   return (
     <g className="anatomy-placeholder anatomy-ab-wall">
-      {RECTUS.map((d) => (
-        <path key={d} className="anatomy-rectus" d={d} />
-      ))}
-      {RECTUS.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={rectA} />
-      ))}
+      <MuscleHit id="rectus" onInspect={onInspect}>
+        {RECTUS.map((d) => (
+          <path key={d} className="anatomy-rectus" d={d} />
+        ))}
+        {RECTUS.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={rectA} />
+        ))}
+      </MuscleHit>
       <path className="anatomy-linea" d="M120 148 L120 206" />
-      {OBLIQUES.map((d) => (
-        <path key={d} className="anatomy-oblique" d={d} />
-      ))}
-      {OBLIQUES.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={oblA} />
-      ))}
+      <MuscleHit id="obliques" onInspect={onInspect}>
+        {OBLIQUES.map((d) => (
+          <path key={d} className="anatomy-oblique" d={d} />
+        ))}
+        {OBLIQUES.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={oblA} />
+        ))}
+      </MuscleHit>
       {["M96 140 L106 148", "M94 156 L104 164", "M96 172 L105 180"].map((d) => (
         <path key={d} className="anatomy-oblique-fiber" d={d} />
       ))}
@@ -285,37 +333,45 @@ function AbWallLayer({ activations }: LayerProps) {
   );
 }
 
-function SuperficialLayer({ activations }: LayerProps) {
+function SuperficialLayer({ activations, onInspect }: LayerProps) {
   const trapA = act(activations, "traps");
   const majorA = act(activations, "pec_major");
   const minorA = act(activations, "pec_minor");
   const subA = act(activations, "subclavius");
   return (
     <g className="anatomy-placeholder anatomy-superficial">
-      {PEC_MINOR.map((d) => (
-        <path key={d} className="anatomy-pec-minor" d={d} />
-      ))}
-      {PEC_MINOR.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={minorA} />
-      ))}
-      {PEC_MAJOR.map((d) => (
-        <path key={d} className="anatomy-pec" d={d} />
-      ))}
-      {PEC_MAJOR.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={majorA} />
-      ))}
-      {SUBCLAVIUS.map((d) => (
-        <path key={d} className="anatomy-subclavius" d={d} />
-      ))}
-      {SUBCLAVIUS.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={subA} width={1.5} />
-      ))}
-      {TRAPS.map((d) => (
-        <path key={d} className="anatomy-trap" d={d} />
-      ))}
-      {TRAPS.map((d) => (
-        <TintFill key={`${d}-tint`} d={d} a={trapA} />
-      ))}
+      <MuscleHit id="pec_minor" onInspect={onInspect}>
+        {PEC_MINOR.map((d) => (
+          <path key={d} className="anatomy-pec-minor" d={d} />
+        ))}
+        {PEC_MINOR.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={minorA} />
+        ))}
+      </MuscleHit>
+      <MuscleHit id="pec_major" onInspect={onInspect}>
+        {PEC_MAJOR.map((d) => (
+          <path key={d} className="anatomy-pec" d={d} />
+        ))}
+        {PEC_MAJOR.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={majorA} />
+        ))}
+      </MuscleHit>
+      <MuscleHit id="subclavius" onInspect={onInspect}>
+        {SUBCLAVIUS.map((d) => (
+          <path key={d} className="anatomy-subclavius" d={d} />
+        ))}
+        {SUBCLAVIUS.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={subA} width={1.5} />
+        ))}
+      </MuscleHit>
+      <MuscleHit id="traps" onInspect={onInspect}>
+        {TRAPS.map((d) => (
+          <path key={d} className="anatomy-trap" d={d} />
+        ))}
+        {TRAPS.map((d) => (
+          <TintFill key={`${d}-tint`} d={d} a={trapA} />
+        ))}
+      </MuscleHit>
     </g>
   );
 }
@@ -329,29 +385,39 @@ function SurfaceLayer() {
 }
 
 /** Neck muscles sit outside #torso-clip — mount unclipped, Guide view only. */
-export function ScaleneHints({ activations }: { activations?: Activations }) {
+export function ScaleneHints({
+  activations,
+  onInspect,
+}: {
+  activations?: Activations;
+  onInspect?: (id: MuscleId) => void;
+}) {
   const scaleneA = act(activations, "scalenes");
   const platysmaA = act(activations, "platysma");
   return (
-    <g className="anatomy-placeholder anatomy-scalenes" pointerEvents="none" aria-hidden="true">
-      {SCALENES.map((d) => (
-        <path key={d} className="anatomy-scalene" d={d} />
-      ))}
-      {SCM.map((d) => (
-        <path key={d} className="anatomy-scm" d={d} />
-      ))}
-      {PLATYSMA.map((d) => (
-        <path key={d} className="anatomy-platysma" d={d} />
-      ))}
-      {SCALENES.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={scaleneA} width={1.8} />
-      ))}
-      {SCM.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={scaleneA} width={2} />
-      ))}
-      {PLATYSMA.map((d) => (
-        <TintStroke key={`${d}-tint`} d={d} a={platysmaA} width={1.6} />
-      ))}
+    <g className="anatomy-placeholder anatomy-scalenes" aria-hidden={!onInspect}>
+      <MuscleHit id="scalenes" onInspect={onInspect}>
+        {SCALENES.map((d) => (
+          <path key={d} className="anatomy-scalene" d={d} />
+        ))}
+        {SCM.map((d) => (
+          <path key={d} className="anatomy-scm" d={d} />
+        ))}
+        {SCALENES.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={scaleneA} width={1.8} />
+        ))}
+        {SCM.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={scaleneA} width={2} />
+        ))}
+      </MuscleHit>
+      <MuscleHit id="platysma" onInspect={onInspect}>
+        {PLATYSMA.map((d) => (
+          <path key={d} className="anatomy-platysma" d={d} />
+        ))}
+        {PLATYSMA.map((d) => (
+          <TintStroke key={`${d}-tint`} d={d} a={platysmaA} width={1.6} />
+        ))}
+      </MuscleHit>
     </g>
   );
 }
@@ -363,6 +429,7 @@ export function AnatomyPlaceholder({
   ribLift = 0,
   pelvicLift = 0,
   activations,
+  onInspect,
 }: {
   id: AnatomyLayerId;
   flatten?: number;
@@ -370,8 +437,9 @@ export function AnatomyPlaceholder({
   ribLift?: number;
   pelvicLift?: number;
   activations?: Activations;
+  onInspect?: (id: MuscleId) => void;
 }) {
-  const props: LayerProps = { flatten, expand, ribLift, pelvicLift, activations };
+  const props: LayerProps = { flatten, expand, ribLift, pelvicLift, activations, onInspect };
   switch (id) {
     case "skeleton":
       return <SkeletonLayer {...props} />;

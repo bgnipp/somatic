@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnatomyStack } from "../anatomy/AnatomyStack";
 import { BackFigure } from "../anatomy/backPlaceholders";
-import { muscleById, type FigureAspect } from "../anatomy/catalog";
+import { muscleById, type FigureAspect, type MuscleId } from "../anatomy/catalog";
 import { DepthRail } from "../anatomy/DepthRail";
 import { ScaleneHints } from "../anatomy/placeholders";
 import {
@@ -36,6 +36,7 @@ import {
 } from "../guide/script";
 import { useGuideClock } from "../guide/useGuideClock";
 import { motionFill, motionGlow, motionStroke } from "../lib/color";
+import { readSearchParam, writeSearchParams } from "../lib/urlState";
 import { meanAbdomen, meanRibCage } from "../mock/synthesize";
 import type { CompartmentId, Sample } from "../types";
 import { COMPARTMENT_LABELS, LANDMARKS } from "../types";
@@ -49,6 +50,18 @@ import {
   RIGHT_ARM,
   TORSO,
 } from "./torsoPaths";
+
+function initialScript(): GuideScriptId {
+  const q = readSearchParam("script");
+  if (q === "quiet" || q === "supported" || q === "lengthen" || q === "custom") return q;
+  return loadStoredScript();
+}
+
+function initialAspect(): FigureAspect {
+  const q = readSearchParam("aspect");
+  if (q === "front" || q === "back") return q;
+  return loadStoredAspect();
+}
 
 type Props = {
   sample: Sample | null;
@@ -66,10 +79,12 @@ export function TorsoMap({
   depth: depthProp,
 }: Props) {
   const [hover, setHover] = useState<CompartmentId | null>(null);
+  const [pinned, setPinned] = useState<CompartmentId | null>(null);
+  const [inspectId, setInspectId] = useState<MuscleId | null>(null);
   const [storedDepth, setStoredDepth] = useState<AnatomyDepth>(loadStoredDepth);
-  const [scriptId, setScriptId] = useState<GuideScriptId>(loadStoredScript);
+  const [scriptId, setScriptId] = useState<GuideScriptId>(initialScript);
   const [composition, setComposition] = useState(loadComposition);
-  const [aspect, setAspect] = useState<FigureAspect>(loadStoredAspect);
+  const [aspect, setAspect] = useState<FigureAspect>(initialAspect);
   const [paused, setPaused] = useState(false);
   const [scrub, setScrub] = useState(0.2);
   const [reduceMotion, setReduceMotion] = useState(() =>
@@ -125,6 +140,8 @@ export function TorsoMap({
       : 1 + Math.min(total, 22) * 0.0012;
   const sites = sitesFromSample(sample);
   const showField = view === "field";
+  const readout = showGuide ? null : (hover ?? pinned);
+  const inspected = inspectId ? muscleById(inspectId) : null;
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -151,12 +168,26 @@ export function TorsoMap({
   }, [composition]);
 
   useEffect(() => {
-    saveStoredAspect(aspect);
-  }, [aspect]);
+    if (view === "guide") saveStoredAspect(aspect);
+  }, [aspect, view]);
 
   useEffect(() => {
-    if (view !== "guide") setAspect("front");
-  }, [view]);
+    writeSearchParams({ script: scriptId, aspect });
+  }, [scriptId, aspect]);
+
+  useEffect(() => {
+    if (!showGuide) {
+      setInspectId(null);
+      return;
+    }
+    if (inspectId && !muscleById(inspectId).aspects.includes(aspect)) {
+      setInspectId(null);
+    }
+  }, [showGuide, aspect, inspectId]);
+
+  useEffect(() => {
+    if (showGuide) setPinned(null);
+  }, [showGuide]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -195,6 +226,10 @@ export function TorsoMap({
     setStoredDepth(next);
   }
 
+  function inspectMuscle(id: MuscleId) {
+    setInspectId((cur) => (cur === id ? null : id));
+  }
+
   return (
     <div className="torso-wrap">
       <div className="torso-stage">
@@ -222,7 +257,12 @@ export function TorsoMap({
           <path className="torso-limb" d={RIGHT_ARM} />
           <path className="torso-context" d={TORSO} />
           {showBack ? (
-            <BackFigure expand={expand} ribLift={ribLift} activations={activations} />
+            <BackFigure
+              expand={expand}
+              ribLift={ribLift}
+              activations={activations}
+              onInspect={showGuide ? inspectMuscle : undefined}
+            />
           ) : (
             <AnatomyStack
               depth={depth}
@@ -232,9 +272,12 @@ export function TorsoMap({
               pelvicLift={pelvicLift}
               activations={activations}
               revealLayers={showGuide ? revealLayers : undefined}
+              onInspect={showGuide ? inspectMuscle : undefined}
             />
           )}
-          {showGuide && !showBack && <ScaleneHints activations={activations} />}
+          {showGuide && !showBack && (
+            <ScaleneHints activations={activations} onInspect={inspectMuscle} />
+          )}
           <g clipPath="url(#torso-clip)">
             {showGuide || showBack ? null : showField ? (
               reduceMotion ? (
@@ -271,19 +314,21 @@ export function TorsoMap({
                 })}
               </>
             )}
-            {!showBack &&
+            {!showGuide &&
               (Object.keys(PATHS) as CompartmentId[]).map((id) => {
               const mm = sample?.compartments[id].displacementMm ?? 0;
+              const active = readout === id;
               return (
                 <path
                   key={id}
                   d={PATHS[id]}
                   fill="transparent"
-                  stroke={hover === id ? motionStroke(mm, ceiling) : "transparent"}
-                  strokeWidth={hover === id ? 1.6 : 0.75}
+                  stroke={active ? motionStroke(mm, ceiling) : "transparent"}
+                  strokeWidth={active ? 1.6 : 0.75}
                   className="compartment"
                   onMouseEnter={() => setHover(id)}
                   onMouseLeave={() => setHover(null)}
+                  onClick={() => setPinned((p) => (p === id ? null : id))}
                 />
               );
             })}
@@ -298,7 +343,7 @@ export function TorsoMap({
           </g>
         </g>
         {showLandmarks &&
-          !showBack &&
+          !showGuide &&
           LANDMARKS.map((mark) => (
             <g key={mark.id} className="landmark">
               <circle cx={mark.x} cy={mark.y} r="2.1" />
@@ -310,15 +355,20 @@ export function TorsoMap({
       </div>
       <ViewToggle view={view} onChange={onViewChange} />
       <div className="torso-caption">
-        {hover && sample ? (
+        {readout && sample ? (
           <>
-            <strong>{COMPARTMENT_LABELS[hover]}</strong>
-            <span>{sample.compartments[hover].displacementMm.toFixed(1)} mm from rest</span>
+            <strong>{COMPARTMENT_LABELS[readout]}</strong>
+            <span>{sample.compartments[readout].displacementMm.toFixed(1)} mm from rest</span>
+          </>
+        ) : inspected ? (
+          <>
+            <strong>{inspected.label}</strong>
+            <span>{inspected.action}</span>
           </>
         ) : showGuide ? (
           <>
             <strong>Guide · {script.label}{showBack ? " · back" : ""}</strong>
-            <span>A scripted reference loop. G returns to your data. B flips the figure.</span>
+            <span>A scripted reference loop. Tap a muscle to name it. G returns to your data. B flips the figure.</span>
           </>
         ) : showField ? (
           <>
@@ -344,6 +394,7 @@ export function TorsoMap({
               composition={composition}
               onChange={setComposition}
               onAspectHint={setAspect}
+              aspect={aspect}
             />
           )}
           {script.sideCaption && !showBack && <SideInset script={script} phase={phase} />}

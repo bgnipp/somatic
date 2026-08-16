@@ -6,6 +6,7 @@ import { Metrics } from "./components/Metrics";
 import { TorsoMap } from "./components/TorsoMap";
 import { TracePanel } from "./components/TracePanel";
 import { loadStoredView, saveStoredView, type MapView } from "./field/view";
+import { readSearchParam, writeSearchParams } from "./lib/urlState";
 import { MockBreathSource } from "./mock/MockBreathSource";
 import { meanAbdomen, meanRibCage, sampleAt } from "./mock/synthesize";
 import {
@@ -30,9 +31,15 @@ function formatTime(ms: number): string {
   return `${m}:${r.toFixed(1).padStart(4, "0")}`;
 }
 
+function scenarioLabel(session: Session): string {
+  return session.label?.trim()
+    || PRESETS.find((p) => p.id === session.scenario)?.label
+    || session.scenario
+    || session.protocol;
+}
+
 function takeLabel(session: Session): string {
-  const name = PRESETS.find((p) => p.id === session.scenario)?.label ?? session.scenario ?? session.protocol;
-  return `${name} · ${new Date(session.startedAt).toLocaleTimeString()}`;
+  return `${scenarioLabel(session)} · ${new Date(session.startedAt).toLocaleTimeString()}`;
 }
 
 type Phase = "inhale" | "exhale" | "still";
@@ -56,9 +63,15 @@ function breathPhase(history: Sample[]): Phase {
 }
 
 function initialPreset(): PresetId {
-  const q = new URLSearchParams(window.location.search).get("scenario");
+  const q = readSearchParam("scenario");
   if (q && (PRESET_IDS as readonly string[]).includes(q)) return q as PresetId;
   return "abdominal";
+}
+
+function initialView(): MapView {
+  const q = readSearchParam("view");
+  if (q === "field" || q === "guide" || q === "regions") return q;
+  return loadStoredView();
 }
 
 export default function App() {
@@ -76,7 +89,9 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(false);
   const [speed, setSpeed] = useState<0.5 | 1>(1);
-  const [view, setView] = useState<MapView>(loadStoredView);
+  const [view, setView] = useState<MapView>(initialView);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
 
   useEffect(() => {
     saveStoredView(view);
@@ -90,10 +105,8 @@ export default function App() {
 
   useEffect(() => {
     source.current.setPreset(preset);
-    const url = new URL(window.location.href);
-    url.searchParams.set("scenario", preset);
-    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, [preset]);
+    writeSearchParams({ scenario: preset, view });
+  }, [preset, view]);
 
   useEffect(() => {
     if (mode === "replay") {
@@ -219,6 +232,19 @@ export default function App() {
     source.current = new MockBreathSource(preset);
   }
 
+  function renameSession(id: string, label: string) {
+    const trimmed = label.trim();
+    const next = sessions.map((s) =>
+      s.id === id ? { ...s, label: trimmed || undefined } : s,
+    );
+    setSessions(next);
+    saveSessions(next);
+    if (active?.id === id) {
+      setActive(next.find((s) => s.id === id) ?? active);
+    }
+    setEditingId(null);
+  }
+
   function deleteSession(id: string) {
     const next = sessions.filter((s) => s.id !== id);
     setSessions(next);
@@ -254,7 +280,15 @@ export default function App() {
         }
       }
       if (found.length === 0) return;
-      const next = [...found, ...sessions].slice(0, 24);
+      const seen = new Set(sessions.map((s) => s.id));
+      const unique: Session[] = [];
+      for (const session of found) {
+        if (seen.has(session.id)) continue;
+        seen.add(session.id);
+        unique.push(session);
+      }
+      if (unique.length === 0) return;
+      const next = [...unique, ...sessions].slice(0, 24);
       setSessions(next);
       saveSessions(next);
     });
@@ -331,7 +365,7 @@ export default function App() {
             view={view}
             onViewChange={setView}
           />
-          <CrossSection sample={sample} />
+          {view !== "guide" && <CrossSection sample={sample} />}
         </div>
 
         <div className="console">
@@ -499,14 +533,41 @@ export default function App() {
           <ul>
             {sessions.map((s) => (
               <li key={s.id} className="take-row">
-                <button type="button" className="take-open" onClick={() => openSession(s)}>
-                  <strong>
-                    {PRESETS.find((p) => p.id === s.scenario)?.label ?? s.scenario ?? s.protocol}
-                  </strong>
-                  <span>
-                    {new Date(s.startedAt).toLocaleString()} · {(s.durationMs / 1000).toFixed(1)}s
-                    {s.notes ? " · noted" : ""}
-                  </span>
+                {editingId === s.id ? (
+                  <form
+                    className="take-rename-form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      renameSession(s.id, editDraft);
+                    }}
+                  >
+                    <input
+                      autoFocus
+                      value={editDraft}
+                      onChange={(e) => setEditDraft(e.target.value)}
+                      onBlur={() => renameSession(s.id, editDraft)}
+                      aria-label="Take name"
+                    />
+                  </form>
+                ) : (
+                  <button type="button" className="take-open" onClick={() => openSession(s)}>
+                    <strong>{scenarioLabel(s)}</strong>
+                    <span>
+                      {new Date(s.startedAt).toLocaleString()} · {(s.durationMs / 1000).toFixed(1)}s
+                      {s.notes ? " · noted" : ""}
+                    </span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="take-rename"
+                  aria-label="Rename take"
+                  onClick={() => {
+                    setEditingId(s.id);
+                    setEditDraft(scenarioLabel(s));
+                  }}
+                >
+                  ✎
                 </button>
                 <button
                   type="button"

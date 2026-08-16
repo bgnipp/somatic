@@ -1,9 +1,9 @@
 # Improvement pass 2 — findings and queue
 
 *2026-08-16. A general review pass over the live prototype and the codebase: UI
-consistency, bugs, robustness, and small feature opportunities. Nothing here is
-implemented yet — this doc is the queue. The first improvement pass (P0–P3) is
-in `docs/improvement-plan.md`; everything from it that mattered has shipped.*
+consistency, bugs, robustness, and small feature opportunities. The first
+improvement pass (P0–P3) is in `docs/improvement-plan.md`; everything from it
+that mattered has shipped. **E1–E8 implemented the same day.***
 
 ## What was checked and found healthy
 
@@ -40,7 +40,8 @@ places:
    render over the Guide front figure.
    **Fix:** `showLandmarks && !showGuide` instead of `!showBack` only.
 
-All three are a few lines each; do them as one commit.
+**Done.** Cross-section hidden in Guide; hover mm readout and landmark dots
+are measured-view only.
 
 ## E2 — Import robustness (real crash path)
 
@@ -61,6 +62,10 @@ two takes with the same `id` → duplicate React keys in the takes list, and
 - In `importFiles` (App), skip sessions whose `id` already exists in the list
   (imports win nothing over existing state; skipping is the honest behavior).
 
+**Done.** `parseSession` rejects any session whose samples lack a numeric `t`
+or any of the six compartment displacements. Import skips ids already in the
+list (and duplicates within the incoming batch).
+
 ## E3 — Composer loop speed control (`holdMs` is dead state)
 
 `Composition.holdMs` exists, is validated on load (2 000–20 000 ms), and drives
@@ -69,6 +74,8 @@ permanently 6 s. Either wire it or delete it; wiring is more useful:
 
 - A small three-way pill in the ComposerPanel: `Slow (10 s) · Medium (6 s) ·
   Fast (4 s)`, writing `holdMs`. Persistence and compile path already work.
+
+**Done.** Fast / Medium / Slow pill in the Composer writes `holdMs`.
 
 ## E4 — Composer on phones: the action sentences vanish
 
@@ -81,6 +88,8 @@ likely to review on.
 (`-webkit-line-clamp: 2`), or render the sentence under the label at full width
 on narrow screens instead of beside it. Keep rows compact; don't hide content.
 
+**Done.** Narrow layout stacks the row and two-line-clamps the sentence.
+
 ## E5 — Aspect badges on composition chips
 
 Picking a back-only muscle auto-flips the figure, but only at pick time. A
@@ -91,6 +100,9 @@ side."
 **Fix:** on each chip in the engage/release/stabilize lists, render a small
 `front`/`back` badge when the muscle is *not* visible in the current aspect.
 Data is already in the catalog (`aspects`); TorsoMap can pass `aspect` down.
+
+**Done.** Chips whose muscle is not on the current aspect show a `front`/`back`
+badge.
 
 ## E6 — Shareable state via URL params
 
@@ -103,6 +115,10 @@ meaningfully easier if view state did too:
 - Then "look at the supported exhale from the back" is one link in an iMessage
   instead of three instructions.
 
+**Done.** `?view=`, `?script=`, and `?aspect=` read on load (URL wins over
+localStorage) and write on change via `src/lib/urlState.ts`, merging with
+`?scenario=` so writers don't clobber each other.
+
 ## E7 — Muscle inspector in Guide (catalog meets figure)
 
 The catalog has a label + action sentence for all 17 muscles, but the figure
@@ -113,6 +129,9 @@ name and action sentence in the caption slot (which E1 frees up in Guide view).
   swap on click. No new layout.
 - This also gives the back figure — currently unlabeled schematic shapes — a
   way to teach what each column *is*.
+
+**Done.** Tapping a muscle group (front or back) swaps the Guide caption to
+its catalog label + action. Tap again to clear.
 
 ## E8 — Smaller items (grab-bag, do opportunistically)
 
@@ -131,6 +150,12 @@ name and action sentence in the caption slot (which E1 frees up in Guide view).
   tap-to-rename on the take label would help once more than ~5 takes exist.
 - **Composer region-open state** resets on reload (all but Core collapse).
   Persist `open` next to the composition if it grates.
+
+**Done.** Aspect is only persisted while Guide is open (leaving Guide no
+longer overwrites storage with `front`). Compartment paths pin on tap for
+touch. Konno–Mead draws a direction arrow at the live tip. Takes have a
+rename control (`Session.label`). Composer region-open state persists
+(`somatic.composerOpen.v1`).
 
 ## Suggested order
 
