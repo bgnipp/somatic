@@ -45,6 +45,13 @@
 | **Physician review of the back figure and composer** | `docs/muscle-catalog-composer-plan.md` §Open questions | Schematic back roster + select-order-as-light-order shipped; her eye decides grouping, art, and whether onsets should become editable |
 | **Ask her open question 8: scapular anchoring vs. "traps and rhomboids relax"** | `docs/breath-animation-plan.md` §Open questions | Gates the rhomboid stabilizer curve in D1; the rest of D1 doesn't wait on it |
 
+## Remaining — agent work, gated (plan exists)
+
+| Work | Plan doc | Gate |
+|---|---|---|
+| **P2-a — Webcam capture spike** (`CameraBreathSource` behind the existing `BreathSource` interface; profile-view optical flow, relative units, baseline/sway handling) | `docs/capture-plan.md` | Formally the therapist success-gate session; $0 cost, so starting early is a risk decision the user can make |
+| **P2-b — Markers + mm calibration**, **P2-c — depth camera** | `docs/capture-plan.md` | P2-a results + hardware decisions (human) |
+
 ## Remaining — agent work, blocked
 
 | Work | Blocked on | Plan doc |
